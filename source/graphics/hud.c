@@ -99,12 +99,6 @@ void draw_editor_hud() {
     vram_put(HUD_TILE_EDITOR_INFO+16);
     vram_put(HUD_TILE_EDITOR_INFO+17);
 
-    // FIXME: how the heck do we handle attrs?
-    /*vram_adr(NAMETABLE_A + HUD_POSITION_START + HUD_EDITOR_TITLE_START);
-    for (i = 0; i != strlen(gameName); ++i) {
-        vram_put(gameName[i] - 0x32);
-    }*/
-
 }
 
 void update_hud() {

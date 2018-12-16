@@ -486,7 +486,6 @@ void handle_player_sprite_collision() {
 void handle_editor_input() {
     if (pad_trigger(0) & PAD_SELECT) {
         if (editorSelectedTileId == 7) { // End of regular tiles
-            // FIXME Constants what on earth???
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
             editorSelectedTileId = TILE_EDITOR_POSITION_INFO;
@@ -497,7 +496,6 @@ void handle_editor_input() {
         }
     }
 
-    // FIXME: Constants
     if (!movementInProgress) {
         if (pad_state(0) & PAD_A) {
             currentMap[playerGridPosition] = editorSelectedTileId;
