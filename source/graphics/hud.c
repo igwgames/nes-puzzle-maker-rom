@@ -1,10 +1,18 @@
 #include "source/neslib_asm/neslib.h"
 #include "source/graphics/hud.h"
+#include "source/map/map.h"
+#include "source/menus/text_helpers.h"
+#include "source/configuration/game_info.h"
 #include "source/globals.h"
 
 CODE_BANK(PRG_BANK_HUD);
 
+ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
+
+#define tempTileId tempChar1
+
 void draw_hud() {
+    // FIXME: Show game name here, assuming it's loaded.
     vram_adr(NAMETABLE_A + HUD_POSITION_START);
     for (i = 0; i != 160; ++i) {
         vram_put(HUD_TILE_BLANK);
@@ -21,13 +29,78 @@ void draw_hud() {
     }
 }
 
+void put_hud_str(unsigned int adr, const char* str) {
+	vram_adr(adr);
+	while(1) {
+		if(!*str) break;
+		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
+	}
+}
+
+void draw_editor_hud() {
+    vram_adr(NAMETABLE_A + HUD_POSITION_START);
+    for (i = 0; i != 160; ++i) {
+        vram_put(HUD_TILE_BLANK);
+    }
+    vram_put(HUD_TILE_BORDER_BL);
+    for (i = 0; i != 30; ++i) {
+        vram_put(HUD_TILE_BORDER_HORIZONTAL);
+    }
+    vram_put(HUD_TILE_BORDER_BR);
+
+    vram_adr(NAMETABLE_A + HUD_ATTRS_START);
+    for (i = 0; i != 16; ++i) {
+        vram_put(0xff);
+    }
+
+    put_hud_str(NAMETABLE_A + HUD_EDITOR_TITLE_START, "Objects       Player Info");
+
+    vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START);
+    for (i = 0; i != 8; ++i) {
+        tempTileId = currentMapTileData[i << 2];
+        vram_put(tempTileId++);
+        vram_put(tempTileId);
+    }
+
+    // FIXME: Correct palette Id?
+    oam_spr(176, 15, HUD_PLAYER_SPRITE_ID, 0x00, HUD_PLAYER_SPRITE_OAM);
+    oam_spr(184, 15, HUD_PLAYER_SPRITE_ID+1, 0x00, HUD_PLAYER_SPRITE_OAM+4);
+    oam_spr(176, 23, HUD_PLAYER_SPRITE_ID+16, 0x00, HUD_PLAYER_SPRITE_OAM+8);
+    oam_spr(184, 23, HUD_PLAYER_SPRITE_ID+17, 0x00, HUD_PLAYER_SPRITE_OAM+12);
+
+
+    vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START + 32);
+    for (i = 0; i != 8; ++i) {
+        tempTileId = currentMapTileData[i << 2] + 16;
+        vram_put(tempTileId++);
+        vram_put(tempTileId);
+    }
+
+    // Info Icon
+    vram_adr(NAMETABLE_A + HUD_INFO_ICON_START);
+    vram_put(HUD_TILE_EDITOR_INFO);
+    vram_put(HUD_TILE_EDITOR_INFO+1);
+    vram_adr(NAMETABLE_A + HUD_INFO_ICON_START + 32);
+    vram_put(HUD_TILE_EDITOR_INFO+16);
+    vram_put(HUD_TILE_EDITOR_INFO+17);
+
+    // FIXME: how the heck do we handle attrs?
+    /*vram_adr(NAMETABLE_A + HUD_POSITION_START + HUD_EDITOR_TITLE_START);
+    for (i = 0; i != strlen(gameName); ++i) {
+        vram_put(gameName[i] - 0x32);
+    }*/
+
+}
+
 void update_hud() {
     // This sets up screenBuffer to print x hearts, then x more empty hearts. 
     // You give it the address, tell it the direction to write, then follow up with
     // Ids, ending with NT_UPD_EOF
+    // FIXME: Axe this completely? Or make it useful somehow.
     
     // We use i for the index on screen buffer, so we don't have to shift things around
     // as we add values. 
+    /*
     i = 0;
     screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
     screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
@@ -50,6 +123,17 @@ void update_hud() {
 
 
     screenBuffer[i++] = NT_UPD_EOF;
-    set_vram_update(screenBuffer);
+    set_vram_update(screenBuffer);*/
+
+}
+
+void update_editor_hud() {
+
+    tempTileId = HUD_EDITOR_TILES_SPRITE_START + (editorSelectedTileId << 4);
+
+    oam_spr(tempTileId, 15, HUD_SELECTOR_SPRITE_ID, 0x00, HUD_SELECTOR_SPRITE_OAM);
+    oam_spr(tempTileId+8, 15, HUD_SELECTOR_SPRITE_ID+1, 0x00, HUD_SELECTOR_SPRITE_OAM+4);
+    oam_spr(tempTileId, 23, HUD_SELECTOR_SPRITE_ID+16, 0x00, HUD_SELECTOR_SPRITE_OAM+8);
+    oam_spr(tempTileId+8, 23, HUD_SELECTOR_SPRITE_ID+17, 0x00, HUD_SELECTOR_SPRITE_OAM+12);
 
 }

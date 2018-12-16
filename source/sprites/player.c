@@ -17,8 +17,11 @@ CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 // Some useful global variables
 ZEROPAGE_DEF(int, playerXPosition);
 ZEROPAGE_DEF(int, playerYPosition);
+// FIXME: axe
 ZEROPAGE_DEF(int, playerXVelocity);
 ZEROPAGE_DEF(int, playerYVelocity);
+ZEROPAGE_DEF(unsigned char, playerGridPosition);
+ZEROPAGE_DEF(unsigned char, movementInProgress);
 ZEROPAGE_DEF(unsigned char, playerControlsLockTime);
 ZEROPAGE_DEF(unsigned char, playerInvulnerabilityTime);
 ZEROPAGE_DEF(unsigned char, playerDirection);
@@ -38,6 +41,7 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 #define collisionTempXInt tempInt3
 #define collisionTempYInt tempInt4
 
+// TODO: axe all text communication stuff.
  const unsigned char* introductionText = 
                                 "Welcome to nes-starter-kit! I " 
                                 "am an NPC.                    "
@@ -53,6 +57,11 @@ const unsigned char* movedText =
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
 void update_player_sprite() {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
+    // FIXME: Space to space animations plox
+    rawXPosition = (PLAY_AREA_LEFT + ((playerGridPosition & 0x07) << 4));
+    rawYPosition = (PLAY_AREA_TOP + ((playerGridPosition & 0x38) << 1));
+    rawTileId = PLAYER_SPRITE_TILE_ID;
+    /*
     rawXPosition = (playerXPosition >> PLAYER_POSITION_SHIFT);
     rawYPosition = (playerYPosition >> PLAYER_POSITION_SHIFT);
     rawTileId = PLAYER_SPRITE_TILE_ID + playerDirection;
@@ -61,7 +70,7 @@ void update_player_sprite() {
         // Does some math with the current NES frame to add either 2 or 0 to the tile id, animating the sprite.
         rawTileId += ((frameCount >> SPRITE_ANIMATION_SPEED_DIVISOR) & 0x01) << 1;
     }
-    
+    */
     if (playerInvulnerabilityTime && frameCount & PLAYER_INVULNERABILITY_BLINK_MASK) {
         // If the player is invulnerable, we hide their sprite about half the time to do a flicker animation.
         oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
@@ -79,8 +88,46 @@ void update_player_sprite() {
 }
 
 void handle_player_movement() {
+    lastControllerState = controllerState;
+    controllerState = pad_poll(0);
+
+    // If Start is pressed now, and was not pressed before...
+    if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+        gameState = GAME_STATE_PAUSED;
+        return;
+    }
+
+    if (movementInProgress) {
+        // One input at a time, bud...
+        --movementInProgress;
+        return;
+    }
+    
+    rawTileId = playerGridPosition;
+
+    if (controllerState & PAD_LEFT && (rawTileId & 0x07) != 0) {
+        rawTileId--;
+    } else if (controllerState & PAD_RIGHT && (rawTileId & 0x07) != 7) {
+        rawTileId++;
+    } else if (controllerState & PAD_UP && (rawTileId & 0x38) != 0) {
+        rawTileId -= 8;
+    } else if (controllerState & PAD_DOWN && (rawTileId & 0x38) != 0x38) {
+        rawTileId += 8;
+    }
+
+    if (rawTileId == playerGridPosition) {
+        // Ya didn't move...
+        return; 
+    }
+
+    movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+    // FIXME: Collision testing
+    playerGridPosition = rawTileId;
+
+
     // Using a variable, so we can change the velocity based on pressing a button, having a special item,
     // or whatever you like!
+    /*
     int maxVelocity = PLAYER_MAX_VELOCITY;
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
@@ -188,7 +235,7 @@ void handle_player_movement() {
             gameState = GAME_STATE_SCREEN_SCROLL;
             playerOverworldPosition -= 8;
         }
-    }
+    }*/
 
 }
 
@@ -289,6 +336,7 @@ void test_player_tile_collision() {
 
 #define currentMapSpriteIndex tempChar1
 void handle_player_sprite_collision() {
+    /*
     // We store the last sprite hit when we update the sprites in `map_sprites.c`, so here all we have to do is react to it.
     if (lastPlayerSpriteCollisionId != NO_SPRITE_HIT) {
         currentMapSpriteIndex = lastPlayerSpriteCollisionId<<MAP_SPRITE_DATA_SHIFT;
@@ -432,5 +480,5 @@ void handle_player_sprite_collision() {
 
         }
 
-    }
+    }*/
 }

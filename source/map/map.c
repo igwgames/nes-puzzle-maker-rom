@@ -19,16 +19,19 @@ ZEROPAGE_DEF(unsigned char, playerOverworldPosition);
 ZEROPAGE_DEF(int, xScrollPosition);
 ZEROPAGE_DEF(int, yScrollPosition);
 
-unsigned char currentMap[256];
+unsigned char currentMap[64];
 
 unsigned char assetTable[0x38];
 
 unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];
+unsigned char currentMapTileData[32];
 
-unsigned char currentMapSpritePersistance[64];
+// unsigned char currentMapSpritePersistance[64];
 
 unsigned char mapScreenBuffer[0x55];
 
+
+// FIXME: Need almost none of this file
 
 void init_map() {
     // Make sure we're looking at the right sprite and chr data, not the ones for the menu.
@@ -53,6 +56,8 @@ void init_map() {
 
 // Load the sprites from the current map
 void load_sprites() {
+    // Do nothing; part of map.
+    /*
     for (i = 0; i != MAP_MAX_SPRITES; ++i) {
         // Each sprite has just 2 bytes stored. The first is the location, and the 2nd is the sprite id in spriteDefinitions.
         spriteDefinitionIndex = currentMap[(MAP_DATA_TILE_LENGTH + 1) + (i<<1)]<<SPRITE_DEF_SHIFT;
@@ -91,6 +96,7 @@ void load_sprites() {
             currentMapSpriteData[mapSpriteDataIndex + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
         }
     }
+    */
 }
 
 // Clears the asset table. Set containsHud to 1 to set the HUD bytes to use palette 4 (will break the coloring logic if you use the
@@ -108,6 +114,7 @@ void clear_asset_table(containsHud) {
 
 // Clears the asset table like we do above, but leaves the first row (top *half* of the asset table) blank.
 // Used for proper scrolling animation, since we end up flip-flopping on which row we're on during the scrolling up animation.
+// TODO: Axe if not needed
 void clear_asset_table_skip_top() {
     clear_asset_table(0);
     return;
@@ -143,12 +150,12 @@ void load_palette_to_map_screen_buffer(int attributeTableAdr) {
     mapScreenBuffer[tempArrayIndex++] = NT_UPD_EOF;
 }
 
-        // Now based on where we are in the map, shift them appropriately.
-        // This builds up the palette bytes - which comprise of 2 bits per 16x16 tile. It's a bit confusing...
+// Now based on where we are in the map, shift them appropriately.
+// This builds up the palette bytes - which comprise of 2 bits per 16x16 tile. It's a bit confusing...
 void update_asset_table_based_on_current_value(unsigned char reverseAttributes) {
     if ((i & 0x01) == 0) {
         // Even/left
-        if (((i >> 4) & 0x01) == reverseAttributes) {
+        if (((i >> 3) & 0x01) == reverseAttributes) {
             // top
             currentValue >>= 6;
         } else {
@@ -157,7 +164,7 @@ void update_asset_table_based_on_current_value(unsigned char reverseAttributes) 
         }
     } else {
         // Odd/right
-        if (((i >> 4) & 0x01) == reverseAttributes) {
+        if (((i >> 3) & 0x01) == reverseAttributes) {
             // Top
             currentValue >>= 4;
         } else {
@@ -183,25 +190,39 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
 
     // Prepare to draw on the first nametable
     set_vram_update(NULL);
+    clear_asset_table(0);
     bufferIndex = 0;
+    for (i = 0; i != 0x55; ++i) {
+        // FIXME: Probably wanna make this a constant, and put it in a known place.
+        mapScreenBuffer[i] = 0xe2;
+    }
 
     if (!reverseAttributes) {
-        j = -1;
+        // j = -1;
+        // j = 7;
+        // j = 9;
+        j = 9;
     } else {
+        // j = 7;
+        // j = 15;
+        // j = 17;
         j = 7;
     }
     tempArrayIndex = NAMETABLE_UPDATE_PREFIX_LENGTH;
-    for (i = 0; i != 192; ++i) {
+    for (i = 0; i != 64; ++i) {
+        /*
          // The top 2 bytes of map data are palette data. Skip that for now.
         currentValue = currentMap[i] & 0x3f;
         // This bumps the tile id up from the id for a 16x16 tile to an 8x8 tile on the real map
         currentValue = (((currentValue & 0xf8)) << 2) + ((currentValue & 0x07) << 1);
+        */
+        // Look up tile id from our lookup table based on the id in the map - the data stored in currentMap is aleady an array index, so just shift to what we wanna look up.
+        currentValue = currentMapTileData[currentMap[i]+TILE_DATA_LOOKUP_OFFSET_ID];
 
         if (bufferIndex == 0) {
-            currentMemoryLocation = nametableAdr +  ((i & 0xf0) << 2) + ((i % 16) << 1);
+            // FIXME: Constant would be good here (8 is the number of tiles over from the lefthand side, 64 is one 16x16 row of tiles)
+            currentMemoryLocation = nametableAdr + 8 + 128 + ((i & 0x38) << 3) + ((i & 0x07) << 1);
         }
-
-        
 
         mapScreenBuffer[tempArrayIndex] = currentValue;
         mapScreenBuffer[tempArrayIndex + 1] = currentValue + 1;
@@ -210,11 +231,15 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
 
         // okay, now we have to update the byte for palettes. This is going to look a bit messy...
         // Start with the top 2 bytes
-        currentValue = currentMap[i] & 0xc0;
+        currentValue = (currentMapTileData[currentMap[i] + TILE_DATA_LOOKUP_OFFSET_PALETTE]) << 6;
 
         // Update where we are going to update with the palette data, which we store in the buffer.
-        if ((i & 0x1f) == (reverseAttributes ? 0 : 16)) 
-			j -= 8;
+        // TODO: This def needs some help, but my brain's not ready for that
+        // Flip it every other row, since attribute tables are 32x32, not 16x16
+        if ((i % 16) == 8) 
+			j -= 4;
+        else if ((i % 8) == 0 && i != 0) 
+            j += 4;
 		if ((i & 0x01) == 0) 
 			j++;
 
@@ -225,7 +250,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
         // Every 16 frames, write the buffered data to the screen and start anew.
         ++bufferIndex;
         tempArrayIndex += 2;
-        if (bufferIndex == 16) {
+        if (bufferIndex == 8) {
             bufferIndex = 0;
             tempArrayIndex = NAMETABLE_UPDATE_PREFIX_LENGTH;
             // Bunch of messy-looking stuff that tells neslib where to write this to the nametable, and how.
@@ -242,6 +267,58 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
 
         }
     }
+    // Clear the rest of the screen... one row at a time.
+    // 64 tiles in one row.
+    for (j = 0; j != 3; ++j) {
+        currentMemoryLocation += 64;
+        for (i = 0; i != 0x55; ++i) {
+            // FIXME: Probably wanna make this a constant, and put it in a known place.
+            mapScreenBuffer[i] = 0xe2;
+        }
+        mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+        mapScreenBuffer[1] = LSB(currentMemoryLocation);
+        mapScreenBuffer[2] = 65;
+        mapScreenBuffer[64 + NAMETABLE_UPDATE_PREFIX_LENGTH + 1] = NT_UPD_EOF;
+        set_vram_update(mapScreenBuffer);
+        ppu_wait_nmi();
+        if (xScrollPosition != -1) {
+            split_y(xScrollPosition, yScrollPosition);
+        }
+        set_vram_update(NULL);
+    }
+
+    // Very first rows too
+    // TODO: This code is duplicated a lot... probably makes sense to toss to a function.
+    currentMemoryLocation = nametableAdr;
+    for (j = 0; j != 2; ++j) {
+
+        mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+        mapScreenBuffer[1] = LSB(currentMemoryLocation);
+        mapScreenBuffer[2] = 65;
+        mapScreenBuffer[64 + NAMETABLE_UPDATE_PREFIX_LENGTH + 1] = NT_UPD_EOF;
+        set_vram_update(mapScreenBuffer);
+        ppu_wait_nmi();
+        if (xScrollPosition != -1) {
+            split_y(xScrollPosition, yScrollPosition);
+        }
+        set_vram_update(NULL);
+        currentMemoryLocation += 64;
+    }
+
+    // Okay, one last blip for right before the map starts.
+    mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+    mapScreenBuffer[1] = LSB(currentMemoryLocation);
+    mapScreenBuffer[2] = 8;
+    mapScreenBuffer[7 + NAMETABLE_UPDATE_PREFIX_LENGTH + 1] = NT_UPD_EOF;
+    set_vram_update(mapScreenBuffer);
+    ppu_wait_nmi();
+    if (xScrollPosition != -1) {
+        split_y(xScrollPosition, yScrollPosition);
+    }
+    set_vram_update(NULL);
+
+
+
     // Draw the palette that we built up above.
     // Start by copying it into mapScreenBuffer, so we can tell neslib where this lives.
     for (i = 0; i != 0x38; ++i) {
@@ -261,6 +338,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     
 }
 
+/*
 // Draw a row (technically two rows) of tiles onto the map. Breaks things up so we can hide
 // the change behind the HUD while continuing to use vertical mirroring.
 // This basically is the draw_current_map_to_nametable logic, but it stops after 32. 
@@ -464,6 +542,7 @@ void draw_current_row_palette_only(int attributeTableAdr) {
     }
 
 }
+*/
 
 void draw_current_map_to_a() {
     clear_asset_table(1);
@@ -524,6 +603,8 @@ void do_fade_screen_transition() {
 }
 
 // Use a scrolling animation to move the player to the next screen.
+// FIXME: Rewrite
+/*
 void do_scroll_screen_transition() {
     // First, draw the next tile onto b
     xScrollPosition = -1;
@@ -705,3 +786,4 @@ void do_scroll_screen_transition() {
     gameState = GAME_STATE_RUNNING;
 
 }
+*/

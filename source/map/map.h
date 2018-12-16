@@ -58,7 +58,7 @@
 #define MAP_DATA_TILE_LENGTH 192
 
 // The current map; usable for collisions/etc
-extern unsigned char currentMap[256];
+extern unsigned char currentMap[64];
 
 // Supporting data for sprites; 16 bytes per sprite. Look at the sprite loader function in `map.h` (or the guide) for more details.
 extern unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];
@@ -70,6 +70,9 @@ extern unsigned char currentMapSpritePersistance[64];
 
 // The player's position on the world map. 0-7 are first row, 8-15 are 2nd, etc...
 ZEROPAGE_EXTERN(unsigned char, playerOverworldPosition);
+
+// Stores information about the current available tiles for the map/game. 8 tiles, 4 bytes per.. 32 bytes total.
+extern unsigned char currentMapTileData[32];
 
 // Load the sprites from the current map into currentMapSpriteData, and the sprite list.
 void load_sprites();
@@ -91,3 +94,19 @@ void do_fade_screen_transition();
 
 // Defines world ids we use, which are also PRG bank ids to save storage and simplify code.
 #define WORLD_OVERWORLD PRG_BANK_MAP_OVERWORLD
+
+// Handles collisions of all sorts in this engine.
+#define TILE_COLLISION_WALKABLE 0
+#define TILE_COLLISION_SOLID 1
+#define TILE_COLLISION_HOLE 2
+#define TILE_COLLISION_GAP 3
+#define TILE_COLLISION_CRATE 4
+#define TILE_COLLISION_COLLECTABLE 5
+#define TILE_COLLISION_UNUSED 6
+#define TILE_COLLISION_LEVEL_END 7
+
+#define TILE_DATA_LOOKUP_OFFSET_ID 0
+#define TILE_DATA_LOOKUP_OFFSET_PALETTE 1
+#define TILE_DATA_LOOKUP_OFFSET_COLLISION 2
+// NOTE: Currently unused; rename if use
+#define TILE_DATA_LOOKUP_OFFSET_EXTRA 3

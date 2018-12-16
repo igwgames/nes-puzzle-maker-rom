@@ -14,6 +14,11 @@
 #define PLAYER_X_OFFSET_EXTENDED 28
 #define PLAYER_Y_OFFSET_EXTENDED 16
 
+#define PLAY_AREA_TOP 80
+#define PLAY_AREA_LEFT 64
+
+#define PLAYER_TILE_MOVE_FRAMES 10
+
 // We store extra detail about the player's position to make movement smoother. This is how much to shift
 // by to get to the real location. (Think about this as dividing by 2^(this number))
 #define PLAYER_POSITION_SHIFT 4
@@ -36,6 +41,8 @@ ZEROPAGE_EXTERN(int, playerYPosition);
 ZEROPAGE_EXTERN(int, playerXVelocity);
 ZEROPAGE_EXTERN(int, playerYVelocity);
 ZEROPAGE_EXTERN(unsigned char, playerDirection);
+ZEROPAGE_EXTERN(unsigned char, playerGridPosition);
+ZEROPAGE_EXTERN(unsigned char, movementInProgress);
 
 // Helper macro to convert the player's X and Y position into a position on the map
 #define PLAYER_MAP_POSITION(xPos, yPos) (xPos>>4) + (yPos & 0xf0)

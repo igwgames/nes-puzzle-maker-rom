@@ -21,6 +21,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/sprites/sprite_definitions.h"
 #include "source/menus/input_helpers.h"
 #include "source/menus/game_over.h"
+#include "source/game_data/game_data.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -37,6 +38,9 @@ void initialize_variables() {
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
     currentWorldId = WORLD_OVERWORLD; // The ID of the world to load.
+
+    movementInProgress = 0;
+    playerGridPosition = 0;
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
@@ -95,12 +99,107 @@ void main() {
                 banked_call(PRG_BANK_PLAYER_SPRITE, handle_player_movement);
                 banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
                 break;
+            case GAME_STATE_EDITOR_INIT:
+
+                // FIXME: Interface to save/load games, rather than this...
+                unload_editor_game();
+
+                music_stop();
+                fade_out();
+                load_map();
+
+                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
+                banked_call(PRG_BANK_MAP_LOGIC, init_map);
+
+                // FIXME: create a real variable
+                tempChar2 = 0;
+    
+                // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
+                ppu_off();
+                banked_call(PRG_BANK_HUD, draw_editor_hud);
+                ppu_on_all();
+
+                // TODO: Load up game music for this map
+
+                fade_in();
+                gameState = GAME_STATE_EDITOR;
+                break;
+            case GAME_STATE_EDITOR:
+                // FIXME
+                
+                // FIXME This too
+                if (pad_trigger(0) & PAD_SELECT) {
+                    if (editorSelectedTileId == 7) {
+                        // FIXME Constants what on earth???
+                        editorSelectedTileId = 10;
+                    } else if (editorSelectedTileId == 10) {
+                        editorSelectedTileId = 13;
+                    } else if (editorSelectedTileId == 13) {
+                        editorSelectedTileId = 0;
+                    } else {
+                        ++editorSelectedTileId;
+                    }
+                }
+
+                // FIXME: Constants, and move this somewhere sane
+                if (!movementInProgress) {
+                    if (pad_state(0) & PAD_RIGHT) {
+                        if ((tempChar2 & 0x07) == 0x07) {
+                            tempChar2 -= 7;
+                        } else {
+                            tempChar2++;
+                        }
+                        movementInProgress = 10; // FIXME: Constant plox
+                    }
+                    if (pad_state(0) & PAD_LEFT) {
+                        if ((tempChar2 & 0x07) == 0x00) {
+                            tempChar2 += 7;
+                        } else {
+                            tempChar2--;
+                        }
+                        movementInProgress = 10; // FIXME: Constant plox
+                    }
+
+                    if (pad_state(0) & PAD_UP) {
+                        if ((tempChar2 & 0x38) == 0x00) {
+                            tempChar2 += 56;
+                        } else {
+                            tempChar2 -= 8;
+                        }
+                        movementInProgress = 10; // FIXME: Constant plox
+                    } 
+
+                    if (pad_state(0) & PAD_DOWN) {
+                        if ((tempChar2 & 0x38) == 0x38) {
+                            tempChar2 -= 56;
+                        } else {
+                            tempChar2 += 8;
+                        }
+                        movementInProgress = 10; // FIXME: Constant plox
+
+                    }
+
+
+                } else {
+                    movementInProgress--;
+                }
+                tempChar3 = (64 + ((tempChar2 & 0x07)<<4));
+                tempChar4 = (80 + ((tempChar2 & 0x38)<<1));
+                oam_spr(tempChar3, tempChar4, 0xe2, 0x00, 0xd0);
+                oam_spr(tempChar3+8, tempChar4, 0xe2+1, 0x00, 0xd0+4);
+                oam_spr(tempChar3, tempChar4+8, 0xe2+16, 0x00, 0xd0+8);
+                oam_spr(tempChar3+8, tempChar4+8, 0xe2+17, 0x00, 0xd0+12);
+
+                banked_call(PRG_BANK_HUD, update_editor_hud);
+
+                break;
             case GAME_STATE_SCREEN_SCROLL:
                 // Hide all non-player sprites in play, so we have an empty screen to add new ones to
                 oam_hide_rest(FIRST_ENEMY_SPRITE_OAM_INDEX);
 
                 // If you don't like the screen scrolling transition, you can replace the transition with `do_fade_screen_transition`
-                banked_call(PRG_BANK_MAP_LOGIC, do_scroll_screen_transition);
+                // banked_call(PRG_BANK_MAP_LOGIC, do_scroll_screen_transition);
+                banked_call(PRG_BANK_MAP_LOGIC, do_fade_screen_transition);
                 break;
             case GAME_STATE_SHOWING_TEXT:
                 banked_call(PRG_BANK_GAME_TEXT, draw_game_text);
