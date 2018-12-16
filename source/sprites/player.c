@@ -482,3 +482,74 @@ void handle_player_sprite_collision() {
 
     }*/
 }
+
+void handle_editor_input() {
+    if (pad_trigger(0) & PAD_SELECT) {
+        if (editorSelectedTileId == 7) { // End of regular tiles
+            // FIXME Constants what on earth???
+            editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
+        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
+            editorSelectedTileId = TILE_EDITOR_POSITION_INFO;
+        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_INFO) {
+            editorSelectedTileId = 0;
+        } else {
+            ++editorSelectedTileId;
+        }
+    }
+
+    // FIXME: Constants
+    if (!movementInProgress) {
+        if (pad_state(0) & PAD_A) {
+            currentMap[playerGridPosition] = editorSelectedTileId;
+
+            // Pseudocode: find position, calculate nametable pos based on map x+y, MSB should be trustworthy for all 4 tiles, LSB math is basic
+            // Don't forget palettes...
+            banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
+        } else {
+            if (pad_state(0) & PAD_RIGHT) {
+                if ((playerGridPosition & 0x07) == 0x07) {
+                    playerGridPosition -= 7;
+                } else {
+                    playerGridPosition++;
+                }
+                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+            }
+            if (pad_state(0) & PAD_LEFT) {
+                if ((playerGridPosition & 0x07) == 0x00) {
+                    playerGridPosition += 7;
+                } else {
+                    playerGridPosition--;
+                }
+                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+            }
+
+            if (pad_state(0) & PAD_UP) {
+                if ((playerGridPosition & 0x38) == 0x00) {
+                    playerGridPosition += 56;
+                } else {
+                    playerGridPosition -= 8;
+                }
+                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+            } 
+
+            if (pad_state(0) & PAD_DOWN) {
+                if ((playerGridPosition & 0x38) == 0x38) {
+                    playerGridPosition -= 56;
+                } else {
+                    playerGridPosition += 8;
+                }
+                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+            }
+        }
+
+
+    } else {
+        movementInProgress--;
+    }
+    rawXPosition = (64 + ((playerGridPosition & 0x07)<<4));
+    rawYPosition = (80 + ((playerGridPosition & 0x38)<<1));
+    oam_spr(rawXPosition, rawYPosition, 0xe2, 0x00, 0xd0);
+    oam_spr(rawXPosition+8, rawYPosition, 0xe2+1, 0x00, 0xd0+4);
+    oam_spr(rawXPosition, rawYPosition+8, 0xe2+16, 0x00, 0xd0+8);
+    oam_spr(rawXPosition+8, rawYPosition+8, 0xe2+17, 0x00, 0xd0+12);
+}

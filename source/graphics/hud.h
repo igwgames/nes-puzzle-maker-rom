@@ -5,11 +5,11 @@
 #define HUD_HEART_START 0x0361
 #define HUD_KEY_START 0x037d
 #define HUD_ATTRS_START 0x03f0
-#define HUD_EDITOR_TITLE_START 0x0386
-#define HUD_EDITOR_TILES_START 0x342
+#define HUD_EDITOR_TITLE_START 0x0380
+#define HUD_EDITOR_TILES_START 0x344
 #define HUD_INFO_ICON_START 0x035c
 
-#define HUD_EDITOR_TILES_SPRITE_START 0x10
+#define HUD_EDITOR_TILES_SPRITE_START 0x20
 
 #define HUD_TILE_HEART 0xe7
 #define HUD_TILE_HEART_EMPTY 0xe9
@@ -42,3 +42,6 @@ void draw_editor_hud();
 void update_hud();
 
 void update_editor_hud();
+
+// Draw a string using hud characters...
+void put_hud_str(unsigned int adr, const char* str);

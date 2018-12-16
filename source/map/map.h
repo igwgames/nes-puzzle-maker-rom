@@ -92,6 +92,12 @@ void do_scroll_screen_transition();
 // Take the value of playerOverworldPosition, and transition onto that screen with a fade animation.
 void do_fade_screen_transition();
 
+// Based on the current position and tile, update the map and the attribute table
+void update_editor_map_tile();
+
+// Adds some color text around the editor map - current map id, etc
+void draw_editor_help();
+
 // Defines world ids we use, which are also PRG bank ids to save storage and simplify code.
 #define WORLD_OVERWORLD PRG_BANK_MAP_OVERWORLD
 
@@ -110,3 +116,8 @@ void do_fade_screen_transition();
 #define TILE_DATA_LOOKUP_OFFSET_COLLISION 2
 // NOTE: Currently unused; rename if use
 #define TILE_DATA_LOOKUP_OFFSET_EXTRA 3
+
+#define TILE_EDITOR_POSITION_INFO 12
+#define TILE_EDITOR_POSITION_PLAYER 10
+
+#define MAPS_IN_GAME 8

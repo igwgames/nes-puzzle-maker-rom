@@ -53,7 +53,7 @@ void draw_editor_hud() {
         vram_put(0xff);
     }
 
-    put_hud_str(NAMETABLE_A + HUD_EDITOR_TITLE_START, "Objects       Player Info");
+    put_hud_str(NAMETABLE_A + HUD_EDITOR_TITLE_START, " <        Objects     Player  >");
 
     vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START);
     for (i = 0; i != 8; ++i) {
@@ -62,11 +62,26 @@ void draw_editor_hud() {
         vram_put(tempTileId);
     }
 
+    // Fixing palette ids
+    vram_adr(NAMETABLE_A + 0x3f1);
+    for (i = 0; i != 4; ++i) {
+        // Get second tile's id first, then shift it two and add the first
+        tempTileId = currentMapTileData[(i << 3) + TILE_DATA_LOOKUP_OFFSET_PALETTE + 4];
+        tempTileId <<= 2;
+        tempTileId |= currentMapTileData[(i << 3) + TILE_DATA_LOOKUP_OFFSET_PALETTE];
+        // Leave other two palettes alone
+        tempTileId <<= 4;
+        tempTileId |= 0x0f;
+        vram_put(tempTileId);
+    }
+
+
+
     // FIXME: Correct palette Id?
-    oam_spr(176, 15, HUD_PLAYER_SPRITE_ID, 0x00, HUD_PLAYER_SPRITE_OAM);
-    oam_spr(184, 15, HUD_PLAYER_SPRITE_ID+1, 0x00, HUD_PLAYER_SPRITE_OAM+4);
-    oam_spr(176, 23, HUD_PLAYER_SPRITE_ID+16, 0x00, HUD_PLAYER_SPRITE_OAM+8);
-    oam_spr(184, 23, HUD_PLAYER_SPRITE_ID+17, 0x00, HUD_PLAYER_SPRITE_OAM+12);
+    oam_spr(192, 15, HUD_PLAYER_SPRITE_ID, 0x00, HUD_PLAYER_SPRITE_OAM);
+    oam_spr(200, 15, HUD_PLAYER_SPRITE_ID+1, 0x00, HUD_PLAYER_SPRITE_OAM+4);
+    oam_spr(192, 23, HUD_PLAYER_SPRITE_ID+16, 0x00, HUD_PLAYER_SPRITE_OAM+8);
+    oam_spr(200, 23, HUD_PLAYER_SPRITE_ID+17, 0x00, HUD_PLAYER_SPRITE_OAM+12);
 
 
     vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START + 32);

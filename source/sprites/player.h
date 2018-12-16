@@ -58,3 +58,6 @@ void test_player_tile_collision();
 
 // The sprite update method gives us an id of a sprite that we most recently hit. This reacts to that appropriately.
 void handle_player_sprite_collision();
+
+// Handle all input done on the map editor. (Probably should be somewhere else, but this is a rushed job, so whatever... can always relocate this later.)
+void handle_editor_input();

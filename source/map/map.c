@@ -53,6 +53,9 @@ void init_map() {
 #define spriteDefinitionIndex tempChar5
 #define mapSpriteDataIndex tempChar6
 #define tempArrayIndex tempInt3
+#define editorSelectedTileObject tempChar7
+#define editorAttrX tempChar8
+#define editorAttrY tempChar9
 
 // Load the sprites from the current map
 void load_sprites() {
@@ -191,6 +194,12 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     // Prepare to draw on the first nametable
     set_vram_update(NULL);
     clear_asset_table(0);
+    // Make some tweaks for text areas outside the normal map
+    for (i = 0; i != 7; ++i) {
+        assetTable[i] = 0xff;
+        assetTable[i+0x28] = 0xff;
+    }
+
     bufferIndex = 0;
     for (i = 0; i != 0x55; ++i) {
         // FIXME: Probably wanna make this a constant, and put it in a known place.
@@ -787,3 +796,108 @@ void do_scroll_screen_transition() {
 
 }
 */
+
+void update_editor_map_tile() {
+    // Tile id is editorSelectedTileId, 0-7 or known constant
+    // map is currentMapData
+    // Need to update nametable too, which is of course the finnicky bit
+    if (editorSelectedTileId < 8) {
+        // Reusing rawX
+        currentMap[playerGridPosition] = editorSelectedTileId;
+        currentValue = NTADR_A(((playerGridPosition & 0x07)<<1) + 8, ((playerGridPosition & 0x38) >> 2) + 4);
+        editorSelectedTileObject = currentMapTileData[(editorSelectedTileId << 2) + TILE_DATA_LOOKUP_OFFSET_ID];
+
+        screenBuffer[0] = MSB(currentValue);
+        screenBuffer[1] = LSB(currentValue);
+        screenBuffer[2] = editorSelectedTileObject;
+        ++currentValue;
+        screenBuffer[3] = MSB(currentValue);
+        screenBuffer[4] = LSB(currentValue);
+        screenBuffer[5] = editorSelectedTileObject+1;
+        currentValue += 31;
+        screenBuffer[6] = MSB(currentValue);
+        screenBuffer[7] = LSB(currentValue);
+        screenBuffer[8] = editorSelectedTileObject+16;
+        ++currentValue;
+        screenBuffer[9] = MSB(currentValue);
+        screenBuffer[10] = LSB(currentValue);
+        screenBuffer[11] = editorSelectedTileObject+17;
+
+        // Next, figure out the palette bits...
+        editorSelectedTileObject = currentMapTileData[(editorSelectedTileId << 2) + TILE_DATA_LOOKUP_OFFSET_PALETTE];
+
+        // Raw X / Y positions on-screen
+        editorAttrX = (playerGridPosition & 0x07) + 4;
+        editorAttrY = ((playerGridPosition & 0x38) >> 3) + 2;
+
+        // Calculate raw attr table address
+        currentValue = ((editorAttrY >> 1) << 3) + (editorAttrX >> 1);
+
+        if (editorAttrX & 0x01) {
+            if (editorAttrY & 0x01) {
+                assetTable[currentValue] &= 0x3f;
+                assetTable[currentValue] |= (editorSelectedTileObject) << 6;
+            } else {
+                assetTable[currentValue] &= 0xf3;
+                assetTable[currentValue] |= (editorSelectedTileObject) << 2;
+            }
+        } else {
+            if (editorAttrY & 0x01) {
+                assetTable[currentValue] &= 0xcf;
+                assetTable[currentValue] |= (editorSelectedTileObject) << 4;
+            } else {
+                assetTable[currentValue] &= 0xfc;
+                assetTable[currentValue] |= (editorSelectedTileObject);
+            }
+        }
+
+        screenBuffer[14] = assetTable[currentValue];
+        currentValue += NAMETABLE_A + 0x3c0;
+        screenBuffer[12] = MSB(currentValue);
+        screenBuffer[13] = LSB(currentValue);
+
+        screenBuffer[15] = NT_UPD_EOF;
+        set_vram_update(screenBuffer);
+        ppu_wait_nmi();
+        set_vram_update(NULL);
+
+
+    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_INFO) {
+        // FIXME Remove
+    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
+        // FIXME Player updating
+        // FIXME Also need initial player placement loading
+    }
+}
+
+// TODO: May want to move this into the kernel; reproduced in a couple places now
+void put_map_str(unsigned int adr, const char* str) {
+	vram_adr(adr);
+	while(1) {
+		if(!*str) break;
+		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
+	}
+}
+
+
+void draw_editor_help() {
+
+    // TODO: Recolor, use same as HUD
+
+    vram_adr(NTADR_A(2,1));
+    vram_put('M' + 0x60);
+    vram_put('a' + 0x60);
+    vram_put('p' + 0x60);
+    vram_put(' ' + 0x60);
+    vram_put('0' + 0x60);
+    // FIXME: current map num needs to be taken from somewhere.
+    vram_put('0' + (0 + 1) + 0x60);
+    vram_put(' ' + 0x60);
+    vram_put('/' + 0x60);
+    vram_put(' ' + 0x60);
+    vram_put('0' + 0x60);
+    vram_put('0' + (MAPS_IN_GAME) + 0x60);
+
+    put_map_str(NTADR_A(2, 21), "Start:  Edit Game Info");
+    put_map_str(NTADR_A(2, 22), "Select: Switch Tile/Action");
+}

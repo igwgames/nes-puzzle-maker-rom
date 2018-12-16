@@ -112,12 +112,15 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
 
                 // FIXME: create a real variable
-                tempChar2 = 0;
+                playerGridPosition = 0;
     
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
                 banked_call(PRG_BANK_HUD, draw_editor_hud);
+                banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
                 ppu_on_all();
+
+                playerGridPosition = 0;
 
                 // TODO: Load up game music for this map
 
@@ -126,69 +129,8 @@ void main() {
                 break;
             case GAME_STATE_EDITOR:
                 // FIXME
-                
-                // FIXME This too
-                if (pad_trigger(0) & PAD_SELECT) {
-                    if (editorSelectedTileId == 7) {
-                        // FIXME Constants what on earth???
-                        editorSelectedTileId = 10;
-                    } else if (editorSelectedTileId == 10) {
-                        editorSelectedTileId = 13;
-                    } else if (editorSelectedTileId == 13) {
-                        editorSelectedTileId = 0;
-                    } else {
-                        ++editorSelectedTileId;
-                    }
-                }
-
-                // FIXME: Constants, and move this somewhere sane
-                if (!movementInProgress) {
-                    if (pad_state(0) & PAD_RIGHT) {
-                        if ((tempChar2 & 0x07) == 0x07) {
-                            tempChar2 -= 7;
-                        } else {
-                            tempChar2++;
-                        }
-                        movementInProgress = 10; // FIXME: Constant plox
-                    }
-                    if (pad_state(0) & PAD_LEFT) {
-                        if ((tempChar2 & 0x07) == 0x00) {
-                            tempChar2 += 7;
-                        } else {
-                            tempChar2--;
-                        }
-                        movementInProgress = 10; // FIXME: Constant plox
-                    }
-
-                    if (pad_state(0) & PAD_UP) {
-                        if ((tempChar2 & 0x38) == 0x00) {
-                            tempChar2 += 56;
-                        } else {
-                            tempChar2 -= 8;
-                        }
-                        movementInProgress = 10; // FIXME: Constant plox
-                    } 
-
-                    if (pad_state(0) & PAD_DOWN) {
-                        if ((tempChar2 & 0x38) == 0x38) {
-                            tempChar2 -= 56;
-                        } else {
-                            tempChar2 += 8;
-                        }
-                        movementInProgress = 10; // FIXME: Constant plox
-
-                    }
-
-
-                } else {
-                    movementInProgress--;
-                }
-                tempChar3 = (64 + ((tempChar2 & 0x07)<<4));
-                tempChar4 = (80 + ((tempChar2 & 0x38)<<1));
-                oam_spr(tempChar3, tempChar4, 0xe2, 0x00, 0xd0);
-                oam_spr(tempChar3+8, tempChar4, 0xe2+1, 0x00, 0xd0+4);
-                oam_spr(tempChar3, tempChar4+8, 0xe2+16, 0x00, 0xd0+8);
-                oam_spr(tempChar3+8, tempChar4+8, 0xe2+17, 0x00, 0xd0+12);
+                                
+                banked_call(PRG_BANK_PLAYER_SPRITE, handle_editor_input);
 
                 banked_call(PRG_BANK_HUD, update_editor_hud);
 
