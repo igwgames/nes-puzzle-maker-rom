@@ -3,8 +3,8 @@
 #include "source/library/bank_helpers.h"
 #include "source/map/map.h"
 #include "source/globals.h"
-
-#define extraBits tempChar1
+#include "source/game_data/game_data.h"
+#include "source/map/map_data.h"
 
 // FIXME: Not in the fixed bank.. not like this
 const unsigned char dummyMap[] = {
@@ -36,10 +36,6 @@ const unsigned char dummyTileData[] = {
 // read data from another prg bank.
 void load_map() {
 
-    for (i = 0; i != 64; ++i) {
-        currentMap[i] = 0;
-    }
-
     // FIXME: should probably be looking this up.
     // FORMAT: 0: tileId, 1: palette, 2: collision type, 4: unused
     memcpy(currentMapTileData, dummyTileData, 32);
@@ -47,29 +43,12 @@ void load_map() {
     
     // Need to switch to the bank that stores this map data.
     // TODO: This would be better as ASM - this is kinda inefficient
-    // TODO: If we're not using the banking, kill
-    bank_push(currentWorldId);
-    j = 0;
-    for (i = 0; i != 24; ++i) {
-        currentMap[j++] = (dummyMap[i] & 0x38) >> 3;
-        currentMap[j++] = (dummyMap[i] & 0x07);
-        // Each row has 3 bytes, with 3 bits per tile. Lowest 2 bits in each 
-        if (i % 3 == 0) {
-            extraBits = (dummyMap[i] & 0xc0) >> 6;
-        } else if (i % 3 == 1) {
-            extraBits |= (dummyMap[i] & 0xc0) >> 4;
-        } else {
-            extraBits |= (dummyMap[i] & 0xc0) >> 2;
-            currentMap[j++] = (extraBits & 0x38) >> 3;
-            currentMap[j++] = extraBits & 0x07;
-        }
-    }
+    UNPACK_6BIT_DATA((&(currentGameData[0]) + GAME_DATA_OFFSET_MAP + (currentLevelId*GAME_DATA_OFFSET_MAP_WORLD_LENGTH)), currentMap, 24);
 
     // Iterate a second time to bump all values up to their array index equivalents, to save us computation later.
     for (i = 0; i != 64; ++i) {
         currentMap[i] <<= 2;
     }
     // memcpy(currentMap, overworld + (playerOverworldPosition << 8), 256);
-    bank_pop();
 
 }

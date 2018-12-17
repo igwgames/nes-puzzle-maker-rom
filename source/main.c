@@ -37,10 +37,11 @@ void initialize_variables() {
 
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
-    currentWorldId = WORLD_OVERWORLD; // The ID of the world to load.
+    currentLevelId = 0;
 
     movementInProgress = 0;
     playerGridPosition = 0;
+    selectedGameId = 0;
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
@@ -71,6 +72,7 @@ void main() {
 
                 music_stop();
                 fade_out();
+                load_game();
                 load_map();
 
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
@@ -102,7 +104,7 @@ void main() {
             case GAME_STATE_EDITOR_INIT:
 
                 // FIXME: Interface to save/load games, rather than this...
-                unload_editor_game();
+                load_game();
 
                 music_stop();
                 fade_out();

@@ -13,7 +13,9 @@ ZEROPAGE_EXTERN(unsigned char, j);
 ZEROPAGE_EXTERN(unsigned char, playerHealth);
 ZEROPAGE_EXTERN(unsigned char, playerKeyCount);
 ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
-ZEROPAGE_EXTERN(unsigned char, currentWorldId);
+ZEROPAGE_EXTERN(unsigned char, currentLevelId);
+
+ZEROPAGE_EXTERN(unsigned char, selectedGameId);
 
 ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x20);
 

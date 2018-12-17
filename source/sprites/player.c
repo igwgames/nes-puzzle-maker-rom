@@ -61,16 +61,7 @@ void update_player_sprite() {
     rawXPosition = (PLAY_AREA_LEFT + ((playerGridPosition & 0x07) << 4));
     rawYPosition = (PLAY_AREA_TOP + ((playerGridPosition & 0x38) << 1));
     rawTileId = PLAYER_SPRITE_TILE_ID;
-    /*
-    rawXPosition = (playerXPosition >> PLAYER_POSITION_SHIFT);
-    rawYPosition = (playerYPosition >> PLAYER_POSITION_SHIFT);
-    rawTileId = PLAYER_SPRITE_TILE_ID + playerDirection;
 
-    if (playerXVelocity != 0 || playerYVelocity != 0) {
-        // Does some math with the current NES frame to add either 2 or 0 to the tile id, animating the sprite.
-        rawTileId += ((frameCount >> SPRITE_ANIMATION_SPEED_DIVISOR) & 0x01) << 1;
-    }
-    */
     if (playerInvulnerabilityTime && frameCount & PLAYER_INVULNERABILITY_BLINK_MASK) {
         // If the player is invulnerable, we hide their sprite about half the time to do a flicker animation.
         oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId, 0x00, PLAYER_SPRITE_INDEX);

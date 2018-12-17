@@ -423,8 +423,8 @@ void draw_editor_help() {
     vram_put('p' + 0x60);
     vram_put(' ' + 0x60);
     vram_put('0' + 0x60);
-    // FIXME: current map num needs to be taken from somewhere.
-    vram_put('0' + (0 + 1) + 0x60);
+
+    vram_put('0' + (currentLevelId + 1) + 0x60);
     vram_put(' ' + 0x60);
     vram_put('/' + 0x60);
     vram_put(' ' + 0x60);
