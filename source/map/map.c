@@ -58,6 +58,7 @@ void init_map() {
 // Load the sprites from the current map
 void load_sprites() {
     // Do nothing; part of map.
+    // oam_hide_rest(FIRST_ENEMY_SPRITE_OAM_INDEX-4);
 }
 
 // Clears the asset table. Set containsHud to 1 to set the HUD bytes to use palette 4 (will break the coloring logic if you use the

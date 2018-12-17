@@ -3,7 +3,9 @@
 #include "source/map/map.h"
 #include "source/menus/text_helpers.h"
 #include "source/configuration/game_info.h"
+#include "source/game_data/game_data.h"
 #include "source/globals.h"
+#include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_HUD);
 
@@ -11,8 +13,16 @@ ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
 #define tempTileId tempChar1
 
+void put_hud_str(unsigned int adr, const char* str) {
+	vram_adr(adr);
+	while(1) {
+		if(!*str) break;
+		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
+	}
+}
+
+
 void draw_hud() {
-    // FIXME: Show game name here, assuming it's loaded.
     vram_adr(NAMETABLE_A + HUD_POSITION_START);
     for (i = 0; i != 160; ++i) {
         vram_put(HUD_TILE_BLANK);
@@ -27,14 +37,17 @@ void draw_hud() {
     for (i = 0; i != 16; ++i) {
         vram_put(0xff);
     }
-}
 
-void put_hud_str(unsigned int adr, const char* str) {
-	vram_adr(adr);
-	while(1) {
-		if(!*str) break;
-		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
-	}
+    set_vram_update(NULL);
+    
+    // FIXME: How do we allow numbers? We can fit it but have to break it up to fit between characters. 
+    // That, or we can do some pre-parsing to make it A-Z a-z 0-9' '@ in order, and re-parse later.
+    UNPACK_6BIT_DATA((&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), screenBuffer, GAME_DATA_OFFSET_TITLE_LENGTH);
+    screenBuffer[16] = NULL;
+    
+    put_hud_str(NTADR_A(2, 2), screenBuffer);
+
+    
 }
 
 void draw_editor_hud() {

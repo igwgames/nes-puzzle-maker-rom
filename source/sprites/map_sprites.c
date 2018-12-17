@@ -39,6 +39,8 @@ void do_sprite_movement_with_collision();
 
 // Updates all available map sprites (with movement every other frame)
 void update_map_sprites() {
+    // Do nothing.
+    /*
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
     
     // To save some cpu time, we only update sprites every other frame - even sprites on even frames, odd sprites on odd frames.
@@ -303,7 +305,7 @@ void update_map_sprites() {
         }
 
         
-    }
+    }*/
 }
 
 // Does movement for a sprite given x/y position. 

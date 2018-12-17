@@ -109,6 +109,7 @@ void main() {
                 music_stop();
                 fade_out();
                 load_map();
+                oam_clear();
 
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
