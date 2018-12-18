@@ -121,3 +121,7 @@ void draw_editor_help();
 #define TILE_EDITOR_POSITION_PLAYER 10
 
 #define MAPS_IN_GAME 8
+
+// Values used to adjust where to start drawing the map on-screen. (NOTE: This bypasses the solid block "border" we draw)
+#define MAP_LEFT_PADDING 8
+#define MAP_TOP_PADDING 128

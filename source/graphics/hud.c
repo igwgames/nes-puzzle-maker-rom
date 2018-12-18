@@ -40,12 +40,11 @@ void draw_hud() {
 
     set_vram_update(NULL);
     
-    // FIXME: How do we allow numbers? We can fit it but have to break it up to fit between characters. 
-    // That, or we can do some pre-parsing to make it A-Z a-z 0-9' '@ in order, and re-parse later.
-    UNPACK_6BIT_DATA((&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), screenBuffer, GAME_DATA_OFFSET_TITLE_LENGTH);
-    screenBuffer[16] = NULL;
-    
-    put_hud_str(NTADR_A(2, 2), screenBuffer);
+    // TODO: Implement 6bit encoding?
+    // UNPACK_6BIT_DATA((&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), screenBuffer, GAME_DATA_OFFSET_TITLE_LENGTH);
+    memcpy(screenBuffer, (&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), GAME_DATA_OFFSET_TITLE_LENGTH);
+    screenBuffer[12] = NULL;
+    put_hud_str(NTADR_A(1, 26), screenBuffer);
 
     
 }

@@ -28,7 +28,7 @@ unsigned char currentMapTileData[32];
 
 // unsigned char currentMapSpritePersistance[64];
 
-unsigned char mapScreenBuffer[0x55];
+unsigned char mapScreenBuffer[0x5c];
 
 
 void init_map() {
@@ -137,7 +137,9 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     // Make some tweaks for text areas outside the normal map
     for (i = 0; i != 7; ++i) {
         assetTable[i] = 0xff;
-        assetTable[i+0x28] = 0xff;
+        if (gameState == GAME_STATE_EDITOR_INIT) {
+            assetTable[i+0x28] = 0xff;
+        }
     }
 
     bufferIndex = 0;
@@ -158,7 +160,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
 
         if (bufferIndex == 0) {
             // FIXME: Constant would be good here (8 is the number of tiles over from the lefthand side, 64 is one 16x16 row of tiles)
-            currentMemoryLocation = nametableAdr + 8 + 128 + ((i & 0x38) << 3) + ((i & 0x07) << 1);
+            currentMemoryLocation = nametableAdr + (MAP_LEFT_PADDING + MAP_TOP_PADDING) + ((i & 0x38) << 3) + ((i & 0x07) << 1);
         }
 
         mapScreenBuffer[tempArrayIndex] = currentValue;
@@ -252,6 +254,116 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
         split_y(xScrollPosition, yScrollPosition);
     }
     set_vram_update(NULL);
+
+    // Finally, create a 1 block border around the playing field with our first "solid" block
+    // FIXME: attrs
+    currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING - 64);
+    // FIXME: Constant belongs here
+    currentValue = currentMapTileData[4];
+
+    mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+    mapScreenBuffer[1] = LSB(currentMemoryLocation);
+    mapScreenBuffer[2] = 20;
+    i = 0;
+    while (i != 20) {
+        mapScreenBuffer[3+(i++)] = currentValue;
+        mapScreenBuffer[3+(i++)] = currentValue+1;
+    }
+    currentMemoryLocation += 32;
+    currentValue += 16;
+    mapScreenBuffer[23] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+    mapScreenBuffer[24] = LSB(currentMemoryLocation);
+    mapScreenBuffer[25] = 20;
+    
+    i = 0;
+    while (i != 20) {
+        mapScreenBuffer[26+(i++)] = currentValue;
+        mapScreenBuffer[26+(i++)] = currentValue+1;
+    }
+    
+    currentMemoryLocation = nametableAdr + (MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING;
+    mapScreenBuffer[46] = MSB(currentMemoryLocation) | NT_UPD_VERT;
+    mapScreenBuffer[47] = LSB(currentMemoryLocation);
+    mapScreenBuffer[48] = 16;
+
+    i = 0;
+    currentValue -= 16;
+    while (i != 16) {
+        mapScreenBuffer[49+(i++)] = currentValue;
+        mapScreenBuffer[49+(i++)] = currentValue + 16;
+    }
+
+    ++currentMemoryLocation;
+    mapScreenBuffer[65] = MSB(currentMemoryLocation) | NT_UPD_VERT;
+    mapScreenBuffer[66] = LSB(currentMemoryLocation);
+    mapScreenBuffer[67] = 16;
+
+    i = 0;
+    ++currentValue;
+    while (i != 16) {
+        mapScreenBuffer[68+(i++)] = currentValue;
+        mapScreenBuffer[68+(i++)] = currentValue + 16;
+    }
+
+    mapScreenBuffer[84] = NT_UPD_EOF;
+
+    set_vram_update(mapScreenBuffer);
+    ppu_wait_nmi();
+    if (xScrollPosition != -1) {
+        split_y(xScrollPosition, yScrollPosition);
+    }
+
+    set_vram_update(NULL);
+
+    currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING + (64*8));
+
+    // Don't draw bottom bar in editor mode
+    if (gameState != GAME_STATE_EDITOR_INIT) {
+
+
+        // Reusing fill values from last time.
+        mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+        mapScreenBuffer[1] = LSB(currentMemoryLocation);
+        currentMemoryLocation += 32;
+        mapScreenBuffer[23] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
+        mapScreenBuffer[24] = LSB(currentMemoryLocation);
+    }
+
+    currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING + 16 + 2);
+    mapScreenBuffer[46] = MSB(currentMemoryLocation) | NT_UPD_VERT;
+    mapScreenBuffer[47] = LSB(currentMemoryLocation);
+    ++currentMemoryLocation;
+    mapScreenBuffer[65] = MSB(currentMemoryLocation) | NT_UPD_VERT;
+    mapScreenBuffer[66] = LSB(currentMemoryLocation);
+
+
+    set_vram_update(mapScreenBuffer);
+    ppu_wait_nmi();
+    if (xScrollPosition != -1) {
+        split_y(xScrollPosition, yScrollPosition);
+    }
+
+    set_vram_update(NULL);
+
+    // FIXME: Constant (palette id for border)
+    currentValue = (currentMapTileData[5] << 6) | (currentMapTileData[5] << 4);
+    for (i = 1; i != 7; ++i) {
+        assetTable[i] = (assetTable[i] & 0x0f) | (currentValue & 0xf0);
+    }
+
+    // Don't draw bottom bar in editor mode
+    if (gameState != GAME_STATE_EDITOR_INIT) {
+        currentValue >>= 4;
+        for (i = 41; i != 47; ++i) {
+            assetTable[i] = (assetTable[i] & 0xf0) | (currentValue & 0x0f);
+        }
+    }
+
+    currentValue = (currentMapTileData[5] << 2) | (currentMapTileData[5] << 6);
+    for (i = 9; i != 41; i+=8) {
+        assetTable[i] = (assetTable[i] & 0x33) | (currentValue & 0xcc); 
+        assetTable[i+5] = (assetTable[i+5] & 0xcc) | ((currentValue>>2) & 0x33);
+    }
 
 
 
@@ -418,17 +530,17 @@ void put_map_str(unsigned int adr, const char* str) {
 void draw_editor_help() {
 
 
-    vram_adr(NTADR_A(2,1));
+    vram_adr(NTADR_A(1,1));
     vram_put('M' + 0x60);
     vram_put('a' + 0x60);
     vram_put('p' + 0x60);
     vram_put(' ' + 0x60);
-    vram_put('0' + 0x60);
 
+    vram_put('0' + 0x60);
     vram_put('0' + (currentLevelId + 1) + 0x60);
-    vram_put(' ' + 0x60);
+    //vram_put(' ' + 0x60);
     vram_put('/' + 0x60);
-    vram_put(' ' + 0x60);
+    //vram_put(' ' + 0x60);
     vram_put('0' + 0x60);
     vram_put('0' + (MAPS_IN_GAME) + 0x60);
 
