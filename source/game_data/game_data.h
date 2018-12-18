@@ -25,7 +25,7 @@ void list_games();
 #define GAME_DATA_OFFSET_SFX_ID 4
 #define GAME_DATA_OFFSET_GFX_ID 5
 // TODO: Store starting positions for levels in each of these? Would buy us a variable tile for players, if that's useful.
-// Unused space 7-15 (10 bytes)
+// Unused space 6-8 (2 bytes)
 #define GAME_DATA_OFFSET_TITLE 16
 #define GAME_DATA_OFFSET_TITLE_LENGTH 12
 #define GAME_DATA_OFFSET_AUTHOR 28
@@ -34,6 +34,7 @@ void list_games();
 #define GAME_DATA_OFFSET_CREDITS_LENGTH 24
 #define GAME_DATA_OFFSET_MAP 64
 #define GAME_DATA_OFFSET_MAP_LENGTH 192
+#define GAME_DATA_OFFSET_START_POSITIONS 8
 
 #define GAME_DATA_OFFSET_MAP_WORLD_LENGTH 24
 

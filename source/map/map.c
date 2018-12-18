@@ -11,6 +11,7 @@
 #include "source/sprites/player.h"
 #include "source/sprites/sprite_definitions.h"
 #include "source/sprites/map_sprites.h"
+#include "source/game_data/game_data.h"
 #include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_MAP_LOGIC);
@@ -43,6 +44,9 @@ void init_map() {
     // Do some trickery to make the HUD show up at the top of the screen, with the map slightly below.
     scroll(0, 240-HUD_PIXEL_HEIGHT);
     set_mirroring(MIRROR_MODE_VERTICAL);
+
+    // Set player position -- NOTE: this might not actually be ideal here. 
+    playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
 }
 
 // Reusing a few temporary vars for the sprite function below.
@@ -510,10 +514,9 @@ void update_editor_map_tile() {
 
 
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_INFO) {
-        // FIXME Remove
+        // FIXME Remove??
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
-        // FIXME Player updating
-        // FIXME Also need initial player placement loading
+        currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] = playerGridPosition;
     }
 }
 
@@ -538,9 +541,7 @@ void draw_editor_help() {
 
     vram_put('0' + 0x60);
     vram_put('0' + (currentLevelId + 1) + 0x60);
-    //vram_put(' ' + 0x60);
     vram_put('/' + 0x60);
-    //vram_put(' ' + 0x60);
     vram_put('0' + 0x60);
     vram_put('0' + (MAPS_IN_GAME) + 0x60);
 

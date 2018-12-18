@@ -114,7 +114,6 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
 
-                // FIXME: create a real variable
                 playerGridPosition = 0;
     
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
@@ -131,7 +130,6 @@ void main() {
                 gameState = GAME_STATE_EDITOR;
                 break;
             case GAME_STATE_EDITOR:
-                // FIXME
                                 
                 banked_call(PRG_BANK_PLAYER_SPRITE, handle_editor_input);
 

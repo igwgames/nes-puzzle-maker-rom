@@ -11,6 +11,7 @@
 #include "source/menus/error.h"
 #include "source/graphics/hud.h"
 #include "source/graphics/game_text.h"
+#include "Source/game_data/game_data.h"
 
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
@@ -475,7 +476,9 @@ void handle_player_sprite_collision() {
 }
 
 void handle_editor_input() {
-    if (pad_trigger(0) & PAD_SELECT) {
+    lastControllerState = controllerState;
+    controllerState = pad_poll(0);
+    if (controllerState & PAD_SELECT && !(lastControllerState & PAD_SELECT)) {
         if (editorSelectedTileId == 7) { // End of regular tiles
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
@@ -487,58 +490,73 @@ void handle_editor_input() {
         }
     }
 
-    if (!movementInProgress) {
-        if (pad_state(0) & PAD_A) {
+    if (movementInProgress)
+        --movementInProgress;
+
+    if (!movementInProgress) { 
+        if (controllerState & PAD_A) {
             currentMap[playerGridPosition] = editorSelectedTileId;
 
             // Pseudocode: find position, calculate nametable pos based on map x+y, MSB should be trustworthy for all 4 tiles, LSB math is basic
             // Don't forget palettes...
             banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
-        } else {
-            if (pad_state(0) & PAD_RIGHT) {
-                if ((playerGridPosition & 0x07) == 0x07) {
-                    playerGridPosition -= 7;
-                } else {
-                    playerGridPosition++;
-                }
-                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-            }
-            if (pad_state(0) & PAD_LEFT) {
-                if ((playerGridPosition & 0x07) == 0x00) {
-                    playerGridPosition += 7;
-                } else {
-                    playerGridPosition--;
-                }
-                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-            }
-
-            if (pad_state(0) & PAD_UP) {
-                if ((playerGridPosition & 0x38) == 0x00) {
-                    playerGridPosition += 56;
-                } else {
-                    playerGridPosition -= 8;
-                }
-                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-            } 
-
-            if (pad_state(0) & PAD_DOWN) {
-                if ((playerGridPosition & 0x38) == 0x38) {
-                    playerGridPosition -= 56;
-                } else {
-                    playerGridPosition += 8;
-                }
-                movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-            }
         }
 
+        if (controllerState & PAD_RIGHT) {
+            if ((playerGridPosition & 0x07) == 0x07) {
+                playerGridPosition -= 7;
+            } else {
+                playerGridPosition++;
+            }
+            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+        }
+        if (controllerState & PAD_LEFT) {
+            if ((playerGridPosition & 0x07) == 0x00) {
+                playerGridPosition += 7;
+            } else {
+                playerGridPosition--;
+            }
+            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+        }
 
-    } else {
-        movementInProgress--;
+        if (controllerState & PAD_UP) {
+            if ((playerGridPosition & 0x38) == 0x00) {
+                playerGridPosition += 56;
+            } else {
+                playerGridPosition -= 8;
+            }
+            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+        } 
+
+        if (controllerState & PAD_DOWN) {
+            if ((playerGridPosition & 0x38) == 0x38) {
+                playerGridPosition -= 56;
+            } else {
+                playerGridPosition += 8;
+            }
+            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+        }
+
     }
+
+    // Draw player in the right spot
+    rawXPosition = (PLAY_AREA_LEFT + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x07) << 4));
+    rawYPosition = (PLAY_AREA_TOP + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x38) << 1));
+    rawTileId = PLAYER_SPRITE_TILE_ID;
+
+    oam_spr(rawXPosition, rawYPosition, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
+    oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
+
+
     rawXPosition = (64 + ((playerGridPosition & 0x07)<<4));
     rawYPosition = (80 + ((playerGridPosition & 0x38)<<1));
+    // FIXME: Sprite constant
     oam_spr(rawXPosition, rawYPosition, 0xe2, 0x00, 0xd0);
     oam_spr(rawXPosition+8, rawYPosition, 0xe2+1, 0x00, 0xd0+4);
     oam_spr(rawXPosition, rawYPosition+8, 0xe2+16, 0x00, 0xd0+8);
     oam_spr(rawXPosition+8, rawYPosition+8, 0xe2+17, 0x00, 0xd0+12);
+
+
 }

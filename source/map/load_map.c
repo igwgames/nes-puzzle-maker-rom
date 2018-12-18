@@ -49,6 +49,5 @@ void load_map() {
     for (i = 0; i != 64; ++i) {
         currentMap[i] <<= 2;
     }
-    // memcpy(currentMap, overworld + (playerOverworldPosition << 8), 256);
 
 }
