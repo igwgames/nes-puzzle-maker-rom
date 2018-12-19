@@ -146,9 +146,9 @@ void main() {
                 break;
             case GAME_STATE_EDITOR_INFO:
                 fade_out();
-                banked_call(PRG_BANK_PAUSE_MENU, draw_pause_screen);
+                banked_call(PRG_BANK_PAUSE_MENU, draw_editor_info);
                 fade_in();
-                banked_call(PRG_BANK_PAUSE_MENU, handle_pause_input);
+                banked_call(PRG_BANK_PAUSE_MENU, handle_editor_info_input);
                 
                 fade_out();
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);

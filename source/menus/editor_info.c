@@ -7,20 +7,27 @@
 #include "source/globals.h"
 #include "source/menus/input_helpers.h"
 #include "source/graphics/palettes.h"
+#include "source/menus/about_screen.rle.h"
 
 void draw_editor_info() {
     ppu_off();
-    clear_screen_with_border();
+    //clear_screen_with_border();
     // We reuse the title palette here, though we have the option of making our own if needed.
-    pal_bg(titlePalette);
-	pal_spr(titlePalette);
+    // ACtually we're using the game palette... because we need to show real tiles n stuff
+    // FIXME: Also show player.
+
+    vram_adr(0x2000);
+    vram_unrle(about_screen);
+    //pal_bg(titlePalette);
+	//pal_spr(titlePalette);
     scroll(0, 0);
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
+    // Actually, keep the same one
+	//set_chr_bank_0(CHR_BANK_MENU);
+    //set_chr_bank_1(CHR_BANK_MENU);
 
     // Just write "- Paused -" on the screen... there's plenty of nicer things you could do if you wanna spend time!
-    put_str(NTADR_A(11, 13), "- Paused -");
+    //put_str(NTADR_A(11, 13), "- Paused -");
 
 
 
@@ -30,7 +37,7 @@ void draw_editor_info() {
     ppu_on_bg();
 }
 
-void do_editor_info_input() {
+void handle_editor_info_input() {
     banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
     gameState = GAME_STATE_EDITOR;
 }

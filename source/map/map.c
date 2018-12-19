@@ -138,7 +138,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     // Make some tweaks for text areas outside the normal map
     for (i = 0; i != 7; ++i) {
         assetTable[i] = 0xff;
-        if (gameState == GAME_STATE_EDITOR_INIT) {
+        if (gameState == GAME_STATE_EDITOR_INIT || gameState == GAME_STATE_EDITOR) {
             assetTable[i+0x28] = 0xff;
         }
     }
@@ -146,7 +146,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     bufferIndex = 0;
     for (i = 0; i != 0x55; ++i) {
         // FIXME: Probably wanna make this a constant, and put it in a known place.
-        mapScreenBuffer[i] = 0xe2;
+        mapScreenBuffer[i] = 0xef;
     }
 
     if (!reverseAttributes) {
@@ -212,7 +212,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
         currentMemoryLocation += 64;
         for (i = 0; i != 0x55; ++i) {
             // FIXME: Probably wanna make this a constant, and put it in a known place.
-            mapScreenBuffer[i] = 0xe2;
+            mapScreenBuffer[i] = 0xef;
         }
         mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
         mapScreenBuffer[1] = LSB(currentMemoryLocation);
@@ -319,8 +319,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING + (64*8));
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_INFO) {
-
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR) {
 
         // Reusing fill values from last time.
         mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
@@ -353,7 +352,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     }
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_INFO) {
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR) {
         currentValue >>= 4;
         for (i = 41; i != 47; ++i) {
             assetTable[i] = (assetTable[i] & 0xf0) | (currentValue & 0x0f);

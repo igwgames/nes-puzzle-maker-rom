@@ -15,7 +15,7 @@ const unsigned char builtInMapData[256] = {
     0x00,
     // 0x04:Sfx Id
     0x00,
-    // 0x05:Gfx Id
+    // 0x05:Gfx Id (This is a duplicate - remove! TODO)
     0x00,
     // 0x06:Unused/reserved data (0x02 bytes)
     0x00, 0x00, 
