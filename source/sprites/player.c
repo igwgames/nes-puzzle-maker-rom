@@ -12,6 +12,7 @@
 #include "source/graphics/hud.h"
 #include "source/graphics/game_text.h"
 #include "Source/game_data/game_data.h"
+#include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
@@ -113,7 +114,32 @@ void handle_player_movement() {
     }
 
     movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-    // FIXME: Collision testing
+    // TODO: Take special action based on the game type?
+    switch (currentMap[rawTileId] >> 2) {
+        // Ids are multiplied by 4, which is their index 
+        case 0:
+        case 3: // Hole for crate/ball - no action on its own
+        case 5: // Unimplemented for now... so walkable
+        case 6: // Ditto
+
+            // Walkable.. Go !
+            break;
+        case 1: // Solid 1
+        case 2: // Solid 2
+            // Nope, go back. These are solid.
+            rawTileId = playerGridPosition;
+            break;
+        case 4:
+            // TODO: Implement crate behavior
+            break;
+        case 7: // Level end!
+            // TODO: implement level end
+            break;
+        default:
+            // Stop you when you hit an unknown tile... idk seems better than walking?
+            rawTileId = playerGridPosition;
+            break;
+    }
     playerGridPosition = rawTileId;
 
 
