@@ -13,3 +13,5 @@
 
 #define GAME_STATE_EDITOR           70
 #define GAME_STATE_EDITOR_INIT      71
+
+#define GAME_STATE_EDITOR_INFO      72

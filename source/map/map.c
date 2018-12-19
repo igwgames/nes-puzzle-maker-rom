@@ -45,8 +45,6 @@ void init_map() {
     scroll(0, 240-HUD_PIXEL_HEIGHT);
     set_mirroring(MIRROR_MODE_VERTICAL);
 
-    // Set player position -- NOTE: this might not actually be ideal here. 
-    playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
 }
 
 // Reusing a few temporary vars for the sprite function below.
@@ -321,7 +319,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING + (64*8));
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT) {
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_INFO) {
 
 
         // Reusing fill values from last time.
@@ -355,7 +353,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     }
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT) {
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_INFO) {
         currentValue >>= 4;
         for (i = 41; i != 47; ++i) {
             assetTable[i] = (assetTable[i] & 0xf0) | (currentValue & 0x0f);

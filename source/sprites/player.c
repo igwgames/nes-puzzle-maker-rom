@@ -516,6 +516,11 @@ void handle_editor_input() {
         }
     }
 
+    if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+        gameState = GAME_STATE_EDITOR_INFO;
+        return;
+    }
+
     if (movementInProgress)
         --movementInProgress;
 

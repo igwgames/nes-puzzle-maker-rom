@@ -22,6 +22,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/input_helpers.h"
 #include "source/menus/game_over.h"
 #include "source/game_data/game_data.h"
+#include "source/menus/editor_info.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -78,6 +79,9 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
                 banked_call(PRG_BANK_MAP_LOGIC, load_sprites);
+                // Set player position -- NOTE: this might not actually be ideal here. 
+                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
+
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
@@ -114,6 +118,10 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
 
+                // Set player position -- NOTE: this might not actually be ideal here. 
+                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
+
+
                 playerGridPosition = 0;
     
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
@@ -135,6 +143,24 @@ void main() {
 
                 banked_call(PRG_BANK_HUD, update_editor_hud);
 
+                break;
+            case GAME_STATE_EDITOR_INFO:
+                fade_out();
+                banked_call(PRG_BANK_PAUSE_MENU, draw_pause_screen);
+                fade_in();
+                banked_call(PRG_BANK_PAUSE_MENU, handle_pause_input);
+                
+                fade_out();
+                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
+                banked_call(PRG_BANK_MAP_LOGIC, init_map);
+
+
+                ppu_off();
+                banked_call(PRG_BANK_HUD, draw_editor_hud);
+                banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
+                ppu_on_all();
+                fade_in();
+                gameState = GAME_STATE_EDITOR;
                 break;
             case GAME_STATE_SCREEN_SCROLL:
                 // Hide all non-player sprites in play, so we have an empty screen to add new ones to
