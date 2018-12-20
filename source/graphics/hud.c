@@ -65,7 +65,22 @@ void draw_editor_hud() {
         vram_put(0xff);
     }
 
-    put_hud_str(NAMETABLE_A + HUD_EDITOR_TITLE_START, " <        Objects     Player  >");
+    // TODO: Constants for the arrows
+    if (currentLevelId > 0) {
+        vram_adr(NAMETABLE_A + HUD_POSITION_START + 64 + 1);
+        vram_put(0xe9);
+        vram_adr(NAMETABLE_A + HUD_POSITION_START + 96 + 1);
+        vram_put(0xf9);
+    }
+
+    if (currentLevelId < MAX_GAME_LEVELS) {
+        vram_adr(NAMETABLE_A + HUD_POSITION_START + 64 + 30);
+        vram_put(0xea);
+        vram_adr(NAMETABLE_A + HUD_POSITION_START + 96 + 30);
+        vram_put(0xfa);
+    }
+
+    put_hud_str(NAMETABLE_A + HUD_EDITOR_TITLE_START, "          Objects       Player");
 
     vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START);
     for (i = 0; i != 8; ++i) {
@@ -90,10 +105,10 @@ void draw_editor_hud() {
 
 
     // FIXME: Correct palette Id?
-    oam_spr(192, 15, HUD_PLAYER_SPRITE_ID, 0x00, HUD_PLAYER_SPRITE_OAM);
-    oam_spr(200, 15, HUD_PLAYER_SPRITE_ID+1, 0x00, HUD_PLAYER_SPRITE_OAM+4);
-    oam_spr(192, 23, HUD_PLAYER_SPRITE_ID+16, 0x00, HUD_PLAYER_SPRITE_OAM+8);
-    oam_spr(200, 23, HUD_PLAYER_SPRITE_ID+17, 0x00, HUD_PLAYER_SPRITE_OAM+12);
+    oam_spr(208, 15, HUD_PLAYER_SPRITE_ID, 0x00, HUD_PLAYER_SPRITE_OAM);
+    oam_spr(216, 15, HUD_PLAYER_SPRITE_ID+1, 0x00, HUD_PLAYER_SPRITE_OAM+4);
+    oam_spr(208, 23, HUD_PLAYER_SPRITE_ID+16, 0x00, HUD_PLAYER_SPRITE_OAM+8);
+    oam_spr(216, 23, HUD_PLAYER_SPRITE_ID+17, 0x00, HUD_PLAYER_SPRITE_OAM+12);
 
 
     vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START + 32);
@@ -103,13 +118,6 @@ void draw_editor_hud() {
         vram_put(tempTileId);
     }
 
-    // Info Icon
-    vram_adr(NAMETABLE_A + HUD_INFO_ICON_START);
-    vram_put(HUD_TILE_EDITOR_INFO);
-    vram_put(HUD_TILE_EDITOR_INFO+1);
-    vram_adr(NAMETABLE_A + HUD_INFO_ICON_START + 32);
-    vram_put(HUD_TILE_EDITOR_INFO+16);
-    vram_put(HUD_TILE_EDITOR_INFO+17);
 
 }
 

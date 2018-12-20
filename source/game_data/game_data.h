@@ -43,6 +43,8 @@ void list_games();
 // Simplest style - just get to the end of each level.
 #define GAME_STYLE_MAZE 0
 
+#define MAX_GAME_LEVELS 8
+
 // We do a lot of packing things into 6 bits to save space. This will copy 6bit data from the first address into
 // the second address, stopping after the specified number of bytes.
 #define UNPACK_6BIT_DATA(source, destination, length) \

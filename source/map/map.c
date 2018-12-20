@@ -509,8 +509,6 @@ void update_editor_map_tile() {
         set_vram_update(NULL);
 
 
-    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_INFO) {
-        // FIXME Remove??
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
         currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] = playerGridPosition;
     }

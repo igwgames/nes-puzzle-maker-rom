@@ -508,8 +508,6 @@ void handle_editor_input() {
         if (editorSelectedTileId == 7) { // End of regular tiles
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
-            editorSelectedTileId = TILE_EDITOR_POSITION_INFO;
-        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_INFO) {
             editorSelectedTileId = 0;
         } else {
             ++editorSelectedTileId;

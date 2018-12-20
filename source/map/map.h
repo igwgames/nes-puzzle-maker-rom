@@ -117,8 +117,7 @@ void draw_editor_help();
 // NOTE: Currently unused; rename if use
 #define TILE_DATA_LOOKUP_OFFSET_EXTRA 3
 
-#define TILE_EDITOR_POSITION_INFO 12
-#define TILE_EDITOR_POSITION_PLAYER 10
+#define TILE_EDITOR_POSITION_PLAYER 11
 
 #define MAPS_IN_GAME 8
 
