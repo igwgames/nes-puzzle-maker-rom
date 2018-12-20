@@ -511,6 +511,20 @@ void update_editor_map_tile() {
 
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
         currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] = playerGridPosition;
+    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
+        // FIXME: Redraw everything
+        if (currentLevelId > 0) {
+            --currentLevelId;
+        } else {
+            editorSelectedTileId = 0;
+        }
+    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
+        // FIXME: Same.
+        if (currentLevelId < MAX_GAME_LEVELS) {
+            ++currentLevelId;
+        } else {
+            editorSelectedTileId = 0;
+        }
     }
 }
 

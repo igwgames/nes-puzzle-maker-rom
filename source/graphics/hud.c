@@ -160,6 +160,12 @@ void update_editor_hud() {
 
     tempTileId = HUD_EDITOR_TILES_SPRITE_START + (editorSelectedTileId << 4);
 
+    if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
+        tempTileId = 4;
+    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
+        tempTileId = 236;
+    }
+
     oam_spr(tempTileId, 15, HUD_SELECTOR_SPRITE_ID, 0x00, HUD_SELECTOR_SPRITE_OAM);
     oam_spr(tempTileId+8, 15, HUD_SELECTOR_SPRITE_ID+1, 0x00, HUD_SELECTOR_SPRITE_OAM+4);
     oam_spr(tempTileId, 23, HUD_SELECTOR_SPRITE_ID+16, 0x00, HUD_SELECTOR_SPRITE_OAM+8);

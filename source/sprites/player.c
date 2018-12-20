@@ -508,6 +508,22 @@ void handle_editor_input() {
         if (editorSelectedTileId == 7) { // End of regular tiles
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
+            if (currentLevelId < MAX_GAME_LEVELS) {
+                editorSelectedTileId = TILE_EDITOR_POSITION_RIGHT;
+            } else {
+                if (currentLevelId > 0) {
+                    editorSelectedTileId = TILE_EDITOR_POSITION_LEFT;
+                } else {
+                    editorSelectedTileId = 0;
+                }
+            }
+        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
+            if (currentLevelId > 0) {
+                editorSelectedTileId = TILE_EDITOR_POSITION_LEFT;
+            } else {
+                editorSelectedTileId = 0;
+            }
+        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
             editorSelectedTileId = 0;
         } else {
             ++editorSelectedTileId;
@@ -526,8 +542,6 @@ void handle_editor_input() {
         if (controllerState & PAD_A) {
             currentMap[playerGridPosition] = editorSelectedTileId;
 
-            // Pseudocode: find position, calculate nametable pos based on map x+y, MSB should be trustworthy for all 4 tiles, LSB math is basic
-            // Don't forget palettes...
             banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
         }
 
