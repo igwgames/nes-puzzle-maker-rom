@@ -13,6 +13,7 @@
 #include "source/graphics/game_text.h"
 #include "Source/game_data/game_data.h"
 #include "source/menus/error.h"
+#include "source/map/load_map.h"
 
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
@@ -531,6 +532,7 @@ void handle_editor_input() {
     }
 
     if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+        save_map();
         gameState = GAME_STATE_EDITOR_INFO;
         return;
     }

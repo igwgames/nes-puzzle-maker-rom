@@ -63,4 +63,17 @@ void list_games();
         } \
     }
 
-#define PACK_6BIT_DATA(source, destingation, length) FIXME
+// This does the reverse of the script above.
+#define PACK_6BIT_DATA(source, destination, length) \
+    j = 0; \
+    for (i = 0; i != length; i += 2) { \
+        if (i % 8 != 6) { \
+            destination[j] = ((source[i] & 0x07)<< 3) | ((source[i+1] & 0x07)); \
+            ++j; \
+        } else { \
+            __extraBits = (((source[i] & 0x07)) << 3) | ((source[i+1] & 0x07)); \
+            destination[j-1] |= ((__extraBits & 0x30) << 2); \
+            destination[j-2] |= ((__extraBits & 0x0c) << 4); \
+            destination[j-3] |= ((__extraBits & 0x03) << 6); \
+        } \
+    } 

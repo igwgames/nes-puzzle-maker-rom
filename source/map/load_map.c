@@ -51,3 +51,16 @@ void load_map() {
     }
 
 }
+
+// Saves the map at the player's current position from the ram variable given.
+// I'm not sure why I'm keeping this in the primary bank, but for now I am.
+void save_map() {
+    for (i = 0; i != 64; ++i) {
+        currentMap[i] >>= 2;
+    }
+    PACK_6BIT_DATA(currentMap, (&(currentGameData[0]) + GAME_DATA_OFFSET_MAP + (currentLevelId*GAME_DATA_OFFSET_MAP_WORLD_LENGTH)), 64);
+
+    for (i = 0; i != 64; ++i) {
+        currentMap[i] <<= 2;
+    }
+}

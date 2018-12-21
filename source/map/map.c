@@ -450,7 +450,7 @@ void update_editor_map_tile() {
     // Need to update nametable too, which is of course the finnicky bit
     if (editorSelectedTileId < 8) {
         // Reusing rawX
-        currentMap[playerGridPosition] = editorSelectedTileId;
+        currentMap[playerGridPosition] = (editorSelectedTileId<<2);
         currentValue = NTADR_A(((playerGridPosition & 0x07)<<1) + 8, ((playerGridPosition & 0x38) >> 2) + 4);
         editorSelectedTileObject = currentMapTileData[(editorSelectedTileId << 2) + TILE_DATA_LOOKUP_OFFSET_ID];
 
@@ -512,6 +512,7 @@ void update_editor_map_tile() {
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
         currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] = playerGridPosition;
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
+        save_map();
         if (currentLevelId > 0) {
             --currentLevelId;
             if (currentLevelId == 0) {
@@ -522,6 +523,7 @@ void update_editor_map_tile() {
         }
         gameState = GAME_STATE_EDITOR_REDRAW;
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
+        save_map();
         if (currentLevelId < MAX_GAME_LEVELS) {
             ++currentLevelId;
             if (currentLevelId == (MAX_GAME_LEVELS-1)) {
