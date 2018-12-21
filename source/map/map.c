@@ -138,7 +138,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     // Make some tweaks for text areas outside the normal map
     for (i = 0; i != 7; ++i) {
         assetTable[i] = 0xff;
-        if (gameState == GAME_STATE_EDITOR_INIT || gameState == GAME_STATE_EDITOR) {
+        if (gameState == GAME_STATE_EDITOR_INIT || gameState == GAME_STATE_EDITOR_REDRAW) {
             assetTable[i+0x28] = 0xff;
         }
     }
@@ -319,7 +319,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING + (64*8));
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR) {
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_REDRAW) {
 
         // Reusing fill values from last time.
         mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
@@ -352,7 +352,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     }
 
     // Don't draw bottom bar in editor mode
-    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR) {
+    if (gameState != GAME_STATE_EDITOR_INIT && gameState != GAME_STATE_EDITOR_REDRAW) {
         currentValue >>= 4;
         for (i = 41; i != 47; ++i) {
             assetTable[i] = (assetTable[i] & 0xf0) | (currentValue & 0x0f);
@@ -512,19 +512,25 @@ void update_editor_map_tile() {
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
         currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] = playerGridPosition;
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
-        // FIXME: Redraw everything
         if (currentLevelId > 0) {
             --currentLevelId;
+            if (currentLevelId == 0) {
+                editorSelectedTileId = 0;
+            }
         } else {
             editorSelectedTileId = 0;
         }
+        gameState = GAME_STATE_EDITOR_REDRAW;
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
-        // FIXME: Same.
         if (currentLevelId < MAX_GAME_LEVELS) {
             ++currentLevelId;
+            if (currentLevelId == (MAX_GAME_LEVELS-1)) {
+                editorSelectedTileId = 0;
+            }
         } else {
             editorSelectedTileId = 0;
         }
+        gameState = GAME_STATE_EDITOR_REDRAW;
     }
 }
 

@@ -73,7 +73,7 @@ void draw_editor_hud() {
         vram_put(0xf9);
     }
 
-    if (currentLevelId < MAX_GAME_LEVELS) {
+    if (currentLevelId < (MAX_GAME_LEVELS-1)) {
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 64 + 30);
         vram_put(0xea);
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 96 + 30);

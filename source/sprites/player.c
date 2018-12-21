@@ -508,7 +508,7 @@ void handle_editor_input() {
         if (editorSelectedTileId == 7) { // End of regular tiles
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
-            if (currentLevelId < MAX_GAME_LEVELS) {
+            if (currentLevelId < (MAX_GAME_LEVELS-1)) {
                 editorSelectedTileId = TILE_EDITOR_POSITION_RIGHT;
             } else {
                 if (currentLevelId > 0) {

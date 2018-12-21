@@ -138,19 +138,15 @@ void main() {
                 gameState = GAME_STATE_EDITOR;
                 break;
             case GAME_STATE_EDITOR:
-                                
+                
                 banked_call(PRG_BANK_PLAYER_SPRITE, handle_editor_input);
 
                 banked_call(PRG_BANK_HUD, update_editor_hud);
 
                 break;
-            case GAME_STATE_EDITOR_INFO:
+            case GAME_STATE_EDITOR_REDRAW:
                 fade_out();
-                banked_call(PRG_BANK_PAUSE_MENU, draw_editor_info);
-                fade_in();
-                banked_call(PRG_BANK_PAUSE_MENU, handle_editor_info_input);
-                
-                fade_out();
+                load_map(); // FIXME: This will overwrite any saved data in every redraw. Be sure to always call save.
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
 
@@ -161,6 +157,15 @@ void main() {
                 ppu_on_all();
                 fade_in();
                 gameState = GAME_STATE_EDITOR;
+
+                break;
+            case GAME_STATE_EDITOR_INFO:
+                fade_out();
+                banked_call(PRG_BANK_PAUSE_MENU, draw_editor_info);
+                fade_in();
+                banked_call(PRG_BANK_PAUSE_MENU, handle_editor_info_input);
+                gameState = GAME_STATE_EDITOR_REDRAW;
+                
                 break;
             case GAME_STATE_SCREEN_SCROLL:
                 // Hide all non-player sprites in play, so we have an empty screen to add new ones to
