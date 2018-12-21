@@ -8,7 +8,9 @@
 #include "source/menus/input_helpers.h"
 #include "source/graphics/palettes.h"
 #include "source/menus/about_screen.rle.h"
+#include "source/game_data/game_data.h"
 
+// FIXME: Bank this. It's currently stored in 0, and banked with the pause menu in main.c (Man, I'm gettin sloppy...)
 void draw_editor_info() {
     ppu_off();
     //clear_screen_with_border();
@@ -20,6 +22,20 @@ void draw_editor_info() {
     vram_unrle(about_screen);
     //pal_bg(titlePalette);
 	//pal_spr(titlePalette);
+
+    // Now draw all the user-generated stuff onto the screen
+    vram_adr(NTADR_A(5, 5));
+    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
+        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
+    }
+
+    vram_adr(NTADR_A(5, 21));
+    for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
+        vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
+    }
+
+
+
     scroll(0, 0);
 
     // Actually, keep the same one
@@ -34,10 +50,75 @@ void draw_editor_info() {
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
     // you will have to hide all sprites, then put them back after. 
+    set_vram_update(NULL);
     ppu_on_bg();
 }
 
+#define editorInfoPosition tempChar1
+#define editorInfoPositionFull tempChar2
+#define editorInfoTempInt tempInt1
+
 void handle_editor_info_input() {
-    banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+    screenBuffer[0] = MSB(NTADR_A(3, 4)) | NT_UPD_VERT;
+    screenBuffer[1] = LSB(NTADR_A(3, 4));
+    screenBuffer[2] = 20;
+    for (i = 3; i != 23; ++i) {
+        // FIXME: Constant
+        screenBuffer[i] = 0xee;
+    }
+    screenBuffer[23] = MSB(NTADR_A(3, 4));
+    screenBuffer[24] = LSB(NTADR_A(3, 4));
+    // FIXME: Constant
+    screenBuffer[25] = 0xe2;
+    // NOTE: This is just a random tile to update and keep black - this should be updated when we need a second tile.
+    screenBuffer[26] = MSB(NTADR_A(8, 3));
+    screenBuffer[27] = LSB(NTADR_A(8, 3));
+    screenBuffer[28] = 0xee; // AGAIN, FIXME: Constant
+    screenBuffer[29] = NT_UPD_EOF;
+    editorInfoPosition = 0;
+    set_vram_update(screenBuffer);
+    while (1) {
+        lastControllerState = controllerState;
+        controllerState = pad_poll(0);
+
+        // If Start is pressed now, and was not pressed before...
+        if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+            break;
+        }
+
+        if (controllerState & PAD_UP && !(lastControllerState & PAD_UP)) {
+            if (editorInfoPosition != 0) {
+                --editorInfoPosition;
+            }
+        }
+
+        if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
+            if (editorInfoPosition != 6) {
+                ++editorInfoPosition;
+            }
+        }
+
+        // FIXME: this should be a stepwise thing, sadly.
+        switch (editorInfoPosition) {
+            case 0:
+                editorInfoPositionFull = 4;
+                break;
+            case 1:
+                editorInfoPositionFull = 7;
+                break;
+            case 2:
+                editorInfoPositionFull = 11;
+                break;
+            default:
+                editorInfoPositionFull = 11 + ((editorInfoPosition-2)*3);
+                break;
+        }
+        editorInfoTempInt = NTADR_A(3, editorInfoPositionFull);
+        screenBuffer[23] = MSB(editorInfoTempInt);
+        screenBuffer[24] = LSB(editorInfoTempInt);
+
+        ppu_wait_nmi();
+
+    }
     gameState = GAME_STATE_EDITOR;
 }
