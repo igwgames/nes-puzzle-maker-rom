@@ -11,6 +11,15 @@
 #include "source/game_data/game_data.h"
 #include "source/menus/text_input.h"
 #include "source/graphics/fade_animation.h"
+#include "source/map/load_map.h"
+#include "source/map/map.h"
+
+#define editorInfoPosition tempChar1
+#define editorInfoPositionFull tempChar2
+#define tempScreenByte tempChar3
+#define redraw tempChar9 // Using a higher one, so it's unlikely our called functions steal it.
+#define editorInfoTempInt tempInt1
+
 
 // FIXME: Bank this. It's currently stored in 0, and banked with the pause menu in main.c (Man, I'm gettin sloppy...)
 void draw_editor_info() {
@@ -26,16 +35,35 @@ void draw_editor_info() {
 	//pal_spr(titlePalette);
 
     // Now draw all the user-generated stuff onto the screen
-    vram_adr(NTADR_A(5, 5));
+    vram_adr(NTADR_A(10, 4));
     for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
     }
 
-    vram_adr(NTADR_A(5, 21));
+    vram_adr(NTADR_A(11, 17));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
     }
 
+    vram_adr(NTADR_A(12, 6));
+    i = 0;
+    editorInfoTempInt = (int)tilesetNames[currentGameData[GAME_DATA_OFFSET_TILESET_ID]-2];
+    while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
+        vram_put(j + 0x60);
+    }
+
+    // Recolor tileset area
+    vram_adr(0x23d1); // (Gotten from NES Screen Tool)
+    tempScreenByte = 0x50;
+    for (i = 0; i != 8; ++i) {
+        if (i & 0x01) {
+            tempScreenByte |= (currentMapTileData[(i<<2)+1] << 2);
+            vram_put(tempScreenByte);
+            tempScreenByte = 0x50;
+        } else {
+            tempScreenByte |= currentMapTileData[(i<<2)+1];
+        }
+    }
 
 
     scroll(0, 0);
@@ -56,12 +84,10 @@ void draw_editor_info() {
     ppu_on_bg();
 }
 
-#define editorInfoPosition tempChar1
-#define editorInfoPositionFull tempChar2
-#define redraw tempChar9 // Using a higher one, so it's unlikely our called functions steal it.
-#define editorInfoTempInt tempInt1
 
 void handle_editor_info_input() {
+    editorInfoPosition = 0;
+
     do_redraw:
     screenBuffer[0] = MSB(NTADR_A(3, 4)) | NT_UPD_VERT;
     screenBuffer[1] = LSB(NTADR_A(3, 4));
@@ -79,7 +105,6 @@ void handle_editor_info_input() {
     screenBuffer[27] = LSB(NTADR_A(8, 3));
     screenBuffer[28] = 0xee; // AGAIN, FIXME: Constant
     screenBuffer[29] = NT_UPD_EOF;
-    editorInfoPosition = 0;
     set_vram_update(screenBuffer);
     redraw = 0;
     while (1) {
@@ -104,7 +129,7 @@ void handle_editor_info_input() {
         }
 
         if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
-            if (editorInfoPosition == 0) {
+            if (editorInfoPosition == 0) { // FIXME: Constant
                 memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_TITLE]), 12);
                 do_text_input("game name", 12);
                 memcpy(&(currentGameData[GAME_DATA_OFFSET_TITLE]), inputText, 12);
@@ -120,18 +145,53 @@ void handle_editor_info_input() {
 
         }
 
+        if (controllerState & PAD_LEFT && !(lastControllerState & PAD_LEFT)) {
+            if (editorInfoPosition == 1) { // FIXME: Constant
+                --currentGameData[GAME_DATA_OFFSET_TILESET_ID];
+                if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] < CHR_BANK_ARCADE) {
+                    currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_LAST;
+                }
+                redraw = 1;
+                break;
+            }
+        }
+
+        if (controllerState & PAD_RIGHT && !(lastControllerState & PAD_RIGHT)) {
+            if (editorInfoPosition == 1) { // FIXME: Constant
+                ++currentGameData[GAME_DATA_OFFSET_TILESET_ID];
+                if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] > CHR_BANK_LAST) {
+                    currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ARCADE;
+                }
+                redraw = 1;
+                break;
+            }
+        }
+
+
         switch (editorInfoPosition) {
             case 0:
                 editorInfoPositionFull = 4;
                 break;
             case 1:
-                editorInfoPositionFull = 7;
+                editorInfoPositionFull = 6;
                 break;
             case 2:
                 editorInfoPositionFull = 11;
                 break;
+            case 3:
+                editorInfoPositionFull = 13;
+                break;
+            case 4:
+                editorInfoPositionFull = 15;
+                break;
+            case 5:
+                editorInfoPositionFull = 17;
+                break;
+            case 6: 
+                editorInfoPositionFull = 23;
+                break;
             default:
-                editorInfoPositionFull = 11 + ((editorInfoPosition-2)*3);
+                editorInfoPositionFull = 10 + ((editorInfoPosition-2)*3);
                 break;
         }
         editorInfoTempInt = NTADR_A(3, editorInfoPositionFull);
@@ -143,6 +203,8 @@ void handle_editor_info_input() {
     }
     if (redraw) {
         fade_out();
+        // Use new palettes immediately
+        banked_call(PRG_BANK_MAP_LOGIC,  load_map_tiles_and_palette);
         draw_editor_info();
         fade_in();
         goto do_redraw;

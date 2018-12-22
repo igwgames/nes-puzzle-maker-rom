@@ -81,6 +81,14 @@ void load_map_tiles_and_palette() {
 }
 CODE_BANK_POP();
 
+// NOTE: These are in the primary bank. Lame, I know... but we use them unbanked in a few spots.
+const unsigned char arcadeName[] = "Arcade";
+const unsigned char zoriaName[] = "Zoria";
+const unsigned char zoriaDesertName[] = "Zoria Desert";
+
+const unsigned char* tilesetNames[] = { arcadeName, zoriaName, zoriaDesertName };
+
+
 
 // Loads the map at the player's current position into the ram variable given. 
 // Kept in a separate file, as this must remain in the primary bank so it can
@@ -88,9 +96,7 @@ CODE_BANK_POP();
 void load_map() {
 
     // FORMAT: 0: tileId, 1: palette, 2: collision type, 4: unused
-    bank_push(PRG_BANK_MAP_LOGIC);
-    load_map_tiles_and_palette();
-    bank_pop();
+    banked_call(PRG_BANK_MAP_LOGIC,  load_map_tiles_and_palette);
 
     
     // Need to switch to the bank that stores this map data.
