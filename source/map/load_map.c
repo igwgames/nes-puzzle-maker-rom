@@ -5,30 +5,81 @@
 #include "source/globals.h"
 #include "source/game_data/game_data.h"
 #include "source/map/map_data.h"
+#include "source/graphics/palettes.h"
 
-// FIXME: Not in the fixed bank.. not like this
-const unsigned char dummyMap[] = {
-    0x01, 0x13, 0x25,
-    0xc1, 0x53, 0xe5,
-    0x1c, 0xa8, 0x1c,
-    0x1c, 0xa8, 0x1c,
-    0x1c, 0xa8, 0x1c,
-    0x1c, 0xa8, 0x1c,
-    0x1c, 0xa8, 0x1c,
-    0x1c, 0xa8, 0x1c
+CODE_BANK(PRG_BANK_MAP_LOGIC);
+const unsigned char arcadeTileData[] = {
+    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
+    0x02, 0x01, TILE_COLLISION_WALKABLE, 0,
+    0x04, 0x01, TILE_COLLISION_SOLID, 0,
+    0x06, 0x01, TILE_COLLISION_SOLID, 0,
+    0x08, 0x02, TILE_COLLISION_CRATE, 0,
+    0x0a, 0x03, TILE_COLLISION_GAP, 0,
+    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
+    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
 };
 
-// FIXME: Not like this 
-const unsigned char dummyTileData[] = {
+const unsigned char zoriaDesertTileData[] = {
+    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
     0x02, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x0a, 0x01, TILE_COLLISION_SOLID, 0,
-    0x42, 0x01, TILE_COLLISION_SOLID, 0,
-    0x28, 0x03, TILE_COLLISION_GAP, 0,
-    0x60, 0x02, TILE_COLLISION_CRATE, 0,
-    0x00, 0x00, TILE_COLLISION_UNUSED, 0,
-    0x00, 0x00, TILE_COLLISION_UNUSED, 0,
-    0x4a, 0x00, TILE_COLLISION_LEVEL_END, 0
+    0x04, 0x00, TILE_COLLISION_SOLID, 0,
+    0x06, 0x01, TILE_COLLISION_SOLID, 0,
+    0x08, 0x00, TILE_COLLISION_CRATE, 0,
+    0x0a, 0x00, TILE_COLLISION_GAP, 0,
+    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
+    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
 };
+
+const unsigned char zoriaTileData[] = {
+    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
+    0x02, 0x00, TILE_COLLISION_WALKABLE, 0,
+    0x04, 0x00, TILE_COLLISION_SOLID, 0,
+    0x06, 0x00, TILE_COLLISION_SOLID, 0,
+    0x08, 0x01, TILE_COLLISION_CRATE, 0,
+    0x0a, 0x00, TILE_COLLISION_GAP, 0,
+    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
+    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
+};
+
+void load_map_tiles_and_palette() {
+    switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {
+        case CHR_BANK_ARCADE:
+            // Make sure we're looking at the right sprite and chr data, not the ones for the menu.
+            set_chr_bank_0(CHR_BANK_ARCADE);
+            set_chr_bank_1(CHR_BANK_SPRITES);
+
+            // Also set the palettes to the in-game palettes.
+            pal_bg(mainBgPalette);
+            pal_spr(mainSpritePalette);
+            memcpy(currentMapTileData, arcadeTileData, 32);
+
+            break;
+        case CHR_BANK_ZORIA_DESERT:
+            set_chr_bank_0(CHR_BANK_ZORIA_DESERT);
+            set_chr_bank_1(CHR_BANK_SPRITES);
+
+            // Also set the palettes to the in-game palettes.
+            pal_bg(zoriaDesertBgPalette);
+            pal_spr(mainSpritePalette);
+            memcpy(currentMapTileData, zoriaDesertTileData, 32);
+            break;
+        
+        case CHR_BANK_ZORIA:
+        default:
+            set_chr_bank_0(CHR_BANK_ZORIA);
+            set_chr_bank_1(CHR_BANK_SPRITES);
+
+            // Also set the palettes to the in-game palettes.
+            pal_bg(zoriaBgPalette);
+            pal_spr(mainSpritePalette);
+            memcpy(currentMapTileData, zoriaTileData, 32);
+            break;
+        
+
+    }
+
+}
+CODE_BANK_POP();
 
 
 // Loads the map at the player's current position into the ram variable given. 
@@ -36,9 +87,10 @@ const unsigned char dummyTileData[] = {
 // read data from another prg bank.
 void load_map() {
 
-    // FIXME: should probably be looking this up.
     // FORMAT: 0: tileId, 1: palette, 2: collision type, 4: unused
-    memcpy(currentMapTileData, dummyTileData, 32);
+    bank_push(PRG_BANK_MAP_LOGIC);
+    load_map_tiles_and_palette();
+    bank_pop();
 
     
     // Need to switch to the bank that stores this map data.

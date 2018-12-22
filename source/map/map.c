@@ -33,13 +33,6 @@ unsigned char mapScreenBuffer[0x5c];
 
 
 void init_map() {
-    // Make sure we're looking at the right sprite and chr data, not the ones for the menu.
-    set_chr_bank_0(CHR_BANK_TILES);
-    set_chr_bank_1(CHR_BANK_SPRITES);
-
-    // Also set the palettes to the in-game palettes.
-    pal_bg(mainBgPalette);
-    pal_spr(mainSpritePalette);
 
     // Do some trickery to make the HUD show up at the top of the screen, with the map slightly below.
     scroll(0, 240-HUD_PIXEL_HEIGHT);
@@ -257,10 +250,9 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
     set_vram_update(NULL);
 
     // Finally, create a 1 block border around the playing field with our first "solid" block
-    // FIXME: attrs
     currentMemoryLocation = nametableAdr + ((MAP_LEFT_PADDING - 2) + MAP_TOP_PADDING - 64);
     // FIXME: Constant belongs here
-    currentValue = currentMapTileData[4];
+    currentValue = currentMapTileData[GAME_BORDER_TILE_START];
 
     mapScreenBuffer[0] = MSB(currentMemoryLocation) | NT_UPD_HORZ;
     mapScreenBuffer[1] = LSB(currentMemoryLocation);
@@ -345,8 +337,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
 
     set_vram_update(NULL);
 
-    // FIXME: Constant (palette id for border)
-    currentValue = (currentMapTileData[5] << 6) | (currentMapTileData[5] << 4);
+    currentValue = (currentMapTileData[GAME_BORDER_TILE_START+1] << 6) | (currentMapTileData[GAME_BORDER_TILE_START+1] << 4);
     for (i = 1; i != 7; ++i) {
         assetTable[i] = (assetTable[i] & 0x0f) | (currentValue & 0xf0);
     }
@@ -359,7 +350,7 @@ void draw_current_map_to_nametable(int nametableAdr, int attributeTableAdr, unsi
         }
     }
 
-    currentValue = (currentMapTileData[5] << 2) | (currentMapTileData[5] << 6);
+    currentValue = (currentMapTileData[GAME_BORDER_TILE_START+1] << 2) | (currentMapTileData[GAME_BORDER_TILE_START+1] << 6);
     for (i = 9; i != 41; i+=8) {
         assetTable[i] = (assetTable[i] & 0x33) | (currentValue & 0xcc); 
         assetTable[i+5] = (assetTable[i+5] & 0xcc) | ((currentValue>>2) & 0x33);

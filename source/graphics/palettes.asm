@@ -13,7 +13,12 @@ _mainBgPalette:
 _mainSpritePalette: 
     .incbin "graphics/palettes/main_sprite.pal"
 
+_zoriaBgPalette:
+    .incbin "graphics/palettes/zoria_bg.pal"
+_zoriaDesertBgPalette:
+    .incbin "graphics/palettes/zoria_desert_bg.pal"
+
 ; The .export command tells our assembler that these are meant to be available to C. So does the name...
 ; both do that. There's more complex details, but if I'm honest I don't know them myself, so I can't document
 ; them here.
-.export _titlePalette, _errorPalette, _mainBgPalette, _mainSpritePalette
+.export _titlePalette, _errorPalette, _mainBgPalette, _mainSpritePalette, _zoriaBgPalette, _zoriaDesertBgPalette

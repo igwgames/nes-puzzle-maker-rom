@@ -1,6 +1,7 @@
 #include "source/map/map_data.h"
 #include "source/game_data/game_data.h"
 #include "source/library/bank_helpers.h"
+#include "source/configuration/system_constants.h"
 
 CODE_BANK(PRG_BANK_MAP_DATA);
 
@@ -8,7 +9,7 @@ const unsigned char builtInMapData[256] = {
     // 0x00:Id
     GAME_DATA_VERSION_ID,
     // 0x01:Tileset id
-    0x00,
+    CHR_BANK_ZORIA_DESERT,
     // 0x02:Game Style
     GAME_STYLE_MAZE,
     // 0x03:Song Id

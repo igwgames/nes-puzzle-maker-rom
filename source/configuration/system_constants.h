@@ -15,7 +15,11 @@
 // FIXME: Kill ascii bank entirely
 #define CHR_BANK_MENU 1
 #define CHR_BANK_TILES 1
-#define CHR_BANK_SPRITES 2
+#define CHR_BANK_SPRITES 8
+
+#define CHR_BANK_ARCADE 2
+#define CHR_BANK_ZORIA 3
+#define CHR_BANK_ZORIA_DESERT 4
 
 #define HUD_TILE_SIZE 192
 #define HUD_PIXEL_HEIGHT 48

@@ -289,16 +289,16 @@ detectNTSC:
 	.incbin "graphics/ascii.chr"
 .segment "CHR_01"
 	.incbin "graphics/tiles.chr"
+.segment "CHR_02"
+	.incbin "graphics/tiles.chr"
 
 ; Note: You can put your own separate chr files here to use them... we only use 3 in the demo. This is to avoid warnings,
 ; and make the rom a predictable size. Note that if you do this you'll have to tweak the engine to support it! There's
 ; hopefully a guide on how to do this in the repo.
-.segment "CHR_02"
-	.incbin "graphics/sprites.chr"
 .segment "CHR_03"
-	.incbin "graphics/tiles.chr"
+	.incbin "graphics/zoria.chr"
 .segment "CHR_04"
-	.incbin "graphics/tiles.chr"
+	.incbin "graphics/zoria_desert.chr"
 .segment "CHR_05"
 	.incbin "graphics/tiles.chr"
 .segment "CHR_06"
@@ -306,7 +306,7 @@ detectNTSC:
 .segment "CHR_07"
 	.incbin "graphics/tiles.chr"
 .segment "CHR_08"
-	.incbin "graphics/tiles.chr"
+	.incbin "graphics/sprites.chr"
 .segment "CHR_09"
 	.incbin "graphics/tiles.chr"
 .segment "CHR_0A"
