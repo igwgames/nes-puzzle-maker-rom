@@ -9,6 +9,8 @@
 #include "source/graphics/palettes.h"
 #include "source/menus/about_screen.rle.h"
 #include "source/game_data/game_data.h"
+#include "source/menus/text_input.h"
+#include "source/graphics/fade_animation.h"
 
 // FIXME: Bank this. It's currently stored in 0, and banked with the pause menu in main.c (Man, I'm gettin sloppy...)
 void draw_editor_info() {
@@ -56,9 +58,11 @@ void draw_editor_info() {
 
 #define editorInfoPosition tempChar1
 #define editorInfoPositionFull tempChar2
+#define redraw tempChar9 // Using a higher one, so it's unlikely our called functions steal it.
 #define editorInfoTempInt tempInt1
 
 void handle_editor_info_input() {
+    do_redraw:
     screenBuffer[0] = MSB(NTADR_A(3, 4)) | NT_UPD_VERT;
     screenBuffer[1] = LSB(NTADR_A(3, 4));
     screenBuffer[2] = 20;
@@ -77,6 +81,7 @@ void handle_editor_info_input() {
     screenBuffer[29] = NT_UPD_EOF;
     editorInfoPosition = 0;
     set_vram_update(screenBuffer);
+    redraw = 0;
     while (1) {
         lastControllerState = controllerState;
         controllerState = pad_poll(0);
@@ -98,7 +103,23 @@ void handle_editor_info_input() {
             }
         }
 
-        // FIXME: this should be a stepwise thing, sadly.
+        if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
+            if (editorInfoPosition == 0) {
+                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_TITLE]), 12);
+                do_text_input("game name", 12);
+                memcpy(&(currentGameData[GAME_DATA_OFFSET_TITLE]), inputText, 12);
+                redraw = 1;
+                break;
+            } else if (editorInfoPosition == 5) {
+                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_AUTHOR]), 12);
+                do_text_input("author", 12);
+                memcpy(&(currentGameData[GAME_DATA_OFFSET_AUTHOR]), inputText, 12);
+                redraw = 1;
+                break;
+            }
+
+        }
+
         switch (editorInfoPosition) {
             case 0:
                 editorInfoPositionFull = 4;
@@ -119,6 +140,12 @@ void handle_editor_info_input() {
 
         ppu_wait_nmi();
 
+    }
+    if (redraw) {
+        fade_out();
+        draw_editor_info();
+        fade_in();
+        goto do_redraw;
     }
     gameState = GAME_STATE_EDITOR;
 }

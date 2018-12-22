@@ -16,7 +16,7 @@ void put_str(unsigned int adr, const char *str) {
 void clear_screen() {
 	vram_adr(0x2000);
 	vram_fill(' ' + TEXT_ASCII_SKIPPED_CHARACTERS, 0x03c0);
-	vram_fill(0, 0x30);
+	vram_fill(0x55, 0x30);
 }
 
 // Clear the screen and put a nice border around it.
@@ -47,6 +47,6 @@ void clear_screen_with_border() {
 	vram_fill(' ' + TEXT_ASCII_SKIPPED_CHARACTERS, 64);
 
 	// Attribute table
-	vram_fill(0, 64);
+	vram_fill(0x55, 64);
 
 }

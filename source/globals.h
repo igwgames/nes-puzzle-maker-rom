@@ -17,7 +17,7 @@ ZEROPAGE_EXTERN(unsigned char, currentLevelId);
 
 ZEROPAGE_EXTERN(unsigned char, selectedGameId);
 
-ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x20);
+ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x30);
 
 ZEROPAGE_EXTERN(unsigned char, controllerState);
 ZEROPAGE_EXTERN(unsigned char, lastControllerState);

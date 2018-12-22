@@ -2,6 +2,6 @@
 
 
 // Solicits the user for text input. Reads/writes inputText
-void do_text_input(const unsigned char* name);
+void do_text_input(const unsigned char* name, const unsigned char maxLength);
 
 extern unsigned char inputText[32];

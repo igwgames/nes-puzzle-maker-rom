@@ -16,7 +16,7 @@ ZEROPAGE_DEF(unsigned char, currentLevelId);
 
 ZEROPAGE_DEF(unsigned char, selectedGameId);
 
-ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x20);
+ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x30);
 
 ZEROPAGE_DEF(unsigned char, everyOtherCycle);
 
