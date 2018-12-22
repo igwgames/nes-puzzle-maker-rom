@@ -15,7 +15,7 @@
 
 // Rather than have a full ASCII table, we skip the first 32 characters so we have a little room for extra 
 // data later in the bank. We have to subtract this constantly though, so we made a constant.
-#define TEXT_ASCII_SKIPPED_CHARACTERS 0x20
+#define TEXT_ASCII_SKIPPED_CHARACTERS 0x60
 
 void trigger_game_text(const unsigned char* string);
 

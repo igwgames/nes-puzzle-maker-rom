@@ -45,7 +45,7 @@ void draw_title_screen() {
 	screenBuffer[2] = 0xe2;
 	screenBuffer[3] = MSB(NTADR_A(8, 16));
 	screenBuffer[4] = LSB(NTADR_A(8, 16));
-	screenBuffer[5] = 0x00;
+	screenBuffer[5] = ' ' + 0x60;
 	screenBuffer[6] = NT_UPD_EOF;
 	set_vram_update(screenBuffer);
 }
@@ -61,10 +61,10 @@ void handle_title_input() {
 	} else if (controllerState & PAD_UP) {
 		selectedOption = 0;
 		screenBuffer[2] = 0xe2;
-		screenBuffer[5] = 0x00;
+		screenBuffer[5] = ' ' + 0x60;
 	} else if (controllerState & PAD_DOWN) {
 		selectedOption = 1;
-		screenBuffer[2] = 0x00;
+		screenBuffer[2] = ' ' + 0x60;
 		screenBuffer[5] = 0xe2;
 	}
 	

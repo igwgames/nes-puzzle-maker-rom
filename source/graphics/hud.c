@@ -13,6 +13,7 @@ ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
 #define tempTileId tempChar1
 
+// FIXME: Merge with original; no different anymore
 void put_hud_str(unsigned int adr, const char* str) {
 	vram_adr(adr);
 	while(1) {

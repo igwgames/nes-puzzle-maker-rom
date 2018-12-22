@@ -113,14 +113,14 @@ void draw_game_text() {
                 // Only add things to the drawing buffer if we have not hit our null terminator.
                 if (haveHitNull) {
                     // Draw a space in place of anything else.
-                    buffer[bufferIndex] = ' ' - TEXT_ASCII_SKIPPED_CHARACTERS;
+                    buffer[bufferIndex] = ' ' + TEXT_ASCII_SKIPPED_CHARACTERS;
                 } else {
                     set_char_at_buffer_index();
                     if (currentChar == NULL) {
                         // Mark us as having hit the null terminator, so we stop trying to draw text.
                         haveHitNull = TRUE;
                     } else {
-                        buffer[bufferIndex] = currentChar - TEXT_ASCII_SKIPPED_CHARACTERS;
+                        buffer[bufferIndex] = currentChar + TEXT_ASCII_SKIPPED_CHARACTERS;
                     }
 
                 }

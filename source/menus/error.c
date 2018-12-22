@@ -50,7 +50,7 @@ void _print_variable_data_and_exit(const char *errorId, const char *errorDescrip
     if (numberName != NULL) {
         itoa(number, buffer);
         put_str(NTADR_A(2, 20), numberName);
-        vram_put(':'-0x20);
+        vram_put(':'+0x60);
         put_str(NTADR_A(2, 21), buffer);
     }
     
