@@ -324,7 +324,9 @@ void handle_player_movement() {
             update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
-            // TODO: implement level end
+            ++currentLevelId;
+            gameState = GAME_STATE_LOAD_LEVEL;
+            return;
             break;
         default:
             // Stop you when you hit an unknown tile... idk seems better than walking?
@@ -732,7 +734,6 @@ void handle_editor_input() {
 
     if (!movementInProgress) { 
         if (controllerState & PAD_A) {
-            currentMap[playerGridPosition] = editorSelectedTileId;
 
             banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
         }

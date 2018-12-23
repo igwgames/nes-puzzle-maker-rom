@@ -79,8 +79,12 @@ void main() {
                 draw_list_games(0);
                 fade_in();
                 do_list_game_input(0);
-                fade_out();
                 bank_pop();
+                music_play(SONG_OVERWORLD);
+                gameState = GAME_STATE_LOAD_LEVEL;
+                break;
+            case GAME_STATE_LOAD_LEVEL:
+                fade_out();
 
                 load_game();
                 load_map();
@@ -101,9 +105,10 @@ void main() {
                 set_rand(frameCount);
                 
                 // Map drawing is complete; let the player play the game!
-                music_play(SONG_OVERWORLD);
+                
                 fade_in();
                 gameState = GAME_STATE_RUNNING;
+
                 break;
 
             case GAME_STATE_RUNNING:
