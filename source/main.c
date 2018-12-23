@@ -71,7 +71,6 @@ void main() {
             case GAME_STATE_POST_TITLE:
                 currentLevelId = 0;
 
-                music_stop();
                 fade_out();
                 
                 bank_push(PRG_BANK_GAME_LIST);
@@ -79,10 +78,11 @@ void main() {
                 fade_in();
                 do_list_game_input(0);
                 bank_pop();
-                music_play(SONG_OVERWORLD);
-                gameState = GAME_STATE_LOAD_LEVEL;
+                music_stop();
+                gameState = GAME_STATE_LOAD_LEVEL_1;
                 break;
             case GAME_STATE_LOAD_LEVEL:
+            case GAME_STATE_LOAD_LEVEL_1:
                 fade_out();
                 oam_clear();
 
@@ -103,6 +103,10 @@ void main() {
 
                 // Seed the random number generator here, using the time since console power on as a seed
                 set_rand(frameCount);
+
+                if (gameState == GAME_STATE_LOAD_LEVEL_1) {
+                    music_play(SONG_OVERWORLD);
+                }
                 
                 // Map drawing is complete; let the player play the game!
                 
@@ -122,7 +126,6 @@ void main() {
             case GAME_STATE_EDITOR_INIT:
                 currentLevelId = 0;
 
-                music_stop();
                 fade_out();
 
                 bank_push(PRG_BANK_GAME_LIST);
@@ -130,6 +133,7 @@ void main() {
                 fade_in();
                 do_list_game_input(0);
                 fade_out();
+                music_stop();
                 load_game();
                 bank_pop();
 
@@ -149,6 +153,7 @@ void main() {
                 ppu_off();
                 banked_call(PRG_BANK_HUD, draw_editor_hud);
                 banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
+                music_play(SONG_OVERWORLD);
                 ppu_on_all();
 
                 playerGridPosition = 0;
@@ -166,6 +171,7 @@ void main() {
 
                 break;
             case GAME_STATE_EDITOR_REDRAW:
+                oam_clear();
                 fade_out();
                 load_map(); // FIXME: This will overwrite any saved data in every redraw. Be sure to always call save.
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
@@ -201,6 +207,7 @@ void main() {
                 gameState = GAME_STATE_RUNNING;
                 break;
             case GAME_STATE_PAUSED:
+                sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);  
                 fade_out();
                 banked_call(PRG_BANK_PAUSE_MENU, draw_pause_screen);
                 fade_in();
@@ -208,6 +215,7 @@ void main() {
 
                 // When we get here, the player has unpaused. 
                 // Pause has its own mini main loop in handle_input to make logic easier.
+                sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
                 fade_out();
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);

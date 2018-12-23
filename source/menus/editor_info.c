@@ -129,12 +129,14 @@ void handle_editor_info_input() {
             if (editorInfoPosition != 0) {
                 --editorInfoPosition;
             }
+            sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
             if (editorInfoPosition != 8) {
                 ++editorInfoPosition;
             }
+            sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
         }
 
         if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
@@ -171,11 +173,14 @@ void handle_editor_info_input() {
                     currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_LAST;
                 }
                 redraw = 1;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
             } else if (editorInfoPosition == 7) {
                 editorInfoPosition = 8;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             } else if (editorInfoPosition == 8) {
                 editorInfoPosition = 7;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             }
         }
 
@@ -186,11 +191,14 @@ void handle_editor_info_input() {
                     currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ARCADE;
                 }
                 redraw = 1;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
             } else if (editorInfoPosition == 7) {
                 editorInfoPosition = 8;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             } else if (editorInfoPosition == 8) {
                 editorInfoPosition = 7;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             }
         }
 
@@ -245,4 +253,5 @@ void handle_editor_info_input() {
         goto do_redraw;
     }
     gameState = GAME_STATE_EDITOR;
+    sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
 }

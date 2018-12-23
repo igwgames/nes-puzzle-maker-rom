@@ -64,6 +64,10 @@
 #define SFX_KEY 2
 #define SFX_GAMEOVER 3
 #define SFX_WIN 4
+#define SFX_PLACE_ITEM 5
+#define SFX_MENU_BOP 6
+#define SFX_MENU_OPEN 7
+#define SFX_MENU_CLOSE 8
 
 // Constants for sfx channels. Completely unnecessary but it's easier to read
 #define SFX_CHANNEL_1 0

@@ -702,6 +702,7 @@ void handle_editor_input() {
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
     if (controllerState & PAD_SELECT && !(lastControllerState & PAD_SELECT)) {
+        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
         if (editorSelectedTileId == 7) { // End of regular tiles
             editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
         } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
@@ -729,6 +730,7 @@ void handle_editor_input() {
 
     if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
         save_map();
+        sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);
         gameState = GAME_STATE_EDITOR_INFO;
         return;
     }

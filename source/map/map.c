@@ -514,6 +514,7 @@ void update_editor_map_tile() {
             editorSelectedTileId = 0;
         }
         gameState = GAME_STATE_EDITOR_REDRAW;
+        oam_clear();
         movementInProgress = 10;
     } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
         save_map();
@@ -526,6 +527,7 @@ void update_editor_map_tile() {
             editorSelectedTileId = 0;
         }
         gameState = GAME_STATE_EDITOR_REDRAW;
+        oam_clear();
         movementInProgress = 10;
     }
 }
