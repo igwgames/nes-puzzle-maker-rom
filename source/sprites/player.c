@@ -212,6 +212,7 @@ void handle_player_movement() {
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
+                        ++playerCrateCount;
                         currentMap[rawTileId+1] = 0;
 
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];

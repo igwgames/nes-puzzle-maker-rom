@@ -115,6 +115,8 @@ const unsigned char* gameModeNames[] = { gameModePlainName, gameModeCratesName, 
 // Kept in a separate file, as this must remain in the primary bank so it can
 // read data from another prg bank.
 void load_map() {
+    totalKeyCount = 0;
+    totalCrateCount = 0;
 
     // FORMAT: 0: tileId, 1: palette, 2: collision type, 4: unused
     banked_call(PRG_BANK_MAP_LOGIC,  load_map_tiles_and_palette);
@@ -129,8 +131,12 @@ void load_map() {
         currentMap[i] <<= 2;
 
         j = currentMapTileData[currentMap[i]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
-        if (j == TILE_COLLISION_COLLECTABLE || j == TILE_COLLISION_CRATE) {
+        if (j == TILE_COLLISION_COLLECTABLE) {
             currentMapOrig[i] = 0;
+            ++totalKeyCount;
+        } else if (j == TILE_COLLISION_CRATE) {
+            currentMapOrig[i] = 0;
+            ++totalCrateCount;
         } else {
             currentMapOrig[i] = currentMap[i];
         }

@@ -12,6 +12,9 @@ ZEROPAGE_EXTERN(unsigned char, i);
 ZEROPAGE_EXTERN(unsigned char, j);
 ZEROPAGE_EXTERN(unsigned char, playerHealth);
 ZEROPAGE_EXTERN(unsigned char, playerKeyCount);
+ZEROPAGE_EXTERN(unsigned char, totalKeyCount);
+ZEROPAGE_EXTERN(unsigned char, playerCrateCount);
+ZEROPAGE_EXTERN(unsigned char, totalCrateCount);
 ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
 ZEROPAGE_EXTERN(unsigned char, currentLevelId);
 

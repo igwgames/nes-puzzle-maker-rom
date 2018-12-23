@@ -12,6 +12,7 @@ CODE_BANK(PRG_BANK_HUD);
 ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
 #define tempTileId tempChar1
+#define tempTileIndex tempChar2
 
 // FIXME: Merge with original; no different anymore
 void put_hud_str(unsigned int adr, const char* str) {
@@ -122,6 +123,81 @@ void draw_editor_hud() {
 }
 
 void update_hud() {
+    switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+        case GAME_STYLE_MAZE:
+            break;
+        case GAME_STYLE_COIN:
+            for (i = 0; i != 8; ++i) {
+                if (currentMapTileData[(i<<2) + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_COLLECTABLE) {
+                    tempTileIndex = (i<<2);
+                    tempTileId = currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_ID];
+                    break;
+                }
+            }
+            i = 0;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
+            screenBuffer[i++] = 2;
+            screenBuffer[i++] = tempTileId;
+            screenBuffer[i++] = tempTileId+1;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 32) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 32);
+            screenBuffer[i++] = 2;
+            screenBuffer[i++] = tempTileId+16;
+            screenBuffer[i++] = tempTileId+17;
+            screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
+            screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
+            screenBuffer[i++] = (currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_PALETTE] << 6) | 0x3f;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
+            screenBuffer[i++] = 5;
+            screenBuffer[i++] = (playerKeyCount / 10) + '0' + 0x60;
+            screenBuffer[i++] = (playerKeyCount % 10) + '0' + 0x60;
+            screenBuffer[i++] = '/' + 0x60;
+            screenBuffer[i++] = (totalKeyCount / 10) + '0' + 0x60;
+            screenBuffer[i++] = (totalKeyCount % 10) + '0' + 0x60;
+
+            screenBuffer[i++] = NT_UPD_EOF;
+            set_vram_update(screenBuffer);
+
+            break;
+        case GAME_STYLE_CRATES:
+            for (i = 0; i != 8; ++i) {
+                if (currentMapTileData[(i<<2) + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_CRATE) {
+                    tempTileIndex = (i<<2);
+                    tempTileId = currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_ID];
+                    break;
+                }
+            }
+            i = 0;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
+            screenBuffer[i++] = 2;
+            screenBuffer[i++] = tempTileId;
+            screenBuffer[i++] = tempTileId+1;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 32) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 32);
+            screenBuffer[i++] = 2;
+            screenBuffer[i++] = tempTileId+16;
+            screenBuffer[i++] = tempTileId+17;
+            screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
+            screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
+            screenBuffer[i++] = (currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_PALETTE] << 6) | 0x3f;
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
+            screenBuffer[i++] = 5;
+            screenBuffer[i++] = (playerCrateCount / 10) + '0' + 0x60;
+            screenBuffer[i++] = (playerCrateCount % 10) + '0' + 0x60;
+            screenBuffer[i++] = '/' + 0x60;
+            screenBuffer[i++] = (totalCrateCount / 10) + '0' + 0x60;
+            screenBuffer[i++] = (totalCrateCount % 10) + '0' + 0x60;
+
+            screenBuffer[i++] = NT_UPD_EOF;
+            set_vram_update(screenBuffer);
+
+            break;
+    }
+
     // This sets up screenBuffer to print x hearts, then x more empty hearts. 
     // You give it the address, tell it the direction to write, then follow up with
     // Ids, ending with NT_UPD_EOF

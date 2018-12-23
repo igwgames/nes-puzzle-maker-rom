@@ -83,6 +83,8 @@ void main() {
                 break;
             case GAME_STATE_LOAD_LEVEL:
             case GAME_STATE_LOAD_LEVEL_1:
+                playerKeyCount = 0;
+                playerCrateCount = 0;
                 fade_out();
                 oam_clear();
 
