@@ -69,7 +69,7 @@ void main() {
                 banked_call(PRG_BANK_TITLE, handle_title_input);
                 break;
             case GAME_STATE_POST_TITLE:
-                currentLevelId = 7;//FIXME
+                currentLevelId = 0;
 
                 gameTime = frameCount;
                 gameKeys = 0;
@@ -219,6 +219,9 @@ void main() {
                 banked_call(PRG_BANK_PAUSE_MENU, draw_pause_screen);
                 fade_in();
                 banked_call(PRG_BANK_PAUSE_MENU, handle_pause_input);
+                if (gameState != GAME_STATE_RUNNING) {
+                    break;
+                }
 
                 // When we get here, the player has unpaused. 
                 // Pause has its own mini main loop in handle_input to make logic easier.
