@@ -14,7 +14,7 @@ const unsigned char arcadeTileData[] = {
     0x04, 0x01, TILE_COLLISION_SOLID, 0,
     0x06, 0x01, TILE_COLLISION_SOLID, 0,
     0x08, 0x02, TILE_COLLISION_CRATE, 0,
-    0x0a, 0x03, TILE_COLLISION_GAP, 0,
+    0x0a, 0x02, TILE_COLLISION_GAP, 0,
     0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
     0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
 };
@@ -108,6 +108,14 @@ const unsigned char gameModeCratesName[] = "Crate Removal";
 const unsigned char gameModeCollectName[] = "Coin Collector";
 
 const unsigned char* gameModeNames[] = { gameModePlainName, gameModeCratesName, gameModeCollectName };
+
+const unsigned char songName0[] = "The Forest";
+const unsigned char songName1[] = "Victory Loop";
+const unsigned char songName2[] = "Head in the Sand";
+const unsigned char songName3[] = "Cave";
+const unsigned char songName4[] = "RPG Battle";
+
+const unsigned char* songNames[] = { songName0, songName1, songName2, songName3, songName4 };
 
 
 

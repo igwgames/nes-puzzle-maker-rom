@@ -230,6 +230,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         ++playerCrateCount;
                         ++gameCrates;
@@ -242,6 +243,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
                         rawTileId = playerGridPosition;
                     }
@@ -262,6 +264,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId-1] = 0;
                         ++playerCrateCount;
@@ -274,6 +277,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
                         rawTileId = playerGridPosition;
@@ -295,6 +299,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId-8] = 0;
                         ++playerCrateCount;
@@ -307,6 +312,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
                         rawTileId = playerGridPosition;
@@ -328,6 +334,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId+8] = 0;
                         ++playerCrateCount;
@@ -340,6 +347,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
                         rawTileId = playerGridPosition;
@@ -357,6 +365,7 @@ void handle_player_movement() {
             ++gameKeys;
             currentMap[rawTileId] = 0;
             update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+            sfx_play(SFX_HEART, SFX_CHANNEL_1);
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             collisionTempTileId = 0;
@@ -389,6 +398,7 @@ void handle_player_movement() {
                     gameState = GAME_STATE_CREDITS;
                 } else {
                     gameState = GAME_STATE_LOAD_LEVEL;
+                    sfx_play(SFX_WIN, SFX_CHANNEL_1);
                 }
                 return;
             }

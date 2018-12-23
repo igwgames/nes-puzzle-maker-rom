@@ -11,3 +11,4 @@ void save_map();
 
 const unsigned char* tilesetNames[];
 const unsigned char* gameModeNames[];
+const unsigned char* songNames[];

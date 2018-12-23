@@ -36,6 +36,7 @@ void load_game() {
             memfill(currentGameData, 0, 256);
             currentGameData[GAME_DATA_OFFSET_VERSION] = GAME_DATA_VERSION_ID;
             currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ZORIA;
+            currentGameData[GAME_DATA_OFFSET_SONG_ID] = SONG_OVERWORLD;
             memcpy((&(currentGameData[GAME_DATA_OFFSET_TITLE])), "NO NAME     ", 12);
             memcpy((&(currentGameData[GAME_DATA_OFFSET_AUTHOR])), "ANONYMOUS   ", 12);
         }

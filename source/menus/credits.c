@@ -88,7 +88,6 @@ void draw_win_screen() {
 }
 
 void draw_credits_screen() {
-    // FIXME: this is so very wrong
     ppu_off();
     clear_screen_with_border();
     // We reuse the title palette here, though we have the option of making our own if needed.
@@ -121,16 +120,28 @@ void draw_credits_screen() {
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(10, 4), "  Credits  ");
 
-    put_str(NTADR_A(3, 8), "Game Design");
-    vram_adr(NTADR_A(4, 10));
+    put_str(NTADR_A(4, 8), "Game Design");
+    vram_adr(NTADR_A(5, 10));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
     }
 
-    // FIXME: Reference
     put_str(NTADR_A(4, 13), "Music");
-    put_str(NTADR_A(5, 15), "Wolfgang");
-    put_str(NTADR_A(7, 17), "via OpenGameArt");
+    switch (currentGameData[GAME_DATA_OFFSET_SONG_ID]) {
+        case SONG_OVERWORLD:
+        case SONG_TITLE:
+        case SONG_RPG_BATTLE:
+        case SONG_CAVE:
+            put_str(NTADR_A(5, 15), "Ted Kerr (Wolfgang)");
+            put_str(NTADR_A(7, 17), "via OpenGameArt");
+            break;
+
+        case SONG_HEAD_IN_SAND:
+            put_str(NTADR_A(5, 15), "congusbongus");
+            put_str(NTADR_A(7, 17), "via OpenGameArt");
+            break;
+
+    }
 
     put_str(NTADR_A(4, 20), "Artwork");
     switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {

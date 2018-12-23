@@ -112,7 +112,7 @@ void main() {
                 set_rand(frameCount);
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
-                    music_play(SONG_OVERWORLD);
+                    music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
                 }
                 
                 // Map drawing is complete; let the player play the game!
@@ -160,7 +160,7 @@ void main() {
                 ppu_off();
                 banked_call(PRG_BANK_HUD, draw_editor_hud);
                 banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
-                music_play(SONG_OVERWORLD);
+                music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
                 ppu_on_all();
 
                 playerGridPosition = 0;

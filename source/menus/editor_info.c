@@ -61,6 +61,14 @@ void draw_editor_info() {
         vram_put(j + 0x60); 
     }
 
+    vram_adr(NTADR_A(10, 11));
+    i = 0; 
+    editorInfoTempInt = (int)songNames[currentGameData[GAME_DATA_OFFSET_SONG_ID]];
+    while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
+        vram_put(j + 0x60); 
+    }
+
+
     // Recolor tileset area
     vram_adr(0x23d1); // (Gotten from NES Screen Tool)
     tempScreenByte = 0x50;
@@ -181,6 +189,14 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
+            } else if (editorInfoPosition == 2) {
+                --currentGameData[GAME_DATA_OFFSET_SONG_ID];
+                if (currentGameData[GAME_DATA_OFFSET_SONG_ID] == 255) {
+                    currentGameData[GAME_DATA_OFFSET_SONG_ID] = SONG_COUNT - 1;
+                }
+                music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
+                redraw = 1;
+                break;
             } else if (editorInfoPosition == 4) {
                 --currentGameData[GAME_DATA_OFFSET_GAME_STYLE];
                 if (currentGameData[GAME_DATA_OFFSET_GAME_STYLE] == 255) {
@@ -206,6 +222,14 @@ void handle_editor_info_input() {
                 }
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                break;
+            } else if (editorInfoPosition == 2) {
+                ++currentGameData[GAME_DATA_OFFSET_SONG_ID];
+                if (currentGameData[GAME_DATA_OFFSET_SONG_ID] == SONG_COUNT) {
+                    currentGameData[GAME_DATA_OFFSET_SONG_ID] = 0;
+                }
+                music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
+                redraw = 1;
                 break;
             } else if (editorInfoPosition == 4) {
                 ++currentGameData[GAME_DATA_OFFSET_GAME_STYLE];

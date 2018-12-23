@@ -57,6 +57,10 @@
 // Constants for songs we play in the game
 #define SONG_TITLE 0
 #define SONG_OVERWORLD 1
+#define SONG_HEAD_IN_SAND 2
+#define SONG_CAVE 3
+#define SONG_RPG_BATTLE 4
+#define SONG_COUNT 5
 
 // Constants for sound effects we play in the game
 #define SFX_HURT 0
@@ -68,6 +72,8 @@
 #define SFX_MENU_BOP 6
 #define SFX_MENU_OPEN 7
 #define SFX_MENU_CLOSE 8
+#define SFX_CRATE_SMASH 9
+#define SFX_CRATE_MOVE 10
 
 // Constants for sfx channels. Completely unnecessary but it's easier to read
 #define SFX_CHANNEL_1 0
