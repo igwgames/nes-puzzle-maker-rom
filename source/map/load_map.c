@@ -101,8 +101,13 @@ CODE_BANK_POP();
 const unsigned char arcadeName[] = "Arcade";
 const unsigned char zoriaName[] = "Zoria";
 const unsigned char zoriaDesertName[] = "Zoria Desert";
-
 const unsigned char* tilesetNames[] = { arcadeName, zoriaName, zoriaDesertName };
+
+const unsigned char gameModePlainName[] = "Maze Escape";
+const unsigned char gameModeCratesName[] = "Crate Removal";
+const unsigned char gameModeCollectName[] = "Coin Collector";
+
+const unsigned char* gameModeNames[] = { gameModePlainName, gameModeCratesName, gameModeCollectName };
 
 
 

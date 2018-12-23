@@ -23,7 +23,6 @@
 #define editorInfoTempInt tempInt1
 
 
-// FIXME: Bank this. It's currently stored in 0, and banked with the pause menu in main.c (Man, I'm gettin sloppy...)
 CODE_BANK(PRG_BANK_EDITOR_INFO)
 void draw_editor_info() {
     ppu_off();
@@ -53,6 +52,13 @@ void draw_editor_info() {
     editorInfoTempInt = (int)tilesetNames[currentGameData[GAME_DATA_OFFSET_TILESET_ID]-2];
     while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
         vram_put(j + 0x60);
+    }
+
+    vram_adr(NTADR_A(15, 15));
+    i = 0; 
+    editorInfoTempInt = (int)gameModeNames[currentGameData[GAME_DATA_OFFSET_GAME_STYLE]];
+    while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
+        vram_put(j + 0x60); 
     }
 
     // Recolor tileset area
@@ -175,6 +181,14 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
+            } else if (editorInfoPosition == 4) {
+                --currentGameData[GAME_DATA_OFFSET_GAME_STYLE];
+                if (currentGameData[GAME_DATA_OFFSET_GAME_STYLE] == 255) {
+                    currentGameData[GAME_DATA_OFFSET_GAME_STYLE] = GAME_STYLE_COUNT - 1;
+                }
+                redraw = 1;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                break;
             } else if (editorInfoPosition == 7) {
                 editorInfoPosition = 8;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
@@ -184,11 +198,19 @@ void handle_editor_info_input() {
             }
         }
 
-        if (controllerState & PAD_RIGHT && !(lastControllerState & PAD_RIGHT)) {
+        if ((controllerState & PAD_RIGHT && !(lastControllerState & PAD_RIGHT)) || (controllerState & PAD_A && !(lastControllerState & PAD_A))) {
             if (editorInfoPosition == 1) { // FIXME: Constant
                 ++currentGameData[GAME_DATA_OFFSET_TILESET_ID];
                 if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] > CHR_BANK_LAST) {
                     currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ARCADE;
+                }
+                redraw = 1;
+                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                break;
+            } else if (editorInfoPosition == 4) {
+                ++currentGameData[GAME_DATA_OFFSET_GAME_STYLE];
+                if (currentGameData[GAME_DATA_OFFSET_GAME_STYLE] == GAME_STYLE_COUNT) {
+                    currentGameData[GAME_DATA_OFFSET_GAME_STYLE] = 0;
                 }
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);

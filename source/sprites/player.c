@@ -324,13 +324,39 @@ void handle_player_movement() {
             update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
-            ++currentLevelId;
-            if (currentLevelId == MAX_GAME_LEVELS) {
-                gameState = GAME_STATE_CREDITS;
-            } else {
-                gameState = GAME_STATE_LOAD_LEVEL;
+            collisionTempTileId = 0;
+            switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+                case GAME_STYLE_MAZE:
+                    // Do nothing; you're just allowed to pass.
+                    break;
+                case GAME_STYLE_COIN:
+                    for (i = 0; i != 64; ++i) {
+                        if (currentMapTileData[currentMap[i] + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_COLLECTABLE) {
+                            // Sorry, you didn't get em all. Plz try again.
+                            collisionTempTileId = 1;
+                        }
+                    }
+                    break;
+                case GAME_STYLE_CRATES: 
+                    for (i = 0; i != 64; ++i) {
+                        if (currentMapTileData[currentMap[i] + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_GAP) {
+                            // Sorry, you didn't get em all. Plz try again.
+                            collisionTempTileId = 1;
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
-            return;
+            if (!collisionTempTileId) {
+                ++currentLevelId;
+                if (currentLevelId == MAX_GAME_LEVELS) {
+                    gameState = GAME_STATE_CREDITS;
+                } else {
+                    gameState = GAME_STATE_LOAD_LEVEL;
+                }
+                return;
+            }
             break;
         default:
             // Stop you when you hit an unknown tile... idk seems better than walking?

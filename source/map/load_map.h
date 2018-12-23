@@ -10,3 +10,4 @@ void load_map_tiles_and_palette();
 void save_map();
 
 const unsigned char* tilesetNames[];
+const unsigned char* gameModeNames[];

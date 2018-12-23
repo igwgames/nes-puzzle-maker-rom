@@ -44,6 +44,9 @@ void save_game();
 
 // Simplest style - just get to the end of each level.
 #define GAME_STYLE_MAZE 0
+#define GAME_STYLE_CRATES 1
+#define GAME_STYLE_COIN 2
+#define GAME_STYLE_COUNT 3
 
 #define MAX_GAME_LEVELS 8
 
