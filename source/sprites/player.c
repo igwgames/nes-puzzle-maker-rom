@@ -36,10 +36,13 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 #define collisionTempDirection tempChar4
 #define collisionTempX tempChar4
 #define collisionTempY tempChar5
-#define collisionTempXRight tempChar6
 #define collisionTempYBottom tempChar7
 
-#define tempSpriteCollisionX tempInt1
+#define collisionTempTileId tempChar8
+#define collisionTempTileObject tempChar9
+
+
+#define collisionTempValue tempInt1
 #define tempSpriteCollisionY tempInt2
 
 #define collisionTempXInt tempInt3
@@ -82,6 +85,62 @@ void update_player_sprite() {
 
 }
 
+// FIXME: Case
+void update_single_tile(unsigned char id, unsigned char newTile, unsigned char palette) {
+    collisionTempValue = NTADR_A(((id & 0x07)<<1) + 8, ((id & 0x38) >> 2) + 4);
+    screenBuffer[0] = MSB(collisionTempValue);
+    screenBuffer[1] = LSB(collisionTempValue);
+    screenBuffer[2] = newTile;
+    ++collisionTempValue;
+    screenBuffer[3] = MSB(collisionTempValue);
+    screenBuffer[4] = LSB(collisionTempValue);
+    screenBuffer[5] = newTile+1;
+    collisionTempValue += 31;
+    screenBuffer[6] = MSB(collisionTempValue);
+    screenBuffer[7] = LSB(collisionTempValue);
+    screenBuffer[8] = newTile+16;
+    ++collisionTempValue;
+    screenBuffer[9] = MSB(collisionTempValue);
+    screenBuffer[10] = LSB(collisionTempValue);
+    screenBuffer[11] = newTile+17;
+
+    // Raw X / Y positions on-screen
+    collisionTempX = (id & 0x07) + 4;
+    collisionTempY = ((id & 0x38) >> 3) + 2;
+
+    // Calculate raw attr table address
+    collisionTempValue = ((collisionTempY >> 1) << 3) + (collisionTempX >> 1);
+
+    if (collisionTempX & 0x01) {
+        if (collisionTempY & 0x01) {
+            assetTable[collisionTempValue] &= 0x3f;
+            assetTable[collisionTempValue] |= (palette) << 6;
+        } else {
+            assetTable[collisionTempValue] &= 0xf3;
+            assetTable[collisionTempValue] |= (palette) << 2;
+        }
+    } else {
+        if (collisionTempY & 0x01) {
+            assetTable[collisionTempValue] &= 0xcf;
+            assetTable[collisionTempValue] |= (palette) << 4;
+        } else {
+            assetTable[collisionTempValue] &= 0xfc;
+            assetTable[collisionTempValue] |= (palette);
+        }
+    }
+
+    screenBuffer[14] = assetTable[collisionTempValue];
+    collisionTempValue += NAMETABLE_A + 0x3c0;
+    screenBuffer[12] = MSB(collisionTempValue);
+    screenBuffer[13] = LSB(collisionTempValue);
+
+    screenBuffer[15] = NT_UPD_EOF;
+    set_vram_update(screenBuffer);
+    ppu_wait_nmi();
+    set_vram_update(NULL);
+}
+
+
 void handle_player_movement() {
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
@@ -121,7 +180,7 @@ void handle_player_movement() {
 
     movementInProgress = PLAYER_TILE_MOVE_FRAMES;
     // TODO: Take special action based on the game type?
-    switch (currentMapTileData[currentMap[rawTileId]+2]) {
+    switch (currentMapTileData[currentMap[rawTileId]+TILE_DATA_LOOKUP_OFFSET_COLLISION]) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
@@ -135,17 +194,134 @@ void handle_player_movement() {
         case TILE_COLLISION_CRATE:
             // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
             switch (collisionTempDirection) {
-                case PAD_LEFT:
-                    // FIXME: Stopped mid implementation...
-                    rawTileId = playerGridPosition;
+                // TODO: This is ugly... what can we do to pretty it up?
+                case PAD_RIGHT:
+                    if ((rawTileId & 0x07) == 7) {
+                        rawTileId = playerGridPosition;
+                        break;
+                    }
+                    collisionTempTileId = currentMapTileData[currentMap[rawTileId+1]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                        // Do it
+                        currentMap[rawTileId+1] = currentMap[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId+1, collisionTempTileId, currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP) {
+                        currentMap[rawTileId+1] = 0;
+
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId+1, collisionTempTileId, currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                    }
                     break;
+                case PAD_LEFT:
+                    if ((rawTileId & 0x07) == 0) {
+                        rawTileId = playerGridPosition;
+                        break;
+                    }
+                    collisionTempTileId = currentMapTileData[currentMap[rawTileId-1]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                        // Do it
+                        currentMap[rawTileId-1] = currentMap[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId-1, collisionTempTileId, currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP) {
+                        currentMap[rawTileId-1] = 0;
+
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId-1, collisionTempTileId, currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                    }
+                    break;
+                case PAD_UP:
+                    if ((rawTileId & 0x38) == 0) {
+                        rawTileId = playerGridPosition;
+                        break;
+                    }
+                    collisionTempTileId = currentMapTileData[currentMap[rawTileId-8]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                        // Do it
+                        currentMap[rawTileId-8] = currentMap[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId-8, collisionTempTileId, currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP) {
+                        currentMap[rawTileId-8] = 0;
+
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId-8, collisionTempTileId, currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                    }
+                    break;
+                case PAD_DOWN:
+                    if ((rawTileId & 0x38) == 0x38) {
+                        rawTileId = playerGridPosition;
+                        break;
+                    }
+                    collisionTempTileId = currentMapTileData[currentMap[rawTileId+8]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                        // Do it
+                        currentMap[rawTileId+8] = currentMap[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId+8, collisionTempTileId, currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP) {
+                        currentMap[rawTileId+8] = 0;
+
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        update_single_tile(rawTileId+8, collisionTempTileId, currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+
+                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+
+                    }
+                    break;
+
+                    
                 default:
                     rawTileId = playerGridPosition;
                     break;
             }
             break;
         case TILE_COLLISION_COLLECTABLE:
-            // TODO:
+            ++playerKeyCount;
+            currentMap[rawTileId] = 0;
+            update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             // TODO: implement level end
@@ -273,7 +449,7 @@ void handle_player_movement() {
 }
 
 void test_player_tile_collision() {
-
+/*
 	if (playerYVelocity != 0) {
         collisionTempYInt = playerYPosition + PLAYER_Y_OFFSET_EXTENDED + playerYVelocity;
         collisionTempXInt = playerXPosition + PLAYER_X_OFFSET_EXTENDED;
@@ -364,7 +540,7 @@ void test_player_tile_collision() {
 
     playerXPosition += playerXVelocity;
     playerYPosition += playerYVelocity;
-
+*/
 }
 
 #define currentMapSpriteIndex tempChar1
@@ -460,14 +636,14 @@ void handle_player_sprite_collision() {
                 // new player position also collide? If so, stop it. Else, let it go.
 
                 // Calculate position...
-                tempSpriteCollisionX = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X + 1]) << 8));
+                collisionTempValue = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X + 1]) << 8));
                 tempSpriteCollisionY = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_Y]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_Y + 1]) << 8));
 
                 // Are we colliding?
                 // NOTE: We take a bit of a shortcut here and assume all doors are 16x16 (the hard-coded 16 value below)
                 if (
-                    playerXPosition < tempSpriteCollisionX + (16 << PLAYER_POSITION_SHIFT) &&
-                    playerXPosition + PLAYER_WIDTH_EXTENDED > tempSpriteCollisionX &&
+                    playerXPosition < collisionTempValue + (16 << PLAYER_POSITION_SHIFT) &&
+                    playerXPosition + PLAYER_WIDTH_EXTENDED > collisionTempValue &&
                     playerYPosition < tempSpriteCollisionY + (16 << PLAYER_POSITION_SHIFT) &&
                     playerYPosition + PLAYER_HEIGHT_EXTENDED > tempSpriteCollisionY
                 ) {
@@ -484,13 +660,13 @@ void handle_player_sprite_collision() {
                 // new player position also collide? If so, stop it. Else, let it go.
 
                 // Calculate position...
-                tempSpriteCollisionX = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X + 1]) << 8));
+                collisionTempValue = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_X + 1]) << 8));
                 tempSpriteCollisionY = ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_Y]) + ((currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_Y + 1]) << 8));
                 // Are we colliding?
                 // NOTE: We take a bit of a shortcut here and assume all NPCs are 16x16 (the hard-coded 16 value below)
                 if (
-                    playerXPosition < tempSpriteCollisionX + (16 << PLAYER_POSITION_SHIFT) &&
-                    playerXPosition + PLAYER_WIDTH_EXTENDED > tempSpriteCollisionX &&
+                    playerXPosition < collisionTempValue + (16 << PLAYER_POSITION_SHIFT) &&
+                    playerXPosition + PLAYER_WIDTH_EXTENDED > collisionTempValue &&
                     playerYPosition < tempSpriteCollisionY + (16 << PLAYER_POSITION_SHIFT) &&
                     playerYPosition + PLAYER_HEIGHT_EXTENDED > tempSpriteCollisionY
                 ) {

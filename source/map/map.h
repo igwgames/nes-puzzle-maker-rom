@@ -59,6 +59,9 @@
 
 // The current map; usable for collisions/etc
 extern unsigned char currentMap[64];
+extern unsigned char currentMapOrig[64];
+
+extern unsigned char assetTable[0x38];
 
 // Supporting data for sprites; 16 bytes per sprite. Look at the sprite loader function in `map.h` (or the guide) for more details.
 extern unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];

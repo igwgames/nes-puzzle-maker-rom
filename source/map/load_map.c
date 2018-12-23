@@ -122,6 +122,13 @@ void load_map() {
     // Iterate a second time to bump all values up to their array index equivalents, to save us computation later.
     for (i = 0; i != 64; ++i) {
         currentMap[i] <<= 2;
+
+        j = currentMapTileData[currentMap[i]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+        if (j == TILE_COLLISION_COLLECTABLE || j == TILE_COLLISION_CRATE) {
+            currentMapOrig[i] = 0;
+        } else {
+            currentMapOrig[i] = currentMap[i];
+        }
     }
 
 }
