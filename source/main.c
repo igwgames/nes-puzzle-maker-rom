@@ -69,7 +69,12 @@ void main() {
                 banked_call(PRG_BANK_TITLE, handle_title_input);
                 break;
             case GAME_STATE_POST_TITLE:
-                currentLevelId = 0;
+                currentLevelId = 7;//FIXME
+
+                gameTime = frameCount;
+                gameKeys = 0;
+                gameCrates = 0;
+
 
                 fade_out();
                 

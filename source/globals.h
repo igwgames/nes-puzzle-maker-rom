@@ -18,6 +18,11 @@ ZEROPAGE_EXTERN(unsigned char, totalCrateCount);
 ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
 ZEROPAGE_EXTERN(unsigned char, currentLevelId);
 
+ZEROPAGE_EXTERN(unsigned int, gameTime);
+ZEROPAGE_EXTERN(unsigned char, gameKeys);
+ZEROPAGE_EXTERN(unsigned char, gameCrates);
+
+
 ZEROPAGE_EXTERN(unsigned char, selectedGameId);
 
 ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x30);
@@ -27,7 +32,7 @@ ZEROPAGE_EXTERN(unsigned char, lastControllerState);
 
 // Bit of a special case - this is exported from assembly in crt0.asm - it's the number of frames since the system started.
 // Note: DO NOT try to alter this with your code; you will almost certainly cause unusual behavior.
-ZEROPAGE_EXTERN(unsigned char, frameCount);
+ZEROPAGE_EXTERN(unsigned int, frameCount);
 ZEROPAGE_EXTERN(unsigned char, everyOtherCycle);
 
 // A few temp variables we'll reuse a lot... be sure not to expect the state of these to stick around

@@ -17,6 +17,11 @@ ZEROPAGE_DEF(unsigned char, playerMaxHealth);
 ZEROPAGE_DEF(unsigned char, gameState);
 ZEROPAGE_DEF(unsigned char, currentLevelId);
 
+ZEROPAGE_DEF(unsigned int, gameTime);
+ZEROPAGE_DEF(unsigned char, gameKeys);
+ZEROPAGE_DEF(unsigned char, gameCrates);
+
+
 ZEROPAGE_DEF(unsigned char, selectedGameId);
 
 ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x30);

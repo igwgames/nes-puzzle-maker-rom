@@ -40,10 +40,46 @@ void draw_win_screen() {
     vram_put(' ' + 0x60);
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
-    put_str(NTADR_A(7, 10), "  Congratulations  ");
+    put_str(NTADR_A(8, 5), "Congratulations!");
 
-    put_str(NTADR_A(4, 15), "You did the thing, and");
-    put_str(NTADR_A(4, 16), "thus won the game!");
+    put_str(NTADR_A(9, 12), "You have won! ");
+
+    put_str(NTADR_A(5, 24), "Your time:       ");
+
+    // 60 frames/second, so get down to seconds
+    tempInt1 = (frameCount - gameTime) / 60;
+    // Build it up in reverse...
+    screenBuffer[4] = (tempInt1 % 60) % 10;
+    screenBuffer[3] = (tempInt1 % 60) / 10;
+    // Down to minutes
+    tempInt1 /= 60;
+    screenBuffer[2] = (tempInt1 % 100) % 10;
+    screenBuffer[1] = (tempInt1 % 100) / 10;
+
+    vram_put('0' + screenBuffer[1] + 0x60);
+    vram_put('0' + screenBuffer[2] + 0x60);
+    vram_put(':' + 0x60);
+    vram_put('0' + screenBuffer[3] + 0x60);
+    vram_put('0' + screenBuffer[4] + 0x60);
+
+
+    switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+        case GAME_STYLE_MAZE:
+            // Do nothing; nothing special to show
+            break;
+        case GAME_STYLE_COIN:
+            put_str(NTADR_A(5, 22), "Coins collected:     ");
+
+            vram_put('0' + (gameKeys / 10) + 0x60);
+            vram_put('0' + (gameKeys % 10) + 0x60);
+            break;
+        case GAME_STYLE_CRATES:
+            put_str(NTADR_A(5, 22), "Crates Removed:     ");
+            vram_put('0' + (gameCrates / 10) + 0x60);
+            vram_put('0' + (gameCrates % 10) + 0x60);
+            break;
+
+    }
 
     // Hide all existing sprites
     oam_clear();
@@ -83,22 +119,31 @@ void draw_credits_screen() {
 
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
-    put_str(NTADR_A(11, 4), "  Credits  ");
+    put_str(NTADR_A(10, 4), "  Credits  ");
 
-    put_str(NTADR_A(2, 6), "Game Design and Logic");
-    put_str(NTADR_A(4, 8), gameAuthor);
+    put_str(NTADR_A(3, 8), "Game Design");
+    vram_adr(NTADR_A(4, 10));
+    for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
+        vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
+    }
 
-    put_str(NTADR_A(2, 11), "Music");
-    put_str(NTADR_A(4, 13), "Wolfgang (OpenGameArt)");
+    // FIXME: Reference
+    put_str(NTADR_A(4, 13), "Music");
+    put_str(NTADR_A(5, 15), "Wolfgang");
+    put_str(NTADR_A(7, 17), "via OpenGameArt");
 
-    put_str(NTADR_A(2, 16), "Artwork");
-    put_str(NTADR_A(4, 18), "Refresh Games (OpenGameArt)");
+    put_str(NTADR_A(4, 20), "Artwork");
+    switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {
+        case CHR_BANK_ARCADE:
 
-    put_str(NTADR_A(6, 24), "Created in");
-    put_str(NTADR_A(17, 24), currentYear);
-    put_str(NTADR_A(22, 24), "by");
-
-    put_str(NTADR_A(8, 26), gameAuthor);
+            put_str(NTADR_A(5, 22), "RefreshGames");
+            put_str(NTADR_A(7, 24), "via OpenGameArt");
+            break;
+        case CHR_BANK_ZORIA:
+        case CHR_BANK_ZORIA_DESERT:
+            put_str(NTADR_A(5, 22), "DragonDePlatino");
+            put_str(NTADR_A(7, 24), "via OpenGameArt");
+    }
 
 
     // Hide all existing sprites

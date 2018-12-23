@@ -232,6 +232,7 @@ void handle_player_movement() {
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         ++playerCrateCount;
+                        ++gameCrates;
                         currentMap[rawTileId+1] = 0;
 
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];
@@ -241,7 +242,8 @@ void handle_player_movement() {
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
-
+                    } else {
+                        rawTileId = playerGridPosition;
                     }
                     break;
                 case PAD_LEFT:
@@ -262,6 +264,8 @@ void handle_player_movement() {
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId-1] = 0;
+                        ++playerCrateCount;
+                        ++gameCrates;
 
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_ID];
                         update_single_tile(rawTileId-1, collisionTempTileId, currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
@@ -271,6 +275,8 @@ void handle_player_movement() {
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
 
+                    } else {
+                        rawTileId = playerGridPosition;
                     }
                     break;
                 case PAD_UP:
@@ -291,6 +297,8 @@ void handle_player_movement() {
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId-8] = 0;
+                        ++playerCrateCount;
+                        ++gameCrates;
 
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_ID];
                         update_single_tile(rawTileId-8, collisionTempTileId, currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
@@ -300,6 +308,8 @@ void handle_player_movement() {
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
 
+                    } else {
+                        rawTileId = playerGridPosition;
                     }
                     break;
                 case PAD_DOWN:
@@ -320,6 +330,8 @@ void handle_player_movement() {
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         currentMap[rawTileId+8] = 0;
+                        ++playerCrateCount;
+                        ++gameCrates;
 
                         collisionTempTileId = currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_ID];
                         update_single_tile(rawTileId+8, collisionTempTileId, currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
@@ -329,6 +341,8 @@ void handle_player_movement() {
 
                         update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
 
+                    } else {
+                        rawTileId = playerGridPosition;
                     }
                     break;
 
@@ -340,6 +354,7 @@ void handle_player_movement() {
             break;
         case TILE_COLLISION_COLLECTABLE:
             ++playerKeyCount;
+            ++gameKeys;
             currentMap[rawTileId] = 0;
             update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
             break;

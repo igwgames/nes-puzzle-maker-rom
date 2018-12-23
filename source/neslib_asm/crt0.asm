@@ -55,6 +55,7 @@ PAL_BUF		=$01c0
 NTSC_MODE: 			.res 1
 _frameCount: ; By doing this, I make it available to C code with an extern
 FRAME_CNT1: 		.res 1
+FRAME_CNT1B:		.res 1
 FRAME_CNT2: 		.res 1
 VRAM_UPDATE: 		.res 1
 NAME_UPD_ADR: 		.res 2

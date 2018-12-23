@@ -131,6 +131,9 @@ nmi:
 	sta PPU_MASK
 
 	inc <FRAME_CNT1
+	bne @skip_second
+		inc <FRAME_CNT1B
+	@skip_second:
 	inc <FRAME_CNT2
 	lda <FRAME_CNT2
 	cmp #6
