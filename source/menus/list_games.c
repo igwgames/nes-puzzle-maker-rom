@@ -107,6 +107,10 @@ void draw_list_games(unsigned char isSave) {
         selectedGameId = tempSelGameHolder;
     }
 
+    if (selectedGameId > (shownBuiltInGameCount + customGameCount)) {
+        selectedGameId = 0;
+    }
+
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
     // you will have to hide all sprites, then put them back after. 
