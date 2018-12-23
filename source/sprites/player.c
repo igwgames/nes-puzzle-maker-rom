@@ -325,7 +325,11 @@ void handle_player_movement() {
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             ++currentLevelId;
-            gameState = GAME_STATE_LOAD_LEVEL;
+            if (currentLevelId == MAX_GAME_LEVELS) {
+                gameState = GAME_STATE_CREDITS;
+            } else {
+                gameState = GAME_STATE_LOAD_LEVEL;
+            }
             return;
             break;
         default:

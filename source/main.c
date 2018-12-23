@@ -39,8 +39,6 @@ void initialize_variables() {
 
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
-    currentLevelId = 0;
-
     movementInProgress = 0;
     playerGridPosition = 0;
     selectedGameId = 0;
@@ -71,6 +69,7 @@ void main() {
                 banked_call(PRG_BANK_TITLE, handle_title_input);
                 break;
             case GAME_STATE_POST_TITLE:
+                currentLevelId = 0;
 
                 music_stop();
                 fade_out();
@@ -85,6 +84,7 @@ void main() {
                 break;
             case GAME_STATE_LOAD_LEVEL:
                 fade_out();
+                oam_clear();
 
                 load_game();
                 load_map();
@@ -120,6 +120,7 @@ void main() {
                 banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
                 break;
             case GAME_STATE_EDITOR_INIT:
+                currentLevelId = 0;
 
                 music_stop();
                 fade_out();
