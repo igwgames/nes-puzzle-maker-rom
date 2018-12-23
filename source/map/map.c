@@ -412,7 +412,8 @@ void do_fade_screen_transition() {
     load_sprites();
     clear_asset_table(1);
     fade_out_fast();
-    
+
+/*    
     // Now that the screen is clear, migrate the player's sprite a bit..
     if (playerDirection == SPRITE_DIRECTION_LEFT) {
         playerXPosition = (SCREEN_EDGE_RIGHT << PLAYER_POSITION_SHIFT);
@@ -423,6 +424,7 @@ void do_fade_screen_transition() {
     } else if (playerDirection == SPRITE_DIRECTION_DOWN) {
         playerYPosition = (SCREEN_EDGE_TOP << PLAYER_POSITION_SHIFT);
     }
+    */
     // Actually move the sprite too, since otherwise this won't happen until after we un-blank the screen.
     banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
 
