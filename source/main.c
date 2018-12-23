@@ -23,6 +23,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/game_over.h"
 #include "source/game_data/game_data.h"
 #include "source/menus/editor_info.h"
+#include "source/menus/list_games.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -73,6 +74,12 @@ void main() {
 
                 music_stop();
                 fade_out();
+
+                draw_list_games();
+                fade_in();
+                do_list_game_input();
+                fade_out();
+
                 load_game();
                 load_map();
 
@@ -107,11 +114,15 @@ void main() {
                 break;
             case GAME_STATE_EDITOR_INIT:
 
-                // FIXME: Interface to save/load games, rather than this...
-                load_game();
-
                 music_stop();
                 fade_out();
+
+                draw_list_games();
+                fade_in();
+                do_list_game_input();
+                fade_out();
+                load_game();
+
                 load_map();
                 oam_clear();
 

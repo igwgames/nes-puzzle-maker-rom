@@ -16,6 +16,7 @@
 
 #define editorInfoPosition tempChar1
 #define editorInfoPositionFull tempChar2
+#define editorInfoPositionLeft tempChar4
 #define tempScreenByte tempChar3
 #define redraw tempChar9 // Using a higher one, so it's unlikely our called functions steal it.
 #define editorInfoTempInt tempInt1
@@ -96,15 +97,21 @@ void handle_editor_info_input() {
         // FIXME: Constant
         screenBuffer[i] = 0xee;
     }
-    screenBuffer[23] = MSB(NTADR_A(3, 4));
-    screenBuffer[24] = LSB(NTADR_A(3, 4));
+    screenBuffer[23] = MSB(NTADR_A(7, 26));
+    screenBuffer[24] = LSB(NTADR_A(7, 26));
+    screenBuffer[25] = ' ' + 0x60;
+    screenBuffer[26] = MSB(NTADR_A(17, 26));
+    screenBuffer[27] = LSB(NTADR_A(17, 26));
+    screenBuffer[28] = ' ' + 0x60;
+    screenBuffer[29] = MSB(NTADR_A(3, 4));
+    screenBuffer[30] = LSB(NTADR_A(3, 4));
     // FIXME: Constant
-    screenBuffer[25] = 0xe2;
+    screenBuffer[31] = 0xe2;
     // NOTE: This is just a random tile to update and keep black - this should be updated when we need a second tile.
-    screenBuffer[26] = MSB(NTADR_A(8, 3));
-    screenBuffer[27] = LSB(NTADR_A(8, 3));
-    screenBuffer[28] = 0xee; // AGAIN, FIXME: Constant
-    screenBuffer[29] = NT_UPD_EOF;
+    screenBuffer[32] = MSB(NTADR_A(8, 3));
+    screenBuffer[33] = LSB(NTADR_A(8, 3));
+    screenBuffer[34] = 0xee; // AGAIN, FIXME: Constant
+    screenBuffer[35] = NT_UPD_EOF;
     set_vram_update(screenBuffer);
     redraw = 0;
     while (1) {
@@ -123,7 +130,7 @@ void handle_editor_info_input() {
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
-            if (editorInfoPosition != 6) {
+            if (editorInfoPosition != 8) {
                 ++editorInfoPosition;
             }
         }
@@ -153,6 +160,10 @@ void handle_editor_info_input() {
                 }
                 redraw = 1;
                 break;
+            } else if (editorInfoPosition == 7) {
+                editorInfoPosition = 8;
+            } else if (editorInfoPosition == 8) {
+                editorInfoPosition = 7;
             }
         }
 
@@ -164,10 +175,14 @@ void handle_editor_info_input() {
                 }
                 redraw = 1;
                 break;
+            } else if (editorInfoPosition == 7) {
+                editorInfoPosition = 8;
+            } else if (editorInfoPosition == 8) {
+                editorInfoPosition = 7;
             }
         }
 
-
+        editorInfoPositionLeft = 3;
         switch (editorInfoPosition) {
             case 0:
                 editorInfoPositionFull = 4;
@@ -188,15 +203,23 @@ void handle_editor_info_input() {
                 editorInfoPositionFull = 17;
                 break;
             case 6: 
-                editorInfoPositionFull = 23;
+                editorInfoPositionFull = 19;
+                break;
+            case 7:
+                editorInfoPositionFull = 26;
+                editorInfoPositionLeft = 7;
+                break;
+            case 8:
+                editorInfoPositionFull = 26;
+                editorInfoPositionLeft = 17;
                 break;
             default:
                 editorInfoPositionFull = 10 + ((editorInfoPosition-2)*3);
                 break;
         }
-        editorInfoTempInt = NTADR_A(3, editorInfoPositionFull);
-        screenBuffer[23] = MSB(editorInfoTempInt);
-        screenBuffer[24] = LSB(editorInfoTempInt);
+        editorInfoTempInt = NTADR_A(editorInfoPositionLeft, editorInfoPositionFull);
+        screenBuffer[29] = MSB(editorInfoTempInt);
+        screenBuffer[30] = LSB(editorInfoTempInt);
 
         ppu_wait_nmi();
 

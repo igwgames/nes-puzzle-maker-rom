@@ -1,19 +1,19 @@
 // Saving and loading game data, parsing it out of large structures...
 // Also handles the temporary storage for the editor.
+#include "source/library/bank_helpers.h"
 
-// FIXME: Rename to currentGame
 extern unsigned char currentGameData[256];
 
 // NOTE: please don't use this by yourself - it's meant to be used by the macro below. 
 ZEROPAGE_EXTERN(unsigned char, __extraBits);
+
+SRAM_ARRAY_EXTERN(unsigned char, savedGameData, 2048);
 
 void unload_game();
 
 void load_game();
 
 void load_game();
-
-void list_games();
 
 // Pick a random "magic" number to mark a map with, so we know this is the current id. Increment any time there's a major change.
 #define GAME_DATA_VERSION_ID 24

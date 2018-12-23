@@ -33,6 +33,7 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 #define rawXPosition tempChar1
 #define rawYPosition tempChar2
 #define rawTileId tempChar3
+#define collisionTempDirection tempChar4
 #define collisionTempX tempChar4
 #define collisionTempY tempChar5
 #define collisionTempXRight tempChar6
@@ -101,12 +102,16 @@ void handle_player_movement() {
 
     if (controllerState & PAD_LEFT && (rawTileId & 0x07) != 0) {
         rawTileId--;
+        collisionTempDirection = PAD_LEFT;
     } else if (controllerState & PAD_RIGHT && (rawTileId & 0x07) != 7) {
         rawTileId++;
+        collisionTempDirection = PAD_RIGHT;
     } else if (controllerState & PAD_UP && (rawTileId & 0x38) != 0) {
         rawTileId -= 8;
+        collisionTempDirection = PAD_UP;
     } else if (controllerState & PAD_DOWN && (rawTileId & 0x38) != 0x38) {
         rawTileId += 8;
+        collisionTempDirection = PAD_DOWN;
     }
 
     if (rawTileId == playerGridPosition) {
@@ -128,7 +133,16 @@ void handle_player_movement() {
             rawTileId = playerGridPosition;
             break;
         case TILE_COLLISION_CRATE:
-            // TODO: Implement crate behavior
+            // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
+            switch (collisionTempDirection) {
+                case PAD_LEFT:
+                    // FIXME: Stopped mid implementation...
+                    rawTileId = playerGridPosition;
+                    break;
+                default:
+                    rawTileId = playerGridPosition;
+                    break;
+            }
             break;
         case TILE_COLLISION_COLLECTABLE:
             // TODO:
