@@ -74,11 +74,13 @@ void main() {
 
                 music_stop();
                 fade_out();
-
-                draw_list_games();
+                
+                bank_push(PRG_BANK_GAME_LIST);
+                draw_list_games(0);
                 fade_in();
-                do_list_game_input();
+                do_list_game_input(0);
                 fade_out();
+                bank_pop();
 
                 load_game();
                 load_map();
@@ -117,11 +119,13 @@ void main() {
                 music_stop();
                 fade_out();
 
-                draw_list_games();
+                bank_push(PRG_BANK_GAME_LIST);
+                draw_list_games(0);
                 fade_in();
-                do_list_game_input();
+                do_list_game_input(0);
                 fade_out();
                 load_game();
+                bank_pop();
 
                 load_map();
                 oam_clear();
@@ -172,9 +176,9 @@ void main() {
                 break;
             case GAME_STATE_EDITOR_INFO:
                 fade_out();
-                banked_call(PRG_BANK_PAUSE_MENU, draw_editor_info);
+                banked_call(PRG_BANK_EDITOR_INFO, draw_editor_info);
                 fade_in();
-                banked_call(PRG_BANK_PAUSE_MENU, handle_editor_info_input);
+                banked_call(PRG_BANK_EDITOR_INFO, handle_editor_info_input);
                 gameState = GAME_STATE_EDITOR_REDRAW;
                 
                 break;

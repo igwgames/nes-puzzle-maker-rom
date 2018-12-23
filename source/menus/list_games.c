@@ -5,6 +5,21 @@
 #include "source/graphics/fade_animation.h"
 #include "source/menus/text_helpers.h"
 #include "source/game_data/game_data.h"
+#include "source/configuration/game_states.h"
+// NOTE: We're stealing the input variable from this for a temp location to store stuff.
+#include "source/menus/text_input.h"
+
+void bank_draw_list_games(unsigned char isSave) {
+    bank_push(PRG_BANK_GAME_LIST);
+    draw_list_games(isSave);
+    bank_pop();
+}
+
+void bank_do_list_game_input(unsigned char isSave) {
+    bank_push(PRG_BANK_GAME_LIST);
+    do_list_game_input(isSave);
+    bank_pop();
+}
 
 CODE_BANK(PRG_BANK_GAME_LIST);
 
@@ -13,8 +28,11 @@ CODE_BANK(PRG_BANK_GAME_LIST);
 
 #define builtInGameCount tempChar1
 #define customGameCount tempChar2
+#define tempSelGameHolder tempChar3
+#define shownBuiltInGameCount tempChar4
 
-void draw_list_games() {
+void draw_list_games(unsigned char isSave) {
+    tempSelGameHolder = selectedGameId;
     builtInGameCount = 0;
     customGameCount = 0;
     ppu_off();
@@ -24,40 +42,54 @@ void draw_list_games() {
 	// pal_spr(titlePalette);
     scroll(0, 0);
 
-    put_str(NTADR_A(3, 2), " Load Game ");
-	// set_chr_bank_0(CHR_BANK_MENU);
-    // set_chr_bank_1(CHR_BANK_MENU);
+    if (isSave) {
+        put_str(NTADR_A(3, 2), " Save Game ");
+        put_str(NTADR_A(5, 4), "Choose a slot to save to");
+    } else {
+        put_str(NTADR_A(3, 2), " Load Game ");
 
-    // Just write "- Paused -" on the screen... there's plenty of nicer things you could do if you wanna spend time!
-
-    put_str(NTADR_A(5, 4), "Choose a game to load.");
+        put_str(NTADR_A(5, 4), "Choose a game to load.");
+    }
 
     for (i = 0; i != 8; ++i) {
         selectedGameId = i;
-        load_game();
-        if (currentGameData[0] == GAME_DATA_VERSION_ID) {
+        load_game_name_to_input();
+        if (inputText[0] != NULL) {
             ++builtInGameCount;
-            vram_adr(NTADR_A(5, 6+i));
-            vram_put('0' + i + 1 + 0x60);
-            vram_put('.' + 0x60);
-            for (j = 0; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
-                vram_put(currentGameData[GAME_DATA_OFFSET_TITLE + j] + 0x60);
+            if (!isSave) {
+                vram_adr(NTADR_A(5, 6+i));
+                vram_put('0' + i + 1 + 0x60);
+                vram_put('.' + 0x60);
+                for (j = 0; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
+                    vram_put(inputText[j] + 0x60);
+                }
             }
         } else {
             break;
         }
+    }
+
+    if (isSave) {
+        shownBuiltInGameCount = 0;
+    } else {
+        shownBuiltInGameCount = builtInGameCount;
     }
 
     for (i = 0; i != 8; ++i) {
         selectedGameId = 128 + i;
-        load_game();
-        if (currentGameData[0] == GAME_DATA_VERSION_ID) {
+        load_game_name_to_input();
+        if (inputText[0] != NULL) {
             ++customGameCount;
-            vram_adr(NTADR_A(5, 6+(builtInGameCount+i)));
-            vram_put('0' + (builtInGameCount + i) + 1 + 0x60);
+            vram_adr(NTADR_A(5, 6+(shownBuiltInGameCount+i)));
+            if ((shownBuiltInGameCount + i + 1) < 10) {
+                vram_put('0' + (shownBuiltInGameCount + i) + 1 + 0x60);
+            } else {
+                vram_put('A' + (shownBuiltInGameCount + i) + 1 - 10 + 0x60);
+            }
             vram_put('.' + 0x60);
+
             for (j = 0; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
-                vram_put(currentGameData[GAME_DATA_OFFSET_TITLE + j] + 0x60);
+                vram_put(inputText[j] + 0x60);
             }
         } else {
             break;
@@ -65,6 +97,15 @@ void draw_list_games() {
     }
 
 
+    if ((isSave && customGameCount < 8) || gameState == GAME_STATE_EDITOR_INIT) {
+        put_str(NTADR_A(5, 6+(shownBuiltInGameCount + customGameCount)), "- New Game -");
+    }
+
+    if (tempSelGameHolder >= 128) {
+        selectedGameId = tempSelGameHolder - 128 + shownBuiltInGameCount;
+    } else {
+        selectedGameId = tempSelGameHolder;
+    }
 
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
@@ -72,8 +113,7 @@ void draw_list_games() {
     ppu_on_bg();
 }
 
-void do_list_game_input() {
-    selectedGameId = 0;
+void do_list_game_input(unsigned char isSave) {
 
     do_redraw:
     screenBuffer[0] = MSB(NTADR_A(3, 4)) | NT_UPD_VERT;
@@ -110,13 +150,13 @@ void do_list_game_input() {
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
-            if (selectedGameId != 6) {
+            if (selectedGameId != (shownBuiltInGameCount + customGameCount + ((isSave && customGameCount < 8) || gameState == GAME_STATE_EDITOR_INIT ? 0 : -1))) {
                 ++selectedGameId;
             }
         }
 
         if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
-            
+            break;
         }
 
         listGamesTempInt = NTADR_A(3, selectedGameId + 6);
@@ -128,9 +168,13 @@ void do_list_game_input() {
     }
     if (redraw) {
         fade_out();
-        draw_list_games();
+        draw_list_games(isSave);
         fade_in();
         goto do_redraw;
+    }
+
+    if (selectedGameId >= shownBuiltInGameCount) {
+        selectedGameId = 128 + (selectedGameId - shownBuiltInGameCount);
     }
 
 }

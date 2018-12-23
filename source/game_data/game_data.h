@@ -13,7 +13,9 @@ void unload_game();
 
 void load_game();
 
-void load_game();
+void load_game_name_to_input();
+
+void save_game();
 
 // Pick a random "magic" number to mark a map with, so we know this is the current id. Increment any time there's a major change.
 #define GAME_DATA_VERSION_ID 24

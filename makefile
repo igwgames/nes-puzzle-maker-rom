@@ -89,10 +89,7 @@ endif
 # There are probably better ways to do this, and I know things are still deleted. Feel free to PR a better way in.
 .PRECIOUS: $(SOURCE_C) $(SOURCE_S) $(SOURCE_O) temp/%.s
 
-build: rom/$(ROM_NAME).nes graphics/generated/tiles.png graphics/generated/sprites.png
-
-build-tiles: graphics/generated/tiles.png
-build-sprites: graphics/generated/sprites.png
+build: rom/$(ROM_NAME).nes 
 
 temp/base.asm: $(CONFIG_ASM)
 	echo ".include \"$(CONFIG_ASM)\"" > temp/base.asm

@@ -21,6 +21,7 @@ ZEROPAGE_DEF(int, xScrollPosition);
 ZEROPAGE_DEF(int, yScrollPosition);
 
 unsigned char currentMap[64];
+unsigned char currentMapSpriteGrid[64];
 
 unsigned char assetTable[0x38];
 

@@ -24,6 +24,8 @@ char buffer[10];
 
 // Separate function so we can put it into a separate prg bank, then call it below. See documentation with public function.
 void _print_static_screen() {
+    // FIXME: Backport this into engine
+    set_vram_update(NULL);
     ppu_wait_frame();
     ppu_off();
     set_chr_bank_0(CHR_BANK_MENU);

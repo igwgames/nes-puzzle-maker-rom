@@ -74,10 +74,10 @@ void update_player_sprite() {
         oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
 
     } else {
-        oam_spr(rawXPosition, rawYPosition, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
-        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
-        oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
-        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
+        oam_spr(rawXPosition, rawYPosition, rawTileId, 0x03, PLAYER_SPRITE_INDEX);
+        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x03, PLAYER_SPRITE_INDEX+4);
+        oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x03, PLAYER_SPRITE_INDEX+8);
+        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x03, PLAYER_SPRITE_INDEX+12);
     }
 
 }
@@ -603,19 +603,19 @@ void handle_editor_input() {
     rawYPosition = (PLAY_AREA_TOP + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x38) << 1));
     rawTileId = PLAYER_SPRITE_TILE_ID;
 
-    oam_spr(rawXPosition, rawYPosition, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
-    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
-    oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
-    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
+    oam_spr(rawXPosition, rawYPosition, rawTileId, 0x03, PLAYER_SPRITE_INDEX);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x03, PLAYER_SPRITE_INDEX+4);
+    oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x03, PLAYER_SPRITE_INDEX+8);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x03, PLAYER_SPRITE_INDEX+12);
 
 
     rawXPosition = (64 + ((playerGridPosition & 0x07)<<4));
     rawYPosition = (80 + ((playerGridPosition & 0x38)<<1));
     // FIXME: Sprite constant
-    oam_spr(rawXPosition, rawYPosition, 0xe2, 0x00, 0xd0);
-    oam_spr(rawXPosition+8, rawYPosition, 0xe2+1, 0x00, 0xd0+4);
-    oam_spr(rawXPosition, rawYPosition+8, 0xe2+16, 0x00, 0xd0+8);
-    oam_spr(rawXPosition+8, rawYPosition+8, 0xe2+17, 0x00, 0xd0+12);
+    oam_spr(rawXPosition, rawYPosition, 0xe2, 0x03, 0xd0);
+    oam_spr(rawXPosition+8, rawYPosition, 0xe2+1, 0x03, 0xd0+4);
+    oam_spr(rawXPosition, rawYPosition+8, 0xe2+16, 0x03, 0xd0+8);
+    oam_spr(rawXPosition+8, rawYPosition+8, 0xe2+17, 0x03, 0xd0+12);
 
 
 }

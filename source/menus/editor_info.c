@@ -13,6 +13,7 @@
 #include "source/graphics/fade_animation.h"
 #include "source/map/load_map.h"
 #include "source/map/map.h"
+#include "source/menus/list_games.h"
 
 #define editorInfoPosition tempChar1
 #define editorInfoPositionFull tempChar2
@@ -23,6 +24,7 @@
 
 
 // FIXME: Bank this. It's currently stored in 0, and banked with the pause menu in main.c (Man, I'm gettin sloppy...)
+CODE_BANK(PRG_BANK_EDITOR_INFO)
 void draw_editor_info() {
     ppu_off();
     //clear_screen_with_border();
@@ -148,6 +150,16 @@ void handle_editor_info_input() {
                 memcpy(&(currentGameData[GAME_DATA_OFFSET_AUTHOR]), inputText, 12);
                 redraw = 1;
                 break;
+            } else if (editorInfoPosition == 7) {
+                // You hit save. So, let's save.
+                fade_out();
+                bank_draw_list_games(1);
+                fade_in();
+                bank_do_list_game_input(1);
+                redraw = 1;
+                save_game();
+                break;
+
             }
 
         }
