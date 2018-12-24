@@ -121,39 +121,56 @@ void draw_credits_screen() {
     put_str(NTADR_A(10, 4), "  Credits  ");
 
     put_str(NTADR_A(4, 8), "Game Design");
-    vram_adr(NTADR_A(5, 10));
+    vram_adr(NTADR_A(5, 9));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
     }
 
-    put_str(NTADR_A(4, 13), "Music");
+    put_str(NTADR_A(4, 12), "Music");
     switch (currentGameData[GAME_DATA_OFFSET_SONG_ID]) {
         case SONG_OVERWORLD:
         case SONG_TITLE:
         case SONG_RPG_BATTLE:
         case SONG_CAVE:
-            put_str(NTADR_A(5, 15), "Ted Kerr (Wolfgang)");
-            put_str(NTADR_A(7, 17), "via OpenGameArt");
+            put_str(NTADR_A(5, 14), "Ted Kerr (Wolfgang)");
+            put_str(NTADR_A(7, 16), "via OpenGameArt");
             break;
 
         case SONG_HEAD_IN_SAND:
-            put_str(NTADR_A(5, 15), "congusbongus");
-            put_str(NTADR_A(7, 17), "via OpenGameArt");
+            put_str(NTADR_A(5, 14), "congusbongus");
+            put_str(NTADR_A(7, 16), "via OpenGameArt");
             break;
 
     }
 
-    put_str(NTADR_A(4, 20), "Artwork");
+    put_str(NTADR_A(4, 19), "Artwork");
     switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {
         case CHR_BANK_ARCADE:
 
-            put_str(NTADR_A(5, 22), "RefreshGames");
-            put_str(NTADR_A(7, 24), "via OpenGameArt");
+            put_str(NTADR_A(5, 21), "RefreshGames");
+            put_str(NTADR_A(7, 23), "via OpenGameArt");
             break;
         case CHR_BANK_ZORIA:
         case CHR_BANK_ZORIA_DESERT:
-            put_str(NTADR_A(5, 22), "DragonDePlatino");
+            put_str(NTADR_A(5, 21), "DragonDePlatino");
             put_str(NTADR_A(7, 24), "via OpenGameArt");
+    }
+
+    switch (currentGameData[GAME_DATA_OFFSET_SPRITE_ID]) {
+        case GAME_SPRITE_ARCADE:
+        case GAME_SPRITE_SLIME:
+            if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] != CHR_BANK_ARCADE) {
+                put_str(NTADR_A(5, 22), "RefreshGames");
+            }
+            break;
+        case GAME_SPRITE_DOG:
+        case GAME_SPRITE_ROBITZ:
+        case GAME_SPRITE_SPIDER:
+        case GAME_SPRITE_ZORIA:
+            if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] != CHR_BANK_ZORIA && currentGameData[GAME_DATA_OFFSET_TILESET_ID] != CHR_BANK_ZORIA_DESERT) {
+                put_str(NTADR_A(5, 22), "RefreshGames");
+            }
+            break;
     }
 
 
