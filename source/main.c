@@ -70,7 +70,7 @@ void main() {
                 banked_call(PRG_BANK_TITLE, handle_title_input);
                 break;
             case GAME_STATE_POST_TITLE:
-                currentLevelId = 7;
+                currentLevelId = 0;
 
                 gameTime = frameCount;
                 gameKeys = 0;
@@ -101,6 +101,7 @@ void main() {
             case GAME_STATE_LOAD_LEVEL_1: // Used to start music in the case above.
                 playerKeyCount = 0;
                 playerCrateCount = 0;
+                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
                 fade_out();
                 oam_clear();
 
