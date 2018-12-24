@@ -6,6 +6,7 @@
 #include "source/configuration/game_states.h"
 #include "source/menus/text_helpers.h"
 #include "source/menus/input_helpers.h"
+#include "source/game_data/game_data.h"
 
 CODE_BANK(PRG_BANK_PAUSE_MENU);
 
@@ -23,11 +24,29 @@ void draw_pause_screen() {
     // set_chr_bank_1(CHR_BANK_MENU);
 
     // Just write "- Paused -" on the screen... there's plenty of nicer things you could do if you wanna spend time!
-    put_str(NTADR_A(11, 6), "- Paused -");
+    put_str(NTADR_A(11, 7), "- Paused -");
 
     put_str(NTADR_A(12, 16), "Continue");
     put_str(NTADR_A(12, 18), "Restart");
 
+
+    vram_adr(NTADR_A(3,2));
+    vram_put(' ' + 0x60);
+
+    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
+        if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
+            // If all that's left is spaces, don't keep printing
+            for (j = i; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
+                if (currentGameData[GAME_DATA_OFFSET_TITLE+j] != ' ' && currentGameData[GAME_DATA_OFFSET_TITLE+j] != 0) {
+                    goto keep_going;
+                }
+            }
+            break;
+        }
+        keep_going:
+        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
+    }
+    vram_put(' ' + 0x60);
 
 
     // We purposely leave sprites off, so they do not clutter the view. 

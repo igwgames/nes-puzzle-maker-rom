@@ -18,3 +18,5 @@
 
 #define GAME_STATE_EDITOR_INFO      72
 #define GAME_STATE_EDITOR_REDRAW    73
+
+#define GAME_STATE_INTRO            80

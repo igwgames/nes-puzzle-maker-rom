@@ -24,6 +24,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/game_data/game_data.h"
 #include "source/menus/editor_info.h"
 #include "source/menus/list_games.h"
+#include "source/menus/intro.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -83,11 +84,21 @@ void main() {
                 fade_in();
                 do_list_game_input(0);
                 bank_pop();
+                
+                fade_out();
+                load_game();
+                load_map(); // Needed to get proper tile data loaded 
+
+                banked_call(PRG_BANK_INTRO_SCREEN, draw_intro_screen);
+                fade_in();
+                banked_call(PRG_BANK_INTRO_SCREEN, handle_intro_input);
+
+
                 music_stop();
                 gameState = GAME_STATE_LOAD_LEVEL_1;
                 break;
             case GAME_STATE_LOAD_LEVEL:
-            case GAME_STATE_LOAD_LEVEL_1:
+            case GAME_STATE_LOAD_LEVEL_1: // Used to start music in the case above.
                 playerKeyCount = 0;
                 playerCrateCount = 0;
                 fade_out();
