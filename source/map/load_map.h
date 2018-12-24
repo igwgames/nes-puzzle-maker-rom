@@ -9,6 +9,7 @@ void load_map_tiles_and_palette();
 
 void save_map();
 
-const unsigned char* tilesetNames[];
-const unsigned char* gameModeNames[];
-const unsigned char* songNames[];
+extern const unsigned char* tilesetNames[];
+extern const unsigned char* gameModeNames[];
+extern const unsigned char* songNames[];
+extern const unsigned char spritePalettes[];

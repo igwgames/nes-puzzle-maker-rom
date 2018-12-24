@@ -104,12 +104,10 @@ void draw_editor_hud() {
     }
 
 
-
-    // FIXME: Correct palette Id?
-    oam_spr(208, 15, HUD_PLAYER_SPRITE_ID, 0x03, HUD_PLAYER_SPRITE_OAM);
-    oam_spr(216, 15, HUD_PLAYER_SPRITE_ID+1, 0x03, HUD_PLAYER_SPRITE_OAM+4);
-    oam_spr(208, 23, HUD_PLAYER_SPRITE_ID+16, 0x03, HUD_PLAYER_SPRITE_OAM+8);
-    oam_spr(216, 23, HUD_PLAYER_SPRITE_ID+17, 0x03, HUD_PLAYER_SPRITE_OAM+12);
+    oam_spr(208, 15, playerSpriteTileId, 0x03, HUD_PLAYER_SPRITE_OAM);
+    oam_spr(216, 15, playerSpriteTileId+1, 0x03, HUD_PLAYER_SPRITE_OAM+4);
+    oam_spr(208, 23, playerSpriteTileId+16, 0x03, HUD_PLAYER_SPRITE_OAM+8);
+    oam_spr(216, 23, playerSpriteTileId+17, 0x03, HUD_PLAYER_SPRITE_OAM+12);
 
 
     vram_adr(NAMETABLE_A + HUD_EDITOR_TILES_START + 32);

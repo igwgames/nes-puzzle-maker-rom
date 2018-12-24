@@ -23,8 +23,15 @@
 #define editorInfoTempInt tempInt1
 
 
-CODE_BANK(PRG_BANK_EDITOR_INFO)
+CODE_BANK(PRG_BANK_EDITOR_INFO);
+
+
+const unsigned char spriteTilesetName0[] = "Arcade";
+const unsigned char spriteTilesetName1[] = "Zoria";
+const unsigned char* spriteTilesetNames[] = { spriteTilesetName0, spriteTilesetName1, spriteTilesetName0, spriteTilesetName1, spriteTilesetName1, spriteTilesetName1 };
+
 void draw_editor_info() {
+    oam_clear();
     ppu_off();
     //clear_screen_with_border();
     // We reuse the title palette here, though we have the option of making our own if needed.
@@ -42,7 +49,7 @@ void draw_editor_info() {
         vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
     }
 
-    vram_adr(NTADR_A(11, 17));
+    vram_adr(NTADR_A(11, 20));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
     }
@@ -54,16 +61,23 @@ void draw_editor_info() {
         vram_put(j + 0x60);
     }
 
-    vram_adr(NTADR_A(15, 15));
+    vram_adr(NTADR_A(15, 16));
     i = 0; 
     editorInfoTempInt = (int)gameModeNames[currentGameData[GAME_DATA_OFFSET_GAME_STYLE]];
     while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
         vram_put(j + 0x60); 
     }
 
-    vram_adr(NTADR_A(10, 11));
+    vram_adr(NTADR_A(10, 18));
     i = 0; 
     editorInfoTempInt = (int)songNames[currentGameData[GAME_DATA_OFFSET_SONG_ID]];
+    while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
+        vram_put(j + 0x60); 
+    }
+
+    vram_adr(NTADR_A(18, 11));
+    i = 0; 
+    editorInfoTempInt = (int)spriteTilesetNames[currentGameData[GAME_DATA_OFFSET_SPRITE_ID]];
     while ((j = ((unsigned char*)editorInfoTempInt)[i++]) != NULL) {
         vram_put(j + 0x60); 
     }
@@ -94,13 +108,21 @@ void draw_editor_info() {
 
 
 
-    // We purposely leave sprites off, so they do not clutter the view. 
-    // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
-    // you will have to hide all sprites, then put them back after. 
     set_vram_update(NULL);
-    ppu_on_bg();
+    ppu_on_all();
 }
 
+#define EDITOR_INFO_POSITION_TITLE 0
+#define EDITOR_INFO_POSITION_TILESET 1
+#define EDITOR_INFO_POSITION_MUSIC 4
+#define EDITOR_INFO_POSITION_SPRITE 2
+#define EDITOR_INFO_POSITION_AUTHOR 5
+#define EDITOR_INFO_POSITION_PLAY_STYLE 3
+#define EDITOR_INFO_POSITION_SAVE 6
+#define EDITOR_INFO_POSITION_EXPORT 7
+
+#define EDITOR_INFO_PLAYER_X (9<<3)
+#define EDITOR_INFO_PLAYER_Y (13<<3)-2
 
 void handle_editor_info_input() {
     editorInfoPosition = 0;
@@ -113,11 +135,11 @@ void handle_editor_info_input() {
         // FIXME: Constant
         screenBuffer[i] = 0xee;
     }
-    screenBuffer[23] = MSB(NTADR_A(7, 26));
-    screenBuffer[24] = LSB(NTADR_A(7, 26));
+    screenBuffer[23] = MSB(NTADR_A(7, 25));
+    screenBuffer[24] = LSB(NTADR_A(7, 25));
     screenBuffer[25] = ' ' + 0x60;
-    screenBuffer[26] = MSB(NTADR_A(17, 26));
-    screenBuffer[27] = LSB(NTADR_A(17, 26));
+    screenBuffer[26] = MSB(NTADR_A(17, 25));
+    screenBuffer[27] = LSB(NTADR_A(17, 25));
     screenBuffer[28] = ' ' + 0x60;
     screenBuffer[29] = MSB(NTADR_A(3, 4));
     screenBuffer[30] = LSB(NTADR_A(3, 4));
@@ -147,26 +169,26 @@ void handle_editor_info_input() {
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
-            if (editorInfoPosition != 8) {
+            if (editorInfoPosition != EDITOR_INFO_POSITION_EXPORT) {
                 ++editorInfoPosition;
             }
             sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
         }
 
         if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
-            if (editorInfoPosition == 0) { // FIXME: Constant
+            if (editorInfoPosition == EDITOR_INFO_POSITION_TITLE) { 
                 memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_TITLE]), 12);
                 do_text_input("game name", 12);
                 memcpy(&(currentGameData[GAME_DATA_OFFSET_TITLE]), inputText, 12);
                 redraw = 1;
                 break;
-            } else if (editorInfoPosition == 5) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_AUTHOR) {
                 memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_AUTHOR]), 12);
                 do_text_input("author", 12);
                 memcpy(&(currentGameData[GAME_DATA_OFFSET_AUTHOR]), inputText, 12);
                 redraw = 1;
                 break;
-            } else if (editorInfoPosition == 7) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
                 // You hit save. So, let's save.
                 fade_out();
                 bank_draw_list_games(1);
@@ -181,7 +203,7 @@ void handle_editor_info_input() {
         }
 
         if (controllerState & PAD_LEFT && !(lastControllerState & PAD_LEFT)) {
-            if (editorInfoPosition == 1) { // FIXME: Constant
+            if (editorInfoPosition == EDITOR_INFO_POSITION_TILESET) {
                 --currentGameData[GAME_DATA_OFFSET_TILESET_ID];
                 if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] < CHR_BANK_ARCADE) {
                     currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_LAST;
@@ -189,7 +211,7 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == 2) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_MUSIC) {
                 --currentGameData[GAME_DATA_OFFSET_SONG_ID];
                 if (currentGameData[GAME_DATA_OFFSET_SONG_ID] == 255) {
                     currentGameData[GAME_DATA_OFFSET_SONG_ID] = SONG_COUNT - 1;
@@ -197,7 +219,7 @@ void handle_editor_info_input() {
                 music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
                 redraw = 1;
                 break;
-            } else if (editorInfoPosition == 4) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_PLAY_STYLE) {
                 --currentGameData[GAME_DATA_OFFSET_GAME_STYLE];
                 if (currentGameData[GAME_DATA_OFFSET_GAME_STYLE] == 255) {
                     currentGameData[GAME_DATA_OFFSET_GAME_STYLE] = GAME_STYLE_COUNT - 1;
@@ -205,17 +227,25 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == 7) {
-                editorInfoPosition = 8;
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
+                editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
-            } else if (editorInfoPosition == 8) {
-                editorInfoPosition = 7;
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SPRITE) {
+                --currentGameData[GAME_DATA_OFFSET_SPRITE_ID];
+                if (currentGameData[GAME_DATA_OFFSET_SPRITE_ID] == 255) {
+                    currentGameData[GAME_DATA_OFFSET_SPRITE_ID] = GAME_SPRITE_COUNT-1;
+                }
+                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
+                redraw = 1;
+                break;
             }
         }
 
         if ((controllerState & PAD_RIGHT && !(lastControllerState & PAD_RIGHT)) || (controllerState & PAD_A && !(lastControllerState & PAD_A))) {
-            if (editorInfoPosition == 1) { // FIXME: Constant
+            if (editorInfoPosition == EDITOR_INFO_POSITION_TILESET) {
                 ++currentGameData[GAME_DATA_OFFSET_TILESET_ID];
                 if (currentGameData[GAME_DATA_OFFSET_TILESET_ID] > CHR_BANK_LAST) {
                     currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ARCADE;
@@ -223,7 +253,7 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == 2) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_MUSIC) {
                 ++currentGameData[GAME_DATA_OFFSET_SONG_ID];
                 if (currentGameData[GAME_DATA_OFFSET_SONG_ID] == SONG_COUNT) {
                     currentGameData[GAME_DATA_OFFSET_SONG_ID] = 0;
@@ -231,7 +261,7 @@ void handle_editor_info_input() {
                 music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
                 redraw = 1;
                 break;
-            } else if (editorInfoPosition == 4) {
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_PLAY_STYLE) {
                 ++currentGameData[GAME_DATA_OFFSET_GAME_STYLE];
                 if (currentGameData[GAME_DATA_OFFSET_GAME_STYLE] == GAME_STYLE_COUNT) {
                     currentGameData[GAME_DATA_OFFSET_GAME_STYLE] = 0;
@@ -239,12 +269,20 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == 7) {
-                editorInfoPosition = 8;
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
+                editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
-            } else if (editorInfoPosition == 8) {
-                editorInfoPosition = 7;
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SPRITE) {
+                ++currentGameData[GAME_DATA_OFFSET_SPRITE_ID];
+                if (currentGameData[GAME_DATA_OFFSET_SPRITE_ID] == GAME_SPRITE_COUNT) {
+                    currentGameData[GAME_DATA_OFFSET_SPRITE_ID] = 0;
+                }
+                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
+                redraw = 1;
+                break;
             }
         }
 
@@ -260,23 +298,20 @@ void handle_editor_info_input() {
                 editorInfoPositionFull = 11;
                 break;
             case 3:
-                editorInfoPositionFull = 13;
+                editorInfoPositionFull = 16;
                 break;
             case 4:
-                editorInfoPositionFull = 15;
+                editorInfoPositionFull = 18;
                 break;
             case 5:
-                editorInfoPositionFull = 17;
+                editorInfoPositionFull = 20;
                 break;
-            case 6: 
-                editorInfoPositionFull = 19;
-                break;
-            case 7:
-                editorInfoPositionFull = 26;
+            case 6:
+                editorInfoPositionFull = 25;
                 editorInfoPositionLeft = 7;
                 break;
-            case 8:
-                editorInfoPositionFull = 26;
+            case 7:
+                editorInfoPositionFull = 25;
                 editorInfoPositionLeft = 17;
                 break;
             default:
@@ -286,6 +321,13 @@ void handle_editor_info_input() {
         editorInfoTempInt = NTADR_A(editorInfoPositionLeft, editorInfoPositionFull);
         screenBuffer[29] = MSB(editorInfoTempInt);
         screenBuffer[30] = LSB(editorInfoTempInt);
+
+
+        oam_spr(EDITOR_INFO_PLAYER_X, EDITOR_INFO_PLAYER_Y, playerSpriteTileId, 0x03, 0xd0); // FIXME: OAM id constant
+        oam_spr(EDITOR_INFO_PLAYER_X + NES_SPRITE_WIDTH, EDITOR_INFO_PLAYER_Y, playerSpriteTileId + 1, 0x03, 0xd0+4);
+        oam_spr(EDITOR_INFO_PLAYER_X, EDITOR_INFO_PLAYER_Y + NES_SPRITE_HEIGHT, playerSpriteTileId + 16, 0x03, 0xd0+8);
+        oam_spr(EDITOR_INFO_PLAYER_X + NES_SPRITE_WIDTH, EDITOR_INFO_PLAYER_Y + NES_SPRITE_HEIGHT, playerSpriteTileId + 17, 0x03, 0xd0+12);
+
 
         ppu_wait_nmi();
 
@@ -299,5 +341,6 @@ void handle_editor_info_input() {
         goto do_redraw;
     }
     gameState = GAME_STATE_EDITOR;
+    oam_clear();
     sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
 }
