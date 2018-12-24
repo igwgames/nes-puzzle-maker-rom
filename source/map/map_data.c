@@ -14,8 +14,8 @@ const unsigned char builtInMapData[768] = {
     GAME_STYLE_MAZE,
     // 0x03:Song Id
     SONG_OVERWORLD,
-    // 0x04:Sfx Id
-    0x00,
+    // 0x04:Sprite Id
+    0x01,
     // 0x05:Unused/reserved data (0x03 bytes)
     0x00, 0x00, 0x00,
     

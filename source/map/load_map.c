@@ -41,14 +41,20 @@ const unsigned char zoriaTileData[] = {
     0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
 };
 
-// TODO: Variable based on sprite
-const unsigned char spritePalette[] = {
-    0x0f, 0x00, 0x10, 0x30
+const unsigned char spritePalettes[] = {
+    // One set per sprite, in order they appear in chr
+    0x0f, 0x01, 0x21, 0x36,
+    0x0f, 0x09, 0x1a, 0x27,
+    0x0f, 0x16, 0x26, 0x37,
+    0x0f, 0x06, 0x16, 0x30,
+    0x0f, 0x06, 0x16, 0x26,
+    0x0f, 0x06, 0x16, 0x26
 };
 
 unsigned char palette[16];
 
 void load_map_tiles_and_palette() {
+
     switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {
         case CHR_BANK_ARCADE:
             // Make sure we're looking at the right sprite and chr data, not the ones for the menu.
@@ -57,7 +63,7 @@ void load_map_tiles_and_palette() {
 
             // Also set the palettes to the in-game palettes.
             memcpy(palette, mainBgPalette, 16);
-            memcpy((&(palette[12])), spritePalette, 4);
+            memcpy((&(palette[12])), &(spritePalettes[currentGameData[GAME_DATA_OFFSET_SPRITE_ID]<<2]), 4);
             pal_bg(mainBgPalette);
             pal_spr(palette);
             memcpy(currentMapTileData, arcadeTileData, 32);
@@ -68,7 +74,7 @@ void load_map_tiles_and_palette() {
             set_chr_bank_1(CHR_BANK_SPRITES);
 
             memcpy(palette, zoriaDesertBgPalette, 16);
-            memcpy((&(palette[12])), spritePalette, 4);
+            memcpy((&(palette[12])), &(spritePalettes[currentGameData[GAME_DATA_OFFSET_SPRITE_ID]<<2]), 4);
 
 
             // Also set the palettes to the in-game palettes.
@@ -83,7 +89,7 @@ void load_map_tiles_and_palette() {
             set_chr_bank_1(CHR_BANK_SPRITES);
 
             memcpy(palette, zoriaBgPalette, 16);
-            memcpy((&(palette[12])), spritePalette, 4);
+            memcpy((&(palette[12])), &(spritePalettes[currentGameData[GAME_DATA_OFFSET_SPRITE_ID]<<2]), 4);
 
             // Also set the palettes to the in-game palettes.
             pal_bg(zoriaBgPalette);

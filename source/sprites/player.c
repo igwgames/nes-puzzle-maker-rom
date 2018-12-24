@@ -67,7 +67,9 @@ void update_player_sprite() {
     // FIXME: Space to space animations plox
     rawXPosition = (PLAY_AREA_LEFT + ((playerGridPosition & 0x07) << 4));
     rawYPosition = (PLAY_AREA_TOP + ((playerGridPosition & 0x38) << 1));
-    rawTileId = PLAYER_SPRITE_TILE_ID + playerDirection;
+    // rawTileId = PLAYER_SPRITE_TILE_ID + playerDirection;
+    rawTileId = playerSpriteTileId + playerDirection;
+
 
     if (playerInvulnerabilityTime && frameCount & PLAYER_INVULNERABILITY_BLINK_MASK) {
         // If the player is invulnerable, we hide their sprite about half the time to do a flicker animation.
@@ -507,7 +509,8 @@ void handle_editor_input() {
     // Draw player in the right spot
     rawXPosition = (PLAY_AREA_LEFT + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x07) << 4));
     rawYPosition = (PLAY_AREA_TOP + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x38) << 1));
-    rawTileId = PLAYER_SPRITE_TILE_ID;
+    rawTileId = playerSpriteTileId;
+
 
     oam_spr(rawXPosition, rawYPosition, rawTileId, 0x03, PLAYER_SPRITE_INDEX);
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x03, PLAYER_SPRITE_INDEX+4);

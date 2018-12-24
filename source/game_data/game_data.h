@@ -24,7 +24,7 @@ void save_game();
 #define GAME_DATA_OFFSET_TILESET_ID 1
 #define GAME_DATA_OFFSET_GAME_STYLE 2
 #define GAME_DATA_OFFSET_SONG_ID 3
-#define GAME_DATA_OFFSET_SFX_ID 4
+#define GAME_DATA_OFFSET_SPRITE_ID 4
 
 // TODO: Store starting positions for levels in each of these? Would buy us a variable tile for players, if that's useful.
 // Unused space 6-8 (2 bytes)
@@ -49,6 +49,14 @@ void save_game();
 #define GAME_STYLE_COUNT 3
 
 #define MAX_GAME_LEVELS 8
+
+#define GAME_SPRITE_ARCADE 0
+#define GAME_SPRITE_ZORIA 1
+#define GAME_SPRITE_SLIME 2
+#define GAME_SPRITE_SPIDER 3
+#define GAME_SPRITE_ROBITZ 4
+#define GAME_SPRITE_DOG 5
+#define GAME_SPRITE_COUNT 6
 
 // We do a lot of packing things into 6 bits to save space. This will copy 6bit data from the first address into
 // the second address, stopping after the specified number of bytes.

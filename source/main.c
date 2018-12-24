@@ -69,7 +69,7 @@ void main() {
                 banked_call(PRG_BANK_TITLE, handle_title_input);
                 break;
             case GAME_STATE_POST_TITLE:
-                currentLevelId = 0;
+                currentLevelId = 7;
 
                 gameTime = frameCount;
                 gameKeys = 0;
@@ -100,7 +100,7 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
                 banked_call(PRG_BANK_MAP_LOGIC, load_sprites);
                 // Set player position -- NOTE: this might not actually be ideal here. 
-                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
+                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
 
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
@@ -152,6 +152,7 @@ void main() {
 
                 // Set player position -- NOTE: this might not actually be ideal here. 
                 playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
+                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
 
 
                 playerGridPosition = 0;

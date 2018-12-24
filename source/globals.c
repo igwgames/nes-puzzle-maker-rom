@@ -16,6 +16,7 @@ ZEROPAGE_DEF(unsigned char, totalCrateCount);
 ZEROPAGE_DEF(unsigned char, playerMaxHealth);
 ZEROPAGE_DEF(unsigned char, gameState);
 ZEROPAGE_DEF(unsigned char, currentLevelId);
+ZEROPAGE_DEF(unsigned char, playerSpriteTileId);
 
 ZEROPAGE_DEF(unsigned int, gameTime);
 ZEROPAGE_DEF(unsigned char, gameKeys);

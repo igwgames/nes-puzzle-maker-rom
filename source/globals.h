@@ -17,6 +17,8 @@ ZEROPAGE_EXTERN(unsigned char, playerCrateCount);
 ZEROPAGE_EXTERN(unsigned char, totalCrateCount);
 ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
 ZEROPAGE_EXTERN(unsigned char, currentLevelId);
+ZEROPAGE_EXTERN(unsigned char, playerSpriteTileId);
+
 
 ZEROPAGE_EXTERN(unsigned int, gameTime);
 ZEROPAGE_EXTERN(unsigned char, gameKeys);
