@@ -177,15 +177,15 @@ void handle_editor_info_input() {
 
         if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
             if (editorInfoPosition == EDITOR_INFO_POSITION_TITLE) { 
-                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_TITLE]), 12);
-                do_text_input("game name", 12);
-                memcpy(&(currentGameData[GAME_DATA_OFFSET_TITLE]), inputText, 12);
+                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_TITLE]), GAME_DATA_OFFSET_TITLE_LENGTH);
+                do_text_input("game name", GAME_DATA_OFFSET_TITLE_LENGTH);
+                memcpy(&(currentGameData[GAME_DATA_OFFSET_TITLE]), inputText, GAME_DATA_OFFSET_TITLE_LENGTH);
                 redraw = 1;
                 break;
             } else if (editorInfoPosition == EDITOR_INFO_POSITION_AUTHOR) {
-                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_AUTHOR]), 12);
-                do_text_input("author", 12);
-                memcpy(&(currentGameData[GAME_DATA_OFFSET_AUTHOR]), inputText, 12);
+                memcpy(inputText, &(currentGameData[GAME_DATA_OFFSET_AUTHOR]), GAME_DATA_OFFSET_AUTHOR_LENGTH);
+                do_text_input("author", GAME_DATA_OFFSET_AUTHOR_LENGTH);
+                memcpy(&(currentGameData[GAME_DATA_OFFSET_AUTHOR]), inputText, GAME_DATA_OFFSET_AUTHOR_LENGTH);
                 redraw = 1;
                 break;
             } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {

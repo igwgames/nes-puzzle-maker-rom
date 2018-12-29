@@ -44,7 +44,7 @@ void draw_hud() {
     
     // TODO: Implement 6bit encoding?
     memcpy(screenBuffer, (&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), GAME_DATA_OFFSET_TITLE_LENGTH);
-    screenBuffer[12] = NULL;
+    screenBuffer[GAME_DATA_OFFSET_TITLE_LENGTH] = NULL;
     put_hud_str(NTADR_A(1, 26), screenBuffer);
 
     

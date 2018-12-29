@@ -18,7 +18,7 @@ void load_game_name_to_input();
 void save_game();
 
 // Pick a random "magic" number to mark a map with, so we know this is the current id. Increment any time there's a major change.
-#define GAME_DATA_VERSION_ID 24
+#define GAME_DATA_VERSION_ID 25
 
 #define GAME_DATA_OFFSET_VERSION 0
 #define GAME_DATA_OFFSET_TILESET_ID 1
@@ -27,16 +27,17 @@ void save_game();
 #define GAME_DATA_OFFSET_SPRITE_ID 4
 
 // TODO: Store starting positions for levels in each of these? Would buy us a variable tile for players, if that's useful.
-// Unused space 6-8 (2 bytes)
+// Unused space 5-8 (3 bytes)
+#define GAME_DATA_OFFSET_START_POSITIONS 8
 #define GAME_DATA_OFFSET_TITLE 16
-#define GAME_DATA_OFFSET_TITLE_LENGTH 12
-#define GAME_DATA_OFFSET_AUTHOR 28
-#define GAME_DATA_OFFSET_AUTHOR_LENGTH 12
-#define GAME_DATA_OFFSET_CREDITS 40
-#define GAME_DATA_OFFSET_CREDITS_LENGTH 24
+#define GAME_DATA_OFFSET_TITLE_LENGTH 20
+#define GAME_DATA_OFFSET_AUTHOR 36
+#define GAME_DATA_OFFSET_AUTHOR_LENGTH 19 // Literally just to make it fit on the page.
+// This space ended up being unused (8 bytes)
+// #define GAME_DATA_OFFSET_CREDITS 56
+// #define GAME_DATA_OFFSET_CREDITS_LENGTH 8
 #define GAME_DATA_OFFSET_MAP 64
 #define GAME_DATA_OFFSET_MAP_LENGTH 192
-#define GAME_DATA_OFFSET_START_POSITIONS 8
 
 #define GAME_DATA_OFFSET_MAP_WORLD_LENGTH 24
 

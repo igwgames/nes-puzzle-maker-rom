@@ -38,8 +38,8 @@ void load_game() {
             currentGameData[GAME_DATA_OFFSET_TILESET_ID] = CHR_BANK_ZORIA;
             currentGameData[GAME_DATA_OFFSET_SONG_ID] = SONG_OVERWORLD;
             currentGameData[GAME_DATA_OFFSET_SPRITE_ID] = GAME_SPRITE_ZORIA;
-            memcpy((&(currentGameData[GAME_DATA_OFFSET_TITLE])), "NO NAME     ", 12);
-            memcpy((&(currentGameData[GAME_DATA_OFFSET_AUTHOR])), "ANONYMOUS   ", 12);
+            memcpy((&(currentGameData[GAME_DATA_OFFSET_TITLE])), "NO NAME             ", GAME_DATA_OFFSET_TITLE_LENGTH);
+            memcpy((&(currentGameData[GAME_DATA_OFFSET_AUTHOR])), "ANONYMOUS           ", GAME_DATA_OFFSET_AUTHOR_LENGTH);
         }
     }
 }
