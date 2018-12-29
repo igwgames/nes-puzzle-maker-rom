@@ -391,3 +391,9 @@ sounds_data:
 .if(FT_DPCM_ENABLE)
 	.incbin "sound/samples/samples.bin"
 .endif
+
+.segment "PRG_BOOP"
+	_PATCHED_BYTE:
+	_RUNTIME_MODE:
+	.byte 23
+	.export _RUNTIME_MODE
