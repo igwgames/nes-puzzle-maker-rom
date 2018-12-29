@@ -131,6 +131,8 @@ rebuild_tools:
 	pkg -d --public tools/sprite_def2img/src/index.js --output tools/sprite_def2img/sprite_def2img.exe -t node8-windows-x64
 	pkg -d --public tools/tmx2c/src/index.js --output tools/tmx2c/tmx2c.exe -t node8-windows-x64
 
+s3_upload:
+	mc cp ./rom/starter.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker.nes
 
 clean:
 	-rm -f rom/*.nes
