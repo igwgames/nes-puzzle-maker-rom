@@ -74,3 +74,4 @@ extern const unsigned char RUNTIME_MODE;
 
 #define RUNTIME_MODE_NORMAL 0
 #define RUNTIME_MODE_SINGLE_GAME 1
+#define RUNTIME_MODE_EDITOR_EXPORT 2
