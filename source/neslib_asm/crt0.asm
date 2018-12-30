@@ -395,5 +395,5 @@ sounds_data:
 .segment "PRG_BOOP"
 	_PATCHED_BYTE:
 	_RUNTIME_MODE:
-	.byte 23
+	.byte 0
 	.export _RUNTIME_MODE
