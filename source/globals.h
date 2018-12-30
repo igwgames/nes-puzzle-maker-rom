@@ -71,3 +71,6 @@ extern const unsigned int bitToByte[8];
 
 // Defined in crt0, at 0xbff (fixed address) so it can be patched by outside programs.
 extern const unsigned char RUNTIME_MODE;
+
+#define RUNTIME_MODE_NORMAL 0
+#define RUNTIME_MODE_SINGLE_GAME 1

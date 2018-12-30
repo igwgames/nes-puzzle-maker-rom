@@ -58,7 +58,11 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
-                gameState = GAME_STATE_TITLE_DRAW;
+                if (RUNTIME_MODE != RUNTIME_MODE_SINGLE_GAME) {
+                    gameState = GAME_STATE_TITLE_DRAW;
+                } else {
+                    gameState = GAME_STATE_POST_TITLE;
+                }
                 break;
 
             case GAME_STATE_TITLE_DRAW:
@@ -79,13 +83,20 @@ void main() {
 
                 fade_out();
                 
-                bank_push(PRG_BANK_GAME_LIST);
-                draw_list_games(0);
-                fade_in();
-                do_list_game_input(0);
-                bank_pop();
-                
-                fade_out();
+                if (RUNTIME_MODE != RUNTIME_MODE_SINGLE_GAME) {
+                    bank_push(PRG_BANK_GAME_LIST);
+
+                    draw_list_games(0);
+                    fade_in();
+                    do_list_game_input(0);
+                    bank_pop();
+                    
+                    fade_out();
+                } else {
+                    bank_push(PRG_BANK_GAME_LIST);
+                    do_get_last_game();
+                    bank_pop();
+                }
                 load_game();
                 load_map(); // Needed to get proper tile data loaded 
 

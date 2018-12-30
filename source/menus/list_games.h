@@ -5,3 +5,5 @@ void draw_list_games(unsigned char isSave);
 
 void bank_do_list_game_input(unsigned char isSave);
 void do_list_game_input(unsigned char isSave);
+
+void do_get_last_game();

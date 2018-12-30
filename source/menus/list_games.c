@@ -182,3 +182,17 @@ void do_list_game_input(unsigned char isSave) {
     }
 
 }
+
+void do_get_last_game() {
+    for (i = 0; i != 9; ++i) {
+        selectedGameId = i;
+        load_game_name_to_input();
+        if (inputText[0] != NULL) {
+            // Do nothing
+        } else {
+            break;
+        }
+    }
+    --selectedGameId;
+    --selectedGameId;
+}
