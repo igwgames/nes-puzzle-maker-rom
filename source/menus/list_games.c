@@ -194,5 +194,4 @@ void do_get_last_game() {
         }
     }
     --selectedGameId;
-    --selectedGameId;
 }
