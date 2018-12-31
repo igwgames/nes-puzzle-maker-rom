@@ -97,6 +97,12 @@ void draw_editor_info() {
         }
     }
 
+    // Hide the export text if we're in a web-based editor with its own exporting.
+    if (RUNTIME_MODE == RUNTIME_MODE_EDITOR_EXPORT) {
+        put_str(0x2b32, "      ");
+    }
+
+
 
     scroll(0, 0);
 
@@ -114,6 +120,7 @@ void draw_editor_info() {
 }
 
 void show_assisted_export_screen() {
+    /*
     fade_out();
     ppu_off();
     clear_screen_with_border();
@@ -126,7 +133,7 @@ void show_assisted_export_screen() {
 
 
     banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
-    SRAM_COMM = SRAM_COMM_INACTIVE;
+    SRAM_COMM = SRAM_COMM_INACTIVE;*/
 }
 
 #define EDITOR_INFO_POSITION_TITLE 0
@@ -186,7 +193,7 @@ void handle_editor_info_input() {
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
-            if (editorInfoPosition != EDITOR_INFO_POSITION_EXPORT) {
+            if (editorInfoPosition != (RUNTIME_MODE == RUNTIME_MODE_EDITOR_EXPORT ? EDITOR_INFO_POSITION_SAVE : EDITOR_INFO_POSITION_EXPORT )) {
                 ++editorInfoPosition;
             }
             sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
@@ -216,8 +223,9 @@ void handle_editor_info_input() {
                 break;
 
             } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                
                 if (RUNTIME_MODE == RUNTIME_MODE_EDITOR_EXPORT) {
-
+/*
                     for (i = 0; i != 256; ++i) {
                         currentSramGameData[i] = currentGameData[i];
                     }
@@ -226,6 +234,11 @@ void handle_editor_info_input() {
                     break;
                 } else {
                     crash_error("Console export feature not written", "oh crap, you should not see this. Throw things at @cppchriscpp!", "No value", NULL);
+                }
+                */
+                // Do nothing; shouldn't get here.
+                } else {
+                    // TODO: QR stuff
                 }
             }
 
@@ -256,12 +269,6 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
-                editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
-                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
-            } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
-                editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
-                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             } else if (editorInfoPosition == EDITOR_INFO_POSITION_SPRITE) {
                 --currentGameData[GAME_DATA_OFFSET_SPRITE_ID];
                 if (currentGameData[GAME_DATA_OFFSET_SPRITE_ID] == 255) {
@@ -270,6 +277,16 @@ void handle_editor_info_input() {
                 playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
                 redraw = 1;
                 break;
+            } else {
+                if (RUNTIME_MODE != RUNTIME_MODE_EDITOR_EXPORT) {
+                    if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
+                        editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
+                        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                    } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                        editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
+                        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                    }
+                }
             }
         }
 
@@ -298,12 +315,6 @@ void handle_editor_info_input() {
                 redraw = 1;
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
                 break;
-            } else if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
-                editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
-                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
-            } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
-                editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
-                sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
             } else if (editorInfoPosition == EDITOR_INFO_POSITION_SPRITE) {
                 ++currentGameData[GAME_DATA_OFFSET_SPRITE_ID];
                 if (currentGameData[GAME_DATA_OFFSET_SPRITE_ID] == GAME_SPRITE_COUNT) {
@@ -312,6 +323,16 @@ void handle_editor_info_input() {
                 playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
                 redraw = 1;
                 break;
+            } else {
+                if (RUNTIME_MODE != RUNTIME_MODE_EDITOR_EXPORT) {
+                    if (editorInfoPosition == EDITOR_INFO_POSITION_SAVE) {
+                        editorInfoPosition = EDITOR_INFO_POSITION_EXPORT;
+                        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                    } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                        editorInfoPosition = EDITOR_INFO_POSITION_SAVE;
+                        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
+                    } 
+                }
             }
         }
 
