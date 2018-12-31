@@ -5,3 +5,4 @@ extern const unsigned char gameName[];
 extern const unsigned char gameAuthor[];
 extern const unsigned char gameAuthorContact[];
 extern const unsigned char currentYear[];
+extern const unsigned char romVersion[];

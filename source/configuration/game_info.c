@@ -4,3 +4,4 @@ const unsigned char gameName[] = "Retro Puzzle Maker";
 const unsigned char gameAuthor[] = "cppchriscpp";
 const unsigned char gameAuthorContact[] = "Created by @cppchriscpp";
 const unsigned char currentYear[] = "2018";
+const unsigned char romVersion[] = "v1.1";

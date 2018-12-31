@@ -25,14 +25,16 @@ void draw_title_screen() {
     
     put_str(NTADR_A(8, 6), gameName);
 	
-	put_str(NTADR_A(2, 26), gameAuthorContact);
+	put_str(NTADR_A(3, 24), gameAuthorContact);
 	
-	put_str(NTADR_A(2, 28), "Copyright");
-	put_str(NTADR_A(12, 28), currentYear);
-	put_str(NTADR_A(17, 28), gameAuthor);
+	put_str(NTADR_A(3, 26), "Copyright");
+	put_str(NTADR_A(13, 26), currentYear);
+	put_str(NTADR_A(18, 26), gameAuthor);
 
 	put_str(NTADR_A(10, 14), "Play A Game");
 	put_str(NTADR_A(10, 16), "Game Editor");
+
+	put_str(NTADR_A(28, 28), romVersion);
 
 	// put_str(NTADR_A(10, 16), "Press Start!");
 	ppu_on_all();
