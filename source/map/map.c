@@ -50,6 +50,7 @@ void init_map() {
 #define editorSelectedTileObject tempChar7
 #define editorAttrX tempChar8
 #define editorAttrY tempChar9
+#define tempEditorTile tempChar2
 
 // Load the sprites from the current map
 void load_sprites() {
@@ -436,6 +437,13 @@ void do_fade_screen_transition() {
     fade_in_fast();
     // Aand we're back!
     gameState = GAME_STATE_RUNNING;
+}
+
+void update_editor_map_tile_rm() {
+    tempEditorTile = editorSelectedTileId;
+    editorSelectedTileId = 0;
+    update_editor_map_tile();
+    editorSelectedTileId = tempEditorTile;
 }
 
 void update_editor_map_tile() {

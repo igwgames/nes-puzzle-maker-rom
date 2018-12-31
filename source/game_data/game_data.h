@@ -8,6 +8,7 @@ extern unsigned char currentGameData[256];
 ZEROPAGE_EXTERN(unsigned char, __extraBits);
 
 SRAM_ARRAY_EXTERN(unsigned char, savedGameData, 2048);
+SRAM_ARRAY_EXTERN(unsigned char, currentSramGameData, 256);
 
 void unload_game();
 

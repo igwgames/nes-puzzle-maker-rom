@@ -16,6 +16,7 @@ unsigned char currentGameData[256];
 ZEROPAGE_DEF(unsigned char, __extraBits);
 
 SRAM_ARRAY_DEF(unsigned char, savedGameData, 2048);
+SRAM_ARRAY_DEF(unsigned char, currentSramGameData, 256);
 
 
 void unload_game() {

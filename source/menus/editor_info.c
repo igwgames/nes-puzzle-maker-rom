@@ -14,6 +14,7 @@
 #include "source/map/load_map.h"
 #include "source/map/map.h"
 #include "source/menus/list_games.h"
+#include "source/menus/error.h"
 
 #define editorInfoPosition tempChar1
 #define editorInfoPositionFull tempChar2
@@ -112,6 +113,22 @@ void draw_editor_info() {
     ppu_on_all();
 }
 
+void show_assisted_export_screen() {
+    fade_out();
+    ppu_off();
+    clear_screen_with_border();
+    SRAM_COMM = SRAM_COMM_EXPORT;
+    put_str(NTADR_A(8, 13), "- Export Ready -");
+    put_str(NTADR_A(4, 18), "Click the button below");
+
+    ppu_on_all();
+    fade_in();
+
+
+    banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+    SRAM_COMM = SRAM_COMM_INACTIVE;
+}
+
 #define EDITOR_INFO_POSITION_TITLE 0
 #define EDITOR_INFO_POSITION_TILESET 1
 #define EDITOR_INFO_POSITION_MUSIC 4
@@ -198,6 +215,18 @@ void handle_editor_info_input() {
                 save_game();
                 break;
 
+            } else if (editorInfoPosition == EDITOR_INFO_POSITION_EXPORT) {
+                if (RUNTIME_MODE == RUNTIME_MODE_EDITOR_EXPORT) {
+
+                    for (i = 0; i != 256; ++i) {
+                        currentSramGameData[i] = currentGameData[i];
+                    }
+                    show_assisted_export_screen();
+                    redraw = 1;
+                    break;
+                } else {
+                    crash_error("Console export feature not written", "oh crap, you should not see this. Throw things at @cppchriscpp!", "No value", NULL);
+                }
             }
 
         }

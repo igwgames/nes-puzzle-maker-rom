@@ -467,6 +467,8 @@ void handle_editor_input() {
         if (controllerState & PAD_A) {
 
             banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
+        } else if (controllerState & PAD_B) {
+            banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile_rm);
         }
 
         if (controllerState & PAD_RIGHT) {

@@ -98,6 +98,9 @@ void do_fade_screen_transition();
 // Based on the current position and tile, update the map and the attribute table
 void update_editor_map_tile();
 
+// Do the same thing, but use the first tile
+void update_editor_map_tile_rm();
+
 // Adds some color text around the editor map - current map id, etc
 void draw_editor_help();
 

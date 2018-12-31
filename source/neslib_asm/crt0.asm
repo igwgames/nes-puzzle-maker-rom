@@ -396,4 +396,8 @@ sounds_data:
 	_PATCHED_BYTE:
 	_RUNTIME_MODE:
 	.byte 0
-	.export _RUNTIME_MODE
+
+.segment "SRAM_COMM"
+	_SRAM_COMM: .res 1
+
+.export _RUNTIME_MODE, _SRAM_COMM
