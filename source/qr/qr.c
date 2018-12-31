@@ -44,6 +44,7 @@ unsigned char qrType;
 #define FLIP_PIXEL(x, y, val) fullQrCode[(unsigned int)x + (((unsigned int)y)*50)] ^= 0xfe;
 
 void generate_qr(unsigned char* bytes) {
+    memfill(fullQrCode, 0, 1024);
     waitTime = frameCount;
     qrcode_initBytes(&theCode, fullQrCode, 6, bytes, 128);
     waitTime = frameCount - waitTime;

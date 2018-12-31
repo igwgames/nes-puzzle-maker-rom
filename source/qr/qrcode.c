@@ -919,7 +919,7 @@ static void performErrorCorrection(uint8_t version, BitBucket *data) {
 
 // @TODO: Return error if data is too big.
 int8_t qrcode_initBytes(QRCode *qrcode, uint8_t *modules, uint8_t version, uint8_t *data, uint16_t length) {
-    
+
     // uint8_t eccFormatBits = ((ECC_FORMAT_BITS >> (ECC_LEVEL<<1)) & 0x03);
 
     uint16_t moduleCount, dataCapacity;
@@ -948,6 +948,10 @@ int8_t qrcode_initBytes(QRCode *qrcode, uint8_t *modules, uint8_t version, uint8
     dataCapacity = moduleCount / 8 - NUM_ERROR_CORRECTION_CODEWORDS[ECC_FORMAT_BITS_FINAL];
 #endif
     
+    memfill(codewordBytes, 0, BUFFER_SIZE_BYTES);
+    memfill(isFunctionGridBytes, 0, 64);
+    memfill(result, 0, 512);
+
     // uint8_t codewordBytes[bb_getBufferSizeBytes(moduleCount)];
     bb_initBuffer(&codewords, codewordBytes, BUFFER_SIZE_BYTES);
 
