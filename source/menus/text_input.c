@@ -12,8 +12,6 @@ unsigned char inputSelection, lastInputSelection;
 unsigned int lastFullPosition, currentFullPosition;
 unsigned char currentTextPosition;
 
-const unsigned char inputLookupTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]@ !\"#$%&'()";
-
 // Solicits the user for text input. Reads/writes inputText
 void _do_text_input(const unsigned char* name, const unsigned char maxLength);
 void do_text_input(const unsigned char* name, const unsigned char maxLength) {
@@ -23,6 +21,8 @@ void do_text_input(const unsigned char* name, const unsigned char maxLength) {
 }
 
 CODE_BANK(PRG_BANK_TEXT_INPUT);
+
+const unsigned char inputLookupTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]@ !\"#$%&'()";
 
 void draw_string(const char* name) {
     i = 0;

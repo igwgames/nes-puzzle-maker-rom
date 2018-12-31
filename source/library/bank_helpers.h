@@ -91,6 +91,21 @@ void __fastcall__ unset_nmi_chr_tile_bank(void);
     _Pragma("bssseg (pop)") \
     _Pragma("dataseg (pop)")
 
+#define WRAM_DEF(defa, defb) \
+    _Pragma("bssseg (push, \"WRAM\")") \
+    _Pragma("dataseg (push, \"WRAM\")") \
+    defa defb; \
+    _Pragma("bssseg (pop)") \
+    _Pragma("dataseg (pop)")
+
+
+#define WRAM_ARRAY_DEF(defa, defb, defArr) \
+    _Pragma("bssseg (push, \"WRAM\")") \
+    _Pragma("dataseg (push, \"WRAM\")") \
+    defa defb[defArr]; \
+    _Pragma("bssseg (pop)") \
+    _Pragma("dataseg (pop)")
+
 
 
 // Mark a variable referenced in a header file as being a zeropage symbol.
@@ -105,6 +120,8 @@ void __fastcall__ unset_nmi_chr_tile_bank(void);
 // consistency with ZEROPAGE variables, to make the source easier to follow.
 #define SRAM_EXTERN(defa, defb) extern defa defb;
 #define SRAM_ARRAY_EXTERN(defa, defb, defArr) extern defa defb[defArr];
+#define WRAM_EXTERN(defa, defb) extern defa defb;
+#define WRAM_ARRAY_EXTERN(defa, defb, defArr) extern defa defb[defArr];
 
 // Set the PRG bank to put the code in the current file into.
 #define CODE_BANK(id) _Pragma("rodataseg (push, \"ROM_0" STR(id) "\")") _Pragma("codeseg (push, \"ROM_0" STR(id) "\")")

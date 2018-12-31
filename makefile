@@ -102,7 +102,7 @@ temp/crt0.o: source/neslib_asm/crt0.asm source/neslib_asm/neslib.asm temp/base.a
 # be some trickery we could do to find all C files that actually care, but this compiles fast enough that 
 # it shouldn't be a huge deal.
 temp/%.s: %.c $(SOURCE_HEADERS)
-	$(MAIN_COMPILER) -Oi $< --add-source --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
+	$(MAIN_COMPILER) -Oi $< --add-source  --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
 
 temp/%.o: temp/%.s
 	$(MAIN_ASM_COMPILER) $< 

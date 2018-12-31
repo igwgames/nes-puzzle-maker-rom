@@ -195,6 +195,17 @@ clearRAM:
     sta $500,x
     sta $600,x
     sta $700,x
+	; Also take care of the 1k of WRAM we designed out of regular SRAM. (Which will _definitely_ have bogus values in it at start)
+	sta $7600,x
+	sta $7700,x
+	sta $7800,x
+	sta $7900,x
+	sta $7a00,x
+	sta $7b00,x
+	sta $7c00,x
+	sta $7d00,x
+	sta $7e00,x
+	sta $7f00,x
     inx
     bne @1
 
@@ -353,7 +364,7 @@ detectNTSC:
 .segment "CHR_1E"
 	.incbin "graphics/tiles.chr"
 .segment "CHR_1F"
-	.incbin "graphics/tiles.chr"
+	.incbin "graphics/qr.chr"
 
 ; MMC1 needs a reset stub in every bank that will put us into a known state. This defines it for all banks.
 .repeat (SYS_PRG_BANKS-1), I
@@ -397,7 +408,4 @@ sounds_data:
 	_RUNTIME_MODE:
 	.byte 0
 
-.segment "SRAM_COMM"
-	_SRAM_COMM: .res 1
-
-.export _RUNTIME_MODE, _SRAM_COMM
+.export _RUNTIME_MODE

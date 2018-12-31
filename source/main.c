@@ -25,6 +25,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/editor_info.h"
 #include "source/menus/list_games.h"
 #include "source/menus/intro.h"
+#include "source/qr/qr.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -222,9 +223,42 @@ void main() {
                 banked_call(PRG_BANK_EDITOR_INFO, draw_editor_info);
                 fade_in();
                 banked_call(PRG_BANK_EDITOR_INFO, handle_editor_info_input);
-                gameState = GAME_STATE_EDITOR_REDRAW;
+                if (gameState != GAME_STATE_EDITOR_EXPORT) { 
+                    gameState = GAME_STATE_EDITOR_REDRAW;
+                }
                 
                 break;
+            case GAME_STATE_EDITOR_EXPORT:
+                bank_push(PRG_BANK_QR);
+                
+                qrType = QR_TYPE_PAGE_1;
+                fade_out();
+                draw_loading_qr();
+                fade_in();
+                generate_qr(&(currentGameData[0]));
+                fade_out();
+                draw_last_qr();
+                fade_in();
+                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+                fade_out();
+
+                qrType = QR_TYPE_PAGE_2;
+                fade_out();
+                draw_loading_qr();
+                fade_in();
+                generate_qr(&(currentGameData[128]));
+                fade_out();
+                draw_last_qr();
+                fade_in();
+                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+                fade_out();
+
+
+                bank_pop();
+
+                gameState = GAME_STATE_EDITOR_REDRAW;
+                break;
+
             case GAME_STATE_SCREEN_SCROLL:
                 // Hide all non-player sprites in play, so we have an empty screen to add new ones to
                 oam_hide_rest(FIRST_ENEMY_SPRITE_OAM_INDEX);
@@ -232,10 +266,6 @@ void main() {
                 // If you don't like the screen scrolling transition, you can replace the transition with `do_fade_screen_transition`
                 // banked_call(PRG_BANK_MAP_LOGIC, do_scroll_screen_transition);
                 banked_call(PRG_BANK_MAP_LOGIC, do_fade_screen_transition);
-                break;
-            case GAME_STATE_SHOWING_TEXT:
-                banked_call(PRG_BANK_GAME_TEXT, draw_game_text);
-                gameState = GAME_STATE_RUNNING;
                 break;
             case GAME_STATE_PAUSED:
                 sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);  
@@ -260,16 +290,6 @@ void main() {
                 ppu_on_all();
                 fade_in();
 
-                break;
-            case GAME_STATE_GAME_OVER:
-                fade_out();
-
-                // Draw the "you lose" screen
-                banked_call(PRG_BANK_GAME_OVER, draw_game_over_screen);
-                fade_in();
-                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
-                fade_out();
-                reset();
                 break;
             case GAME_STATE_CREDITS:
                 music_stop();

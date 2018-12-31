@@ -31,6 +31,26 @@ const unsigned char spriteTilesetName0[] = "Arcade";
 const unsigned char spriteTilesetName1[] = "Zoria";
 const unsigned char* spriteTilesetNames[] = { spriteTilesetName0, spriteTilesetName1, spriteTilesetName0, spriteTilesetName1, spriteTilesetName1, spriteTilesetName1 };
 
+const unsigned char arcadeName[] = "Arcade";
+const unsigned char zoriaName[] = "Zoria";
+const unsigned char zoriaDesertName[] = "Zoria Desert";
+const unsigned char* tilesetNames[] = { arcadeName, zoriaName, zoriaDesertName };
+
+const unsigned char gameModePlainName[] = "Maze Escape";
+const unsigned char gameModeCratesName[] = "Crate Removal";
+const unsigned char gameModeCollectName[] = "Coin Collector";
+
+const unsigned char* gameModeNames[] = { gameModePlainName, gameModeCratesName, gameModeCollectName };
+
+const unsigned char songName0[] = "The Forest";
+const unsigned char songName1[] = "Victory Loop";
+const unsigned char songName2[] = "Head in the Sand";
+const unsigned char songName3[] = "Cave";
+const unsigned char songName4[] = "RPG Battle";
+
+const unsigned char* songNames[] = { songName0, songName1, songName2, songName3, songName4 };
+
+
 void draw_editor_info() {
     oam_clear();
     ppu_off();
@@ -239,6 +259,8 @@ void handle_editor_info_input() {
                 // Do nothing; shouldn't get here.
                 } else {
                     // TODO: QR stuff
+                    gameState = GAME_STATE_EDITOR_EXPORT;
+                    return;
                 }
             }
 

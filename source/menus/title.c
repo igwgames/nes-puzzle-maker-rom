@@ -9,6 +9,12 @@
 
 CODE_BANK(PRG_BANK_TITLE);
 
+const unsigned char gameName[] = "Retro Puzzle Maker";
+const unsigned char gameAuthor[] = "cppchriscpp";
+const unsigned char gameAuthorContact[] = "Created by @cppchriscpp";
+const unsigned char currentYear[] = "2018";
+
+
 #define selectedOption tempChara
 
 void draw_title_screen() {

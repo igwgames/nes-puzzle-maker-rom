@@ -103,28 +103,6 @@ void load_map_tiles_and_palette() {
 }
 CODE_BANK_POP();
 
-// NOTE: These are in the primary bank. Lame, I know... but we use them unbanked in a few spots.
-const unsigned char arcadeName[] = "Arcade";
-const unsigned char zoriaName[] = "Zoria";
-const unsigned char zoriaDesertName[] = "Zoria Desert";
-const unsigned char* tilesetNames[] = { arcadeName, zoriaName, zoriaDesertName };
-
-const unsigned char gameModePlainName[] = "Maze Escape";
-const unsigned char gameModeCratesName[] = "Crate Removal";
-const unsigned char gameModeCollectName[] = "Coin Collector";
-
-const unsigned char* gameModeNames[] = { gameModePlainName, gameModeCratesName, gameModeCollectName };
-
-const unsigned char songName0[] = "The Forest";
-const unsigned char songName1[] = "Victory Loop";
-const unsigned char songName2[] = "Head in the Sand";
-const unsigned char songName3[] = "Cave";
-const unsigned char songName4[] = "RPG Battle";
-
-const unsigned char* songNames[] = { songName0, songName1, songName2, songName3, songName4 };
-
-
-
 // Loads the map at the player's current position into the ram variable given. 
 // Kept in a separate file, as this must remain in the primary bank so it can
 // read data from another prg bank.
