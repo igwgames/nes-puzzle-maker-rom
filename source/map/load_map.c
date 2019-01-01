@@ -129,6 +129,8 @@ void load_map() {
         } else if (j == TILE_COLLISION_CRATE) {
             currentMapOrig[i] = 0;
             ++totalCrateCount;
+        } else if (j == TILE_COLLISION_GAP) {
+            currentMapOrig[i] = 0;
         } else {
             currentMapOrig[i] = currentMap[i];
         }
