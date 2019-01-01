@@ -818,7 +818,7 @@ static int8_t encodeDataCodewords(BitBucket *dataCodewords, const uint8_t *text,
     return mode;
 }
 
-// FIXME: hardcode
+
 #define ECC_NUM_BLOCKS 2
 #define ECC_TOTAL_ECC 36
 #define ECC_MODULE_COUNT 1383U
@@ -830,23 +830,6 @@ static int8_t encodeDataCodewords(BitBucket *dataCodewords, const uint8_t *text,
 static void performErrorCorrection(uint8_t version, BitBucket *data) {
     
     // See: http://www.thonky.com/qr-code-tutorial/structure-final-message
-   /* 
-#if LOCK_VERSION == 0
-    // NOTE: I hard-coded 10 here as the version, again due to c89 features
-    uint8_t numBlocks = NUM_ERROR_CORRECTION_BLOCKS[ecc][10 - 1];
-    uint16_t totalEcc = NUM_ERROR_CORRECTION_CODEWORDS[ecc][10 - 1];
-    uint16_t moduleCount = NUM_RAW_DATA_MODULES[10 - 1];
-#else
-    uint8_t numBlocks = NUM_ERROR_CORRECTION_BLOCKS[ECC_FORMAT_BITS_FINAL];
-    uint16_t totalEcc = NUM_ERROR_CORRECTION_CODEWORDS[ECC_FORMAT_BITS_FINAL];
-    uint16_t moduleCount = NUM_RAW_DATA_MODULES;
-#endif
-    
-    // uint8_t blockEccLen = totalEcc / numBlocks;
-    uint8_t numShortBlocks = numBlocks - moduleCount / 8 % numBlocks;
-    uint8_t shortBlockLen = moduleCount / 8 / numBlocks;
-    
-    uint8_t shortDataBlockLen = shortBlockLen - blockEccLen;*/
 
     uint16_t offset = 0;
     uint8_t *dataBytes = data->data;

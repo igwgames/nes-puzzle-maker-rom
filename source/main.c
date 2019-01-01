@@ -205,7 +205,7 @@ void main() {
             case GAME_STATE_EDITOR_REDRAW:
                 oam_clear();
                 fade_out();
-                load_map(); // FIXME: This will overwrite any saved data in every redraw. Be sure to always call save.
+                load_map();
                 banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
 

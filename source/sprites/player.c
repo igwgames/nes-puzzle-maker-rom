@@ -64,10 +64,9 @@ const unsigned char* movedText =
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
 void update_player_sprite() {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
-    // FIXME: Space to space animations plox
+
     rawXPosition = (PLAY_AREA_LEFT + ((playerGridPosition & 0x07) << 4));
     rawYPosition = (PLAY_AREA_TOP + ((playerGridPosition & 0x38) << 1));
-    // rawTileId = PLAYER_SPRITE_TILE_ID + playerDirection;
     rawTileId = playerSpriteTileId + playerDirection;
 
 
@@ -87,7 +86,6 @@ void update_player_sprite() {
 
 }
 
-// FIXME: Case
 void update_single_tile(unsigned char id, unsigned char newTile, unsigned char palette) {
     collisionTempValue = NTADR_A(((id & 0x07)<<1) + 8, ((id & 0x38) >> 2) + 4);
     screenBuffer[0] = MSB(collisionTempValue);
