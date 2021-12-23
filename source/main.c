@@ -22,10 +22,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/input_helpers.h"
 #include "source/menus/game_over.h"
 #include "source/game_data/game_data.h"
-#include "source/menus/editor_info.h"
-#include "source/menus/list_games.h"
 #include "source/menus/intro.h"
-#include "source/qr/qr.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -59,11 +56,7 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
-                if (RUNTIME_MODE != RUNTIME_MODE_SINGLE_GAME) {
-                    gameState = GAME_STATE_TITLE_DRAW;
-                } else {
-                    gameState = GAME_STATE_POST_TITLE;
-                }
+                gameState = GAME_STATE_POST_TITLE;
                 break;
 
             case GAME_STATE_TITLE_DRAW:
@@ -84,20 +77,6 @@ void main() {
 
                 fade_out();
                 
-                if (RUNTIME_MODE != RUNTIME_MODE_SINGLE_GAME) {
-                    bank_push(PRG_BANK_GAME_LIST);
-
-                    draw_list_games(0);
-                    fade_in();
-                    do_list_game_input(0);
-                    bank_pop();
-                    
-                    fade_out();
-                } else {
-                    bank_push(PRG_BANK_GAME_LIST);
-                    do_get_last_game();
-                    bank_pop();
-                }
                 load_game();
                 load_map(); // Needed to get proper tile data loaded 
 
@@ -154,119 +133,6 @@ void main() {
                 banked_call(PRG_BANK_PLAYER_SPRITE, handle_player_movement);
                 banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
                 break;
-            case GAME_STATE_EDITOR_INIT:
-                currentLevelId = 0;
-
-                fade_out();
-
-                bank_push(PRG_BANK_GAME_LIST);
-                draw_list_games(0);
-                fade_in();
-                do_list_game_input(0);
-                fade_out();
-                music_stop();
-                load_game();
-                bank_pop();
-
-                load_map();
-                oam_clear();
-
-                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
-                banked_call(PRG_BANK_MAP_LOGIC, init_map);
-
-                // Set player position -- NOTE: this might not actually be ideal here. 
-                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
-                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
-
-
-                playerGridPosition = 0;
-    
-                // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
-                ppu_off();
-                banked_call(PRG_BANK_HUD, draw_editor_hud);
-                banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
-                music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
-                ppu_on_all();
-
-                playerGridPosition = 0;
-
-                // TODO: Load up game music for this map
-
-                fade_in();
-                gameState = GAME_STATE_EDITOR;
-                break;
-            case GAME_STATE_EDITOR:
-                
-                banked_call(PRG_BANK_PLAYER_SPRITE, handle_editor_input);
-
-                banked_call(PRG_BANK_HUD, update_editor_hud);
-
-                break;
-            case GAME_STATE_EDITOR_REDRAW:
-                oam_clear();
-                fade_out();
-                load_map();
-                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
-                banked_call(PRG_BANK_MAP_LOGIC, init_map);
-
-
-                ppu_off();
-                banked_call(PRG_BANK_HUD, draw_editor_hud);
-                banked_call(PRG_BANK_MAP_LOGIC, draw_editor_help);
-                ppu_on_all();
-                fade_in();
-                gameState = GAME_STATE_EDITOR;
-
-                break;
-            case GAME_STATE_EDITOR_INFO:
-                fade_out();
-                banked_call(PRG_BANK_EDITOR_INFO, draw_editor_info);
-                fade_in();
-                banked_call(PRG_BANK_EDITOR_INFO, handle_editor_info_input);
-                if (gameState != GAME_STATE_EDITOR_EXPORT) { 
-                    gameState = GAME_STATE_EDITOR_REDRAW;
-                }
-                
-                break;
-            case GAME_STATE_EDITOR_EXPORT:
-                bank_push(PRG_BANK_QR);
-                
-                qrType = QR_TYPE_PAGE_1;
-                fade_out();
-                draw_loading_qr();
-                fade_in();
-                generate_qr(&(currentGameData[0]));
-                fade_out();
-                draw_last_qr();
-                fade_in();
-                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
-                fade_out();
-
-                qrType = QR_TYPE_PAGE_2;
-                fade_out();
-                draw_loading_qr();
-                fade_in();
-                generate_qr(&(currentGameData[0]) + 128);
-                fade_out();
-                draw_last_qr();
-                fade_in();
-                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
-                fade_out();
-
-
-                bank_pop();
-
-                gameState = GAME_STATE_EDITOR_REDRAW;
-                break;
-
-            /*case GAME_STATE_SCREEN_SCROLL:
-                // Hide all non-player sprites in play, so we have an empty screen to add new ones to
-                oam_hide_rest(FIRST_ENEMY_SPRITE_OAM_INDEX);
-
-                // If you don't like the screen scrolling transition, you can replace the transition with `do_fade_screen_transition`
-                // banked_call(PRG_BANK_MAP_LOGIC, do_scroll_screen_transition);
-                banked_call(PRG_BANK_MAP_LOGIC, do_fade_screen_transition);
-                break;*/
             case GAME_STATE_PAUSED:
                 sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);  
                 fade_out();

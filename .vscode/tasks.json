@@ -3,25 +3,15 @@
     // the working directory while also passing a command through. This could probably be fixed pretty easily;
     //  if you find a way feel free to submit a pr!
     "version": "2.0.0",
-    "command": "C:\\cygwin64\\bin\\bash.exe",
-    "isShellCommand": false,
-    "args": [
-        "-c",
-        "\"/usr/bin/make build run\""
-    ],
     "tasks": [
         {
-            "label": "C:\\cygwin64\\bin\\bash.exe",
+            "label": "build",
             "type": "shell",
-            "command": "C:\\cygwin64\\bin\\bash.exe",
-            "args": [
-                "-c",
-                "\"/usr/bin/make build run\""
-            ],
+            "command": "/usr/bin/make build run",
             "problemMatcher": [],
             "group": {
-                "_id": "build",
-                "isDefault": false
+                "kind": "build",
+                "isDefault": true,
             }
         }
     ]
