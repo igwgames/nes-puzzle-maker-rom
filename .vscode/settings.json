@@ -5,6 +5,8 @@
         "/bin/bash"
     ],
     "files.associations": {
-        "load_map.h": "c"
+        "load_map.h": "c",
+        "game_data.h": "c",
+        "titlebs.h": "c"
     }
 }
