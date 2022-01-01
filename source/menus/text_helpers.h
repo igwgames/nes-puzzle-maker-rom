@@ -9,6 +9,7 @@ void clear_screen();
 
 // Clear the screen with a border around it - useful for menus, etc.
 void clear_screen_with_border();
+void clear_screen_with_border_b();
 
 // Constants around some stuff in the text screen
 #define ASCII_TILE_TL   0xe0

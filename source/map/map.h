@@ -58,10 +58,10 @@
 #define MAP_DATA_TILE_LENGTH 192
 
 // The current map; usable for collisions/etc
-extern unsigned char currentMap[64];
-extern unsigned char currentMapOrig[64];
+extern unsigned char currentMap[120];
+extern unsigned char currentMapOrig[120];
 
-extern unsigned char assetTable[0x38];
+extern unsigned char assetTable[64];
 
 // Supporting data for sprites; 16 bytes per sprite. Look at the sprite loader function in `map.h` (or the guide) for more details.
 extern unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];
@@ -85,6 +85,7 @@ void init_map();
 
 // Assuming the map is available in currentMap, draw it to a nametable. Assumes ppu is already turned off.
 void draw_current_map_to_a();
+void draw_current_map_to_a_inline();
 void draw_current_map_to_b();
 void draw_current_map_to_c();
 void draw_current_map_to_d();
@@ -131,7 +132,9 @@ void draw_editor_help();
 #define MAPS_IN_GAME 8
 
 // Values used to adjust where to start drawing the map on-screen. (NOTE: This bypasses the solid block "border" we draw)
-#define MAP_LEFT_PADDING 8
+#define MAP_LEFT_PADDING 4
 #define MAP_TOP_PADDING 128
 
 #define GAME_BORDER_TILE_START 0x08
+extern const unsigned char tileCollisionTypes[];
+extern const unsigned char tilePalettes[];

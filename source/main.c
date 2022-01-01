@@ -39,7 +39,8 @@ void initialize_variables() {
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
     movementInProgress = 0;
-    playerGridPosition = 0;
+    playerGridPositionX = 0;
+    playerGridPositionY = 0;
     selectedGameId = 0;
     
     // Little bit of generic initialization below this point - we need to set
@@ -56,7 +57,7 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
-                gameState = GAME_STATE_POST_TITLE;
+                gameState = GAME_STATE_TITLE_DRAW;
                 break;
 
             case GAME_STATE_TITLE_DRAW:
@@ -92,14 +93,15 @@ void main() {
             case GAME_STATE_LOAD_LEVEL_1: // Used to start music in the case above.
                 playerKeyCount = 0;
                 playerCrateCount = 0;
-                playerGridPosition = currentGameData[GAME_DATA_OFFSET_START_POSITIONS + currentLevelId];
                 fade_out();
                 oam_clear();
 
                 load_game();
                 load_map();
 
-                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
+                ppu_off();
+                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a_inline);
+                ppu_on_all();
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
                 banked_call(PRG_BANK_MAP_LOGIC, load_sprites);
                 // Set player position -- NOTE: this might not actually be ideal here. 
@@ -147,7 +149,7 @@ void main() {
                 // Pause has its own mini main loop in handle_input to make logic easier.
                 sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
                 fade_out();
-                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
+                // banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.

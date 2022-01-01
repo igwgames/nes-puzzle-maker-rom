@@ -9,14 +9,15 @@
 
 CODE_BANK(PRG_BANK_TITLE);
 
-const unsigned char gameName[] = "Retro Puzzle Maker";
-const unsigned char gameAuthor[] = "cppchriscpp";
-const unsigned char gameAuthorContact[] = "Created by @cppchriscpp";
+extern unsigned char PATCH_GAME_NAME[];
+// const unsigned char gameName[] =   "     Retro Puzzle Maker     ";
+const unsigned char gameAuthor[] = "             You                                                ";
 const unsigned char currentYear[] = "2022";
 
 
 #define selectedOption tempChara
 
+// FIXME: This is dead, kill it or repurpose.
 void draw_title_screen() {
 	set_vram_update(NULL);
     ppu_off();
@@ -29,16 +30,14 @@ void draw_title_screen() {
 	oam_clear();
 
     
-    put_str(NTADR_A(8, 6), gameName);
+    put_str(NTADR_A(2, 6), PATCH_GAME_NAME);
 	
-	put_str(NTADR_A(3, 24), gameAuthorContact);
 	
 	put_str(NTADR_A(3, 26), "Copyright");
 	put_str(NTADR_A(13, 26), currentYear);
-	put_str(NTADR_A(18, 26), gameAuthor);
+	put_str(NTADR_A(2, 27), gameAuthor);
 
-	put_str(NTADR_A(10, 14), "Play A Game");
-	put_str(NTADR_A(10, 16), "Game Editor");
+	put_str(NTADR_A(10, 14), "Play");
 
 	put_str(NTADR_A(28, 28), romVersion);
 
@@ -61,19 +60,7 @@ void draw_title_screen() {
 void handle_title_input() {
 	controllerState = pad_trigger(0);
 	if (controllerState & PAD_START) {
-		if (selectedOption == 0) {
-			gameState = GAME_STATE_POST_TITLE;
-		} else {
-			gameState = GAME_STATE_EDITOR_INIT;
-		}
-	} else if (controllerState & PAD_UP) {
-		selectedOption = 0;
-		screenBuffer[2] = 0xe2;
-		screenBuffer[5] = ' ' + 0x60;
-	} else if (controllerState & PAD_DOWN) {
-		selectedOption = 1;
-		screenBuffer[2] = ' ' + 0x60;
-		screenBuffer[5] = 0xe2;
+		gameState = GAME_STATE_POST_TITLE;
 	}
 	
 }

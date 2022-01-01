@@ -61,3 +61,5 @@ const unsigned int bitToByte[8] = {
     0x40,
     0x80
 };
+
+ZEROPAGE_DEF(unsigned char, currentMapBorderTile);

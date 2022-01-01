@@ -20,9 +20,8 @@ void clear_screen() {
 }
 
 // Clear the screen and put a nice border around it.
-void clear_screen_with_border() {
+void _clear_screen_with_border() {
 	set_vram_update(NULL);
-	vram_adr(0x2000);
 	vram_fill(' ' + TEXT_ASCII_SKIPPED_CHARACTERS, 64);
 
 	vram_put(' ' + TEXT_ASCII_SKIPPED_CHARACTERS);
@@ -49,4 +48,14 @@ void clear_screen_with_border() {
 	// Attribute table
 	vram_fill(0x55, 64);
 
+}
+
+void clear_screen_with_border() {
+	vram_adr(0x2000);
+	_clear_screen_with_border();
+}
+
+void clear_screen_with_border_b() {
+	vram_adr(NAMETABLE_B);
+	_clear_screen_with_border();
 }

@@ -14,23 +14,23 @@ unsigned char editorSelectedPosition;
 
 void draw_pause_screen() {
     ppu_off();
-    clear_screen_with_border();
+    clear_screen_with_border_b();
     // We reuse the title palette here, though we have the option of making our own if needed.
     // pal_bg(titlePalette);
 	// pal_spr(titlePalette);
-    scroll(0, 0);
+    scroll(256, 0);
 
 	// set_chr_bank_0(CHR_BANK_MENU);
     // set_chr_bank_1(CHR_BANK_MENU);
 
     // Just write "- Paused -" on the screen... there's plenty of nicer things you could do if you wanna spend time!
-    put_str(NTADR_A(11, 7), "- Paused -");
+    put_str(NTADR_B(11, 7), "- Paused -");
 
-    put_str(NTADR_A(12, 16), "Continue");
-    put_str(NTADR_A(12, 18), "Restart");
+    put_str(NTADR_B(12, 16), "Continue");
+    put_str(NTADR_B(12, 18), "Restart");
 
 
-    vram_adr(NTADR_A(3,2));
+    vram_adr(NTADR_B(3,2));
     vram_put(' ' + 0x60);
 
     for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
@@ -57,11 +57,11 @@ void draw_pause_screen() {
 
 void handle_pause_input() {
     editorSelectedPosition = 0;
-    screenBuffer[0] = MSB(NTADR_A(10, 16));
-    screenBuffer[1] = LSB(NTADR_A(10, 16));
+    screenBuffer[0] = MSB(NTADR_B(10, 16));
+    screenBuffer[1] = LSB(NTADR_B(10, 16));
     screenBuffer[2] = 0xe2; // FIXME: Constant
-    screenBuffer[3] = MSB(NTADR_A(10, 18));
-    screenBuffer[4] = LSB(NTADR_A(10, 18));
+    screenBuffer[3] = MSB(NTADR_B(10, 18));
+    screenBuffer[4] = LSB(NTADR_B(10, 18));
     screenBuffer[5] = ' ' + 0x60;
     screenBuffer[6] = NT_UPD_EOF;
     set_vram_update(screenBuffer);

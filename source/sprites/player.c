@@ -23,11 +23,16 @@ ZEROPAGE_DEF(int, playerYPosition);
 // FIXME: axe
 ZEROPAGE_DEF(int, playerXVelocity);
 ZEROPAGE_DEF(int, playerYVelocity);
-ZEROPAGE_DEF(unsigned char, playerGridPosition);
+ZEROPAGE_DEF(unsigned char, playerGridPositionX);
+ZEROPAGE_DEF(unsigned char, playerGridPositionY);
 ZEROPAGE_DEF(unsigned char, movementInProgress);
 ZEROPAGE_DEF(unsigned char, playerControlsLockTime);
 ZEROPAGE_DEF(unsigned char, playerInvulnerabilityTime);
 ZEROPAGE_DEF(unsigned char, playerDirection);
+
+ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionX);
+ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionY);
+
 
 // Huge pile of temporary variables
 #define rawXPosition tempChar1
@@ -65,8 +70,8 @@ const unsigned char* movedText =
 void update_player_sprite() {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
 
-    rawXPosition = (PLAY_AREA_LEFT + ((playerGridPosition & 0x07) << 4));
-    rawYPosition = (PLAY_AREA_TOP + ((playerGridPosition & 0x38) << 1));
+    rawXPosition = (PLAY_AREA_LEFT + (playerGridPositionX << 4));
+    rawYPosition = (PLAY_AREA_TOP + (playerGridPositionY << 4));
     rawTileId = playerSpriteTileId + playerDirection;
 
 
@@ -86,8 +91,17 @@ void update_player_sprite() {
 
 }
 
-void update_single_tile(unsigned char id, unsigned char newTile, unsigned char palette) {
-    collisionTempValue = NTADR_A(((id & 0x07)<<1) + 8, ((id & 0x38) >> 2) + 4);
+void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
+
+    if (newTile > 7) {
+        newTile -= 8;
+        newTile <<= 1;
+        newTile += 32;
+    } else {
+        newTile <<= 1;
+    }
+
+    collisionTempValue = 0x2000 + ((x + 2)<<1) + ((y + 1)<<6);
     screenBuffer[0] = MSB(collisionTempValue);
     screenBuffer[1] = LSB(collisionTempValue);
     screenBuffer[2] = newTile;
@@ -105,8 +119,8 @@ void update_single_tile(unsigned char id, unsigned char newTile, unsigned char p
     screenBuffer[11] = newTile+17;
 
     // Raw X / Y positions on-screen
-    collisionTempX = (id & 0x07) + 4;
-    collisionTempY = ((id & 0x38) >> 3) + 2;
+    collisionTempX = x + 2;
+    collisionTempY = y + 1;
 
     // Calculate raw attr table address
     collisionTempValue = ((collisionTempY >> 1) << 3) + (collisionTempX >> 1);
@@ -157,34 +171,35 @@ void handle_player_movement() {
         return;
     }
     
-    rawTileId = playerGridPosition;
+    nextPlayerGridPositionX = playerGridPositionX;
+    nextPlayerGridPositionY = playerGridPositionY;
 
     if (controllerState & PAD_LEFT) {
-        if ((rawTileId & 0x07) != 0) {
-            rawTileId--;
+        if (playerGridPositionX > 0) {
+            --nextPlayerGridPositionX;
             collisionTempDirection = PAD_LEFT;
         }
         // Graphical only
         playerDirection = SPRITE_DIRECTION_LEFT;
     } else if (controllerState & PAD_RIGHT) {
-        if ((rawTileId & 0x07) != 7) {
-            rawTileId++;
+        if (playerGridPositionX < 11) {
+            ++nextPlayerGridPositionX;
             collisionTempDirection = PAD_RIGHT;
         }
         // Graphical only
         playerDirection = SPRITE_DIRECTION_RIGHT;
 
     } else if (controllerState & PAD_UP) {
-        if ((rawTileId & 0x38) != 0) {
-            rawTileId -= 8;
+        if (playerGridPositionY > 0) {
+            --nextPlayerGridPositionY;
             collisionTempDirection = PAD_UP;
         }
         // Graphical only
         playerDirection = SPRITE_DIRECTION_UP;
 
     } else if (controllerState & PAD_DOWN) {
-        if ((rawTileId & 0x38) != 0x38) {
-            rawTileId += 8;
+        if (playerGridPositionY < 9) {
+            ++nextPlayerGridPositionY;
             collisionTempDirection = PAD_DOWN;
         }
         // Graphical only
@@ -192,14 +207,16 @@ void handle_player_movement() {
 
     }
 
-    if (rawTileId == playerGridPosition) {
+
+    if (playerGridPositionX == nextPlayerGridPositionX && playerGridPositionY == nextPlayerGridPositionY) {
         // Ya didn't move...
         return; 
     }
+    rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
 
     movementInProgress = PLAYER_TILE_MOVE_FRAMES;
     // TODO: Take special action based on the game type?
-    switch (currentMapTileData[currentMap[rawTileId]+TILE_DATA_LOOKUP_OFFSET_COLLISION]) {
+    switch (tileCollisionTypes[currentMap[rawTileId]]) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
@@ -208,174 +225,176 @@ void handle_player_movement() {
             break;
         case TILE_COLLISION_SOLID: // Solid 1
             // Nope, go back. These are solid.
-            rawTileId = playerGridPosition;
+                nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
         case TILE_COLLISION_CRATE:
             // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
             switch (collisionTempDirection) {
                 // TODO: This is ugly... what can we do to pretty it up?
                 case PAD_RIGHT:
-                    if ((rawTileId & 0x07) == 7) {
-                        rawTileId = playerGridPosition;
+                    if (nextPlayerGridPositionX == 11) {
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
                     }
-                    collisionTempTileId = currentMapTileData[currentMap[rawTileId+1]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+1]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
                         currentMap[rawTileId+1] = currentMap[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId+1, collisionTempTileId, currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId+1];
+                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId+1]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         ++playerCrateCount;
                         ++gameCrates;
-                        currentMap[rawTileId+1] = 0;
+                        currentMap[rawTileId+1] = currentMapOrig[rawTileId+1];
 
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId+1, collisionTempTileId, currentMapTileData[currentMap[rawTileId+1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId+1];
+                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId+1]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
-                        rawTileId = playerGridPosition;
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
+
                     }
                     break;
                 case PAD_LEFT:
-                    if ((rawTileId & 0x07) == 0) {
-                        rawTileId = playerGridPosition;
+                    if (nextPlayerGridPositionX == 0) {
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
                     }
-                    collisionTempTileId = currentMapTileData[currentMap[rawTileId-1]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-1]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
                         currentMap[rawTileId-1] = currentMap[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId-1, collisionTempTileId, currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId-1];
+                        update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        currentMap[rawTileId-1] = 0;
+                        currentMap[rawTileId-1] = currentMapOrig[rawTileId-1];
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId-1, collisionTempTileId, currentMapTileData[currentMap[rawTileId-1] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId-1];
+                        update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
-                        rawTileId = playerGridPosition;
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                     }
                     break;
                 case PAD_UP:
-                    if ((rawTileId & 0x38) == 0) {
-                        rawTileId = playerGridPosition;
+                    if (nextPlayerGridPositionY == 0) {
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
                     }
-                    collisionTempTileId = currentMapTileData[currentMap[rawTileId-8]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-12]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        currentMap[rawTileId-8] = currentMap[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId-8, collisionTempTileId, currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        currentMap[rawTileId-12] = currentMap[rawTileId];
+                        collisionTempTileId = currentMap[rawTileId-12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[currentMap[rawTileId-12]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        currentMap[rawTileId-8] = 0;
+                        currentMap[rawTileId-12] = 0;
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId-8, collisionTempTileId, currentMapTileData[currentMap[rawTileId-8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId-12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[currentMap[rawTileId-12]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
-                        rawTileId = playerGridPosition;
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                     }
                     break;
                 case PAD_DOWN:
-                    if ((rawTileId & 0x38) == 0x38) {
-                        rawTileId = playerGridPosition;
+                    if (nextPlayerGridPositionY == 9) {
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
                     }
-                    collisionTempTileId = currentMapTileData[currentMap[rawTileId+8]+TILE_DATA_LOOKUP_OFFSET_COLLISION];
+                    collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+12]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        currentMap[rawTileId+8] = currentMap[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId+8, collisionTempTileId, currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        currentMap[rawTileId+12] = currentMap[rawTileId];
+                        collisionTempTileId = currentMap[rawTileId+12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[currentMap[rawTileId+12]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        currentMap[rawTileId+8] = 0;
+                        currentMap[rawTileId+12] = currentMapOrig[rawTileId + 12];
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_ID];
-                        update_single_tile(rawTileId+8, collisionTempTileId, currentMapTileData[currentMap[rawTileId+8] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        collisionTempTileId = currentMap[rawTileId+12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[currentMap[rawTileId+12]]);
 
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_ID];
+                        collisionTempTileId = currentMap[rawTileId];
 
-                        update_single_tile(rawTileId, collisionTempTileId, currentMapTileData[currentMap[rawTileId] + TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
                     } else {
-                        rawTileId = playerGridPosition;
+                        nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                     }
                     break;
 
                     
                 default:
-                    rawTileId = playerGridPosition;
+                    nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                     break;
             }
             break;
         case TILE_COLLISION_COLLECTABLE:
             ++playerKeyCount;
             ++gameKeys;
-            currentMap[rawTileId] = 0;
-            update_single_tile(rawTileId, 0, currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+            currentMap[rawTileId] = currentMapOrig[rawTileId];
+            update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             collisionTempTileId = 0;
+            // FIXME: Game style should be read from a variable from the game
             switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
                 case GAME_STYLE_MAZE:
                     // Do nothing; you're just allowed to pass.
                     break;
                 case GAME_STYLE_COIN:
                     for (i = 0; i != 64; ++i) {
-                        if (currentMapTileData[currentMap[i] + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_COLLECTABLE) {
+                        if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_COLLECTABLE) {
                             // Sorry, you didn't get em all. Plz try again.
                             collisionTempTileId = 1;
                         }
@@ -383,7 +402,7 @@ void handle_player_movement() {
                     break;
                 case GAME_STYLE_CRATES: 
                     for (i = 0; i != 64; ++i) {
-                        if (currentMapTileData[currentMap[i] + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_GAP) {
+                        if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_GAP) {
                             // Sorry, you didn't get em all. Plz try again.
                             collisionTempTileId = 1;
                         }
@@ -405,10 +424,10 @@ void handle_player_movement() {
             break;
         default:
             // Stop you when you hit an unknown tile... idk seems better than walking?
-            rawTileId = playerGridPosition;
+            rawTileId = tempChara;
             break;
     }
-    playerGridPosition = rawTileId;
+    playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
 
 
 
@@ -419,112 +438,4 @@ void test_player_tile_collision() {
 
 #define currentMapSpriteIndex tempChar1
 void handle_player_sprite_collision() {
-}
-
-void handle_editor_input() {
-    lastControllerState = controllerState;
-    controllerState = pad_poll(0);
-    if (controllerState & PAD_SELECT && !(lastControllerState & PAD_SELECT)) {
-        sfx_play(SFX_MENU_BOP, SFX_CHANNEL_4);
-        if (editorSelectedTileId == 7) { // End of regular tiles
-            editorSelectedTileId = TILE_EDITOR_POSITION_PLAYER;
-        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_PLAYER) {
-            if (currentLevelId < (MAX_GAME_LEVELS-1)) {
-                editorSelectedTileId = TILE_EDITOR_POSITION_RIGHT;
-            } else {
-                if (currentLevelId > 0) {
-                    editorSelectedTileId = TILE_EDITOR_POSITION_LEFT;
-                } else {
-                    editorSelectedTileId = 0;
-                }
-            }
-        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
-            if (currentLevelId > 0) {
-                editorSelectedTileId = TILE_EDITOR_POSITION_LEFT;
-            } else {
-                editorSelectedTileId = 0;
-            }
-        } else if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
-            editorSelectedTileId = 0;
-        } else {
-            ++editorSelectedTileId;
-        }
-    }
-
-    if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
-        save_map();
-        sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);
-        gameState = GAME_STATE_EDITOR_INFO;
-        return;
-    }
-
-    if (movementInProgress)
-        --movementInProgress;
-
-    if (!movementInProgress) { 
-        if (controllerState & PAD_A) {
-
-            banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile);
-        } else if (controllerState & PAD_B) {
-            banked_call(PRG_BANK_MAP_LOGIC, update_editor_map_tile_rm);
-        }
-
-        if (controllerState & PAD_RIGHT) {
-            if ((playerGridPosition & 0x07) == 0x07) {
-                playerGridPosition -= 7;
-            } else {
-                playerGridPosition++;
-            }
-            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-        }
-        if (controllerState & PAD_LEFT) {
-            if ((playerGridPosition & 0x07) == 0x00) {
-                playerGridPosition += 7;
-            } else {
-                playerGridPosition--;
-            }
-            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-        }
-
-        if (controllerState & PAD_UP) {
-            if ((playerGridPosition & 0x38) == 0x00) {
-                playerGridPosition += 56;
-            } else {
-                playerGridPosition -= 8;
-            }
-            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-        } 
-
-        if (controllerState & PAD_DOWN) {
-            if ((playerGridPosition & 0x38) == 0x38) {
-                playerGridPosition -= 56;
-            } else {
-                playerGridPosition += 8;
-            }
-            movementInProgress = PLAYER_TILE_MOVE_FRAMES;
-        }
-
-    }
-
-    // Draw player in the right spot
-    rawXPosition = (PLAY_AREA_LEFT + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x07) << 4));
-    rawYPosition = (PLAY_AREA_TOP + ((currentGameData[GAME_DATA_OFFSET_START_POSITIONS+currentLevelId] & 0x38) << 1));
-    rawTileId = playerSpriteTileId;
-
-
-    oam_spr(rawXPosition, rawYPosition, rawTileId, 0x03, PLAYER_SPRITE_INDEX);
-    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x03, PLAYER_SPRITE_INDEX+4);
-    oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x03, PLAYER_SPRITE_INDEX+8);
-    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x03, PLAYER_SPRITE_INDEX+12);
-
-
-    rawXPosition = (64 + ((playerGridPosition & 0x07)<<4));
-    rawYPosition = (80 + ((playerGridPosition & 0x38)<<1));
-    // FIXME: Sprite constant
-    oam_spr(rawXPosition, rawYPosition, 0xe2, 0x03, 0xd0);
-    oam_spr(rawXPosition+8, rawYPosition, 0xe2+1, 0x03, 0xd0+4);
-    oam_spr(rawXPosition, rawYPosition+8, 0xe2+16, 0x03, 0xd0+8);
-    oam_spr(rawXPosition+8, rawYPosition+8, 0xe2+17, 0x03, 0xd0+12);
-
-
 }

@@ -14,8 +14,8 @@
 #define PLAYER_X_OFFSET_EXTENDED 28
 #define PLAYER_Y_OFFSET_EXTENDED 16
 
-#define PLAY_AREA_TOP 80
-#define PLAY_AREA_LEFT 64
+#define PLAY_AREA_TOP 60
+#define PLAY_AREA_LEFT 32
 
 #define PLAYER_TILE_MOVE_FRAMES 10
 
@@ -41,7 +41,8 @@ ZEROPAGE_EXTERN(int, playerYPosition);
 ZEROPAGE_EXTERN(int, playerXVelocity);
 ZEROPAGE_EXTERN(int, playerYVelocity);
 ZEROPAGE_EXTERN(unsigned char, playerDirection);
-ZEROPAGE_EXTERN(unsigned char, playerGridPosition);
+ZEROPAGE_EXTERN(unsigned char, playerGridPositionX);
+ZEROPAGE_EXTERN(unsigned char, playerGridPositionY);
 ZEROPAGE_EXTERN(unsigned char, movementInProgress);
 
 // Helper macro to convert the player's X and Y position into a position on the map
