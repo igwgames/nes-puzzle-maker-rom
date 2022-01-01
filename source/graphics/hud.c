@@ -195,39 +195,6 @@ void update_hud() {
 
             break;
     }
-
-    // This sets up screenBuffer to print x hearts, then x more empty hearts. 
-    // You give it the address, tell it the direction to write, then follow up with
-    // Ids, ending with NT_UPD_EOF
-    // FIXME: Axe this completely? Or make it useful somehow.
-    
-    // We use i for the index on screen buffer, so we don't have to shift things around
-    // as we add values. 
-    /*
-    i = 0;
-    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
-    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
-    screenBuffer[i++] = playerMaxHealth;
-    // Add one heart for every health the player has
-    for (j = 0; j != playerHealth; ++j) {
-        screenBuffer[i++] = HUD_TILE_HEART;
-    }
-    // Using the same variable, add empty hearts up to max health
-    for (; j != playerMaxHealth; ++j) {
-        screenBuffer[i++] = HUD_TILE_HEART_EMPTY;
-    }
-
-    // Next, draw the key count, using the key tile, and our key count variable
-    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_KEY_START) | NT_UPD_HORZ;
-    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_KEY_START);
-    screenBuffer[i++] = 2;
-    screenBuffer[i++] = HUD_TILE_KEY;
-    screenBuffer[i++] = HUD_TILE_NUMBER + playerKeyCount;
-
-
-    screenBuffer[i++] = NT_UPD_EOF;
-    set_vram_update(screenBuffer);*/
-
 }
 
 void update_editor_hud() {

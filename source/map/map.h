@@ -136,5 +136,8 @@ void draw_editor_help();
 #define MAP_TOP_PADDING 128
 
 #define GAME_BORDER_TILE_START 0x08
+extern const unsigned char gameName[];
 extern const unsigned char tileCollisionTypes[];
 extern const unsigned char tilePalettes[];
+
+extern const unsigned char gameLevelData[];

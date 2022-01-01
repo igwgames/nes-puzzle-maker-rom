@@ -6,10 +6,10 @@
 #include "source/menus/text_helpers.h"
 #include "source/graphics/palettes.h"
 #include "source/configuration/game_info.h"
+#include "source/map/map.h"
 
 CODE_BANK(PRG_BANK_TITLE);
 
-extern unsigned char PATCH_GAME_NAME[];
 const unsigned char gameAuthor[] = "             You                                                ";
 const unsigned char currentYear[] = "2022";
 
@@ -29,7 +29,7 @@ void draw_title_screen() {
 	oam_clear();
 
     
-    put_str(NTADR_A(2, 6), PATCH_GAME_NAME);
+    put_str(NTADR_A(2, 6), gameName);
 	
 	
 	put_str(NTADR_A(3, 26), "Copyright");
