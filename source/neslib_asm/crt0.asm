@@ -126,8 +126,8 @@ RLE_BYTE	=TEMP+3
 .segment "HEADER"
 
     .byte $4e,$45,$53,$1a
-	.byte <NES_PRG_BANKS
-	.byte <NES_CHR_BANKS
+	.byte <8
+	.byte <16
 	.byte $12
 	.byte 0
 	.res 8,0

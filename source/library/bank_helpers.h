@@ -64,47 +64,32 @@ void __fastcall__ unset_nmi_chr_tile_bank(void);
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 #define ZEROPAGE_DEF(defa, defb) \
-    _Pragma("bssseg (push,\"ZEROPAGE\")") \
-    _Pragma("dataseg (push, \"ZEROPAGE\")") \
+    _Pragma("bss-name (push,\"ZEROPAGE\")") \
+    _Pragma("data-name (push, \"ZEROPAGE\")") \
     defa defb; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
+    _Pragma("bss-name (pop)") \
+    _Pragma("data-name (pop)")
 
 #define ZEROPAGE_ARRAY_DEF(defa, defb, defArr) \
-    _Pragma("bssseg (push,\"ZEROPAGE\")") \
-    _Pragma("dataseg (push, \"ZEROPAGE\")") \
+    _Pragma("bss-name (push,\"ZEROPAGE\")") \
+    _Pragma("data-name (push, \"ZEROPAGE\")") \
     defa defb[defArr]; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
+    _Pragma("bss-name (pop)") \
+    _Pragma("data-name (pop)")
 
 #define SRAM_DEF(defa, defb) \
-    _Pragma("bssseg (push,\"SRAM\")") \
-    _Pragma("dataseg (push, \"SRAM\")") \
+    _Pragma("bss-name (push,\"SRAM\")") \
+    _Pragma("data-name (push, \"SRAM\")") \
     defa defb; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
+    _Pragma("bss-name (pop)") \
+    _Pragma("data-name (pop)")
 
 #define SRAM_ARRAY_DEF(defa, defb, defArr) \
-    _Pragma("bssseg (push,\"SRAM\")") \
-    _Pragma("dataseg (push, \"SRAM\")") \
+    _Pragma("bss-name (push,\"SRAM\")") \
+    _Pragma("data-name (push, \"SRAM\")") \
     defa defb[defArr]; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
-
-#define WRAM_DEF(defa, defb) \
-    _Pragma("bssseg (push, \"WRAM\")") \
-    _Pragma("dataseg (push, \"WRAM\")") \
-    defa defb; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
-
-
-#define WRAM_ARRAY_DEF(defa, defb, defArr) \
-    _Pragma("bssseg (push, \"WRAM\")") \
-    _Pragma("dataseg (push, \"WRAM\")") \
-    defa defb[defArr]; \
-    _Pragma("bssseg (pop)") \
-    _Pragma("dataseg (pop)")
+    _Pragma("bss-name (pop)") \
+    _Pragma("data-name (pop)")
 
 
 

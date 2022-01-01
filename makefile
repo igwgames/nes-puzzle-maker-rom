@@ -96,16 +96,16 @@ temp/base.asm: $(CONFIG_ASM)
 	echo ".include \"source/neslib_asm/crt0.asm\"" >> temp/base.asm
 
 temp/crt0.o: source/neslib_asm/crt0.asm source/neslib_asm/neslib.asm temp/base.asm $(SOURCE_CRT0_GRAPHICS) sound/music/music.bin sound/music/samples.bin sound/sfx/generated/sfx.s
-	$(MAIN_ASM_COMPILER) temp/base.asm -o temp/crt0.o -D SOUND_BANK=$(SOUND_BANK)
+	$(MAIN_ASM_COMPILER) -I . temp/base.asm -o temp/crt0.o -D SOUND_BANK=$(SOUND_BANK)
 
 # This bit is a little cheap... any time a header file changes, just recompile all C files. There might
 # be some trickery we could do to find all C files that actually care, but this compiles fast enough that 
 # it shouldn't be a huge deal.
 temp/%.s: %.c $(SOURCE_HEADERS)
-	$(MAIN_COMPILER) -Oi $< --add-source  --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
+	$(MAIN_COMPILER) -I . -Oi $< --add-source  --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
 
 temp/%.o: temp/%.s
-	$(MAIN_ASM_COMPILER) $< 
+	$(MAIN_ASM_COMPILER) -I . $< 
 
 temp/%.s: temp/%.c
 	$(MAIN_COMPILER) -Oi $< --add-source --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
@@ -117,7 +117,7 @@ sound/sfx/generated/sfx.s: sound/sfx/sfx.nsf
 	$(SFX_CONVERTER) sound/sfx/sfx.nsf -ca65 -ntsc && sleep 1 && $(AFTER_SFX_CONVERTER)
 
 rom/$(ROM_NAME).nes: temp/crt0.o $(SOURCE_O)
-	$(MAIN_LINKER) -C $(CONFIG_FILE) -o rom/$(ROM_NAME).nes temp/*.o tools/neslib_famitracker/runtime.lib
+	$(MAIN_LINKER) -C $(CONFIG_FILE) -o rom/$(ROM_NAME).nes temp/*.o tools/cc65/lib/nes.lib
 
 # Build up the tool zip that's saved on the website/etc. There's a 99.9% chance you don't care about this.
 # Meant to be run from the base folder of nes-starter-kit - all node stuff must be compiled!
