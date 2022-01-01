@@ -10,14 +10,13 @@
 CODE_BANK(PRG_BANK_TITLE);
 
 extern unsigned char PATCH_GAME_NAME[];
-// const unsigned char gameName[] =   "     Retro Puzzle Maker     ";
 const unsigned char gameAuthor[] = "             You                                                ";
 const unsigned char currentYear[] = "2022";
 
 
 #define selectedOption tempChara
 
-// FIXME: This is dead, kill it or repurpose.
+// Rewrite to pull in custom data
 void draw_title_screen() {
 	set_vram_update(NULL);
     ppu_off();

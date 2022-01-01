@@ -60,6 +60,7 @@ void load_sprites() {
 // Clears the asset table. Set containsHud to 1 to set the HUD bytes to use palette 4 (will break the coloring logic if you use the
 // last few rows for the map.)
 void clear_asset_table(containsHud) {
+    // Fill it with the border color, duplicating it to all 4 2bit pieces
     tempChara = tilePalettes[currentMapBorderTile >> 1];
     tempChara += (tempChara << 2);
     tempChara += (tempChara << 4);
@@ -126,6 +127,7 @@ void update_asset_table_based_on_current_value(unsigned char reverseAttributes) 
 #define otherLoopIndex tempChar9
 
 
+// This is an ascii space
 #define BLANK_TILE 0x80
 void fill_border_line() {
     for (j = 0; j != 12; ++j) {
@@ -225,7 +227,6 @@ void draw_current_map_to_a_inline() {
         }
         tempChar4 += 12;
 
-        // FIXME: asset table tracking and using
         vram_adr(0x2000 + 0x40 + (i<<6));
         vram_write(&mapScreenBuffer[0], 64);
     }
