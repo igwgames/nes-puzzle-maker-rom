@@ -10,9 +10,6 @@
 
 CODE_BANK(PRG_BANK_TITLE);
 
-const unsigned char gameAuthor[] = "             You                                                ";
-const unsigned char currentYear[] = "2022";
-
 
 #define selectedOption tempChara
 
@@ -25,35 +22,17 @@ void draw_title_screen() {
 
 	set_chr_bank_0(CHR_BANK_MENU);
     set_chr_bank_1(CHR_BANK_MENU);
-	clear_screen();
+	//clear_screen();
 	oam_clear();
 
+	vram_adr(0x2000);
+	vram_write(&titleScreenData[0], 0x400);
     
-    put_str(NTADR_A(2, 6), gameName);
-	
-	
-	put_str(NTADR_A(3, 26), "Copyright");
-	put_str(NTADR_A(13, 26), currentYear);
-	put_str(NTADR_A(2, 27), gameAuthor);
-
-	put_str(NTADR_A(10, 14), "Play");
-
-	put_str(NTADR_A(28, 28), romVersion);
 
 	// put_str(NTADR_A(10, 16), "Press Start!");
 	ppu_on_all();
 
 	gameState = GAME_STATE_TITLE_INPUT;
-	selectedOption = 0;
-
-	screenBuffer[0] = MSB(NTADR_A(8, 14));
-	screenBuffer[1] = LSB(NTADR_A(8, 14));
-	screenBuffer[2] = 0xe2;
-	screenBuffer[3] = MSB(NTADR_A(8, 16));
-	screenBuffer[4] = LSB(NTADR_A(8, 16));
-	screenBuffer[5] = ' ' + 0x60;
-	screenBuffer[6] = NT_UPD_EOF;
-	set_vram_update(screenBuffer);
 }
 
 void handle_title_input() {

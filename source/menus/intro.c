@@ -20,108 +20,15 @@ CODE_BANK(PRG_BANK_INTRO_SCREEN);
 
 void draw_intro_screen() {
     ppu_off();
-    clear_screen_with_border();
+    pal_bg(titlePalette);
+	pal_spr(titlePalette);
     scroll(0, 0);
 
+	set_chr_bank_0(CHR_BANK_MENU);
+    set_chr_bank_1(CHR_BANK_MENU);
 
-    vram_adr(NTADR_A(3,2));
-    /*
-    vram_put(' ' + 0x60);
-
-    titleLen = GAME_DATA_OFFSET_TITLE_LENGTH;
-    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
-        if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
-            // If all that's left is spaces, don't keep printing
-            for (j = i; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
-                if (currentGameData[GAME_DATA_OFFSET_TITLE+j] != ' ' && currentGameData[GAME_DATA_OFFSET_TITLE+j] != 0) {
-                    goto keep_going;
-                }
-            }
-            titleLen = i;
-            break;
-        }
-        keep_going:
-        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
-    }
-    vram_put(' ' + 0x60);
-
-    vram_adr(NTADR_A(15 - (titleLen / 2), 5));
-    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
-        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
-    }
-
-    vram_adr(NTADR_A(3, 25));
-    for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
-        vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
-    }*/
-
-    for (i = 0; i != 16; ++i) {
-        switch (tileCollisionTypes[i]) {
-            case TILE_COLLISION_COLLECTABLE:
-                coinTile = i;
-                break;
-            case TILE_COLLISION_CRATE:
-                crateTile = i;
-                break;
-            case TILE_COLLISION_GAP:
-                holeTile = i;
-                break;
-            case TILE_COLLISION_LEVEL_END:
-                goalTile = i;
-                break;
-        }
-    }
-
-    switch (currentGameStyle) {
-        case GAME_STYLE_MAZE:
-            put_str(NTADR_A(7, 16), "Get to the finish!");
-            break;
-        case GAME_STYLE_COIN:
-            put_str(NTADR_A(6, 9), "Collect all coins...");
-            put_str(NTADR_A(6, 17), "And get to the finish!");
-
-            vram_adr(NTADR_A(14, 12));
-            tempTile = currentMapTileData[((coinTile)<<2)+TILE_DATA_LOOKUP_OFFSET_ID];
-            vram_put(tempTile);
-            vram_put(tempTile+1);
-            vram_adr(NTADR_A(14, 13));
-            vram_put(tempTile+16);
-            vram_put(tempTile+17);
-            vram_adr(NAMETABLE_A + 0x03db);
-            tempTile = currentMapTileData[((coinTile)<<2)+TILE_DATA_LOOKUP_OFFSET_PALETTE];
-            tempTile = tempTile | (tempTile<<2) | (tempTile<<4) | (tempTile<<6);
-            vram_put(tempTile);
-
-            break;
-        case GAME_STYLE_CRATES:
-            put_str(NTADR_A(6, 9), "Put crates in holes...");
-            put_str(NTADR_A(6, 17), "And get to the finish!");
-            vram_adr(NTADR_A(14, 12));
-            tempTile = currentMapTileData[((crateTile)<<2)+TILE_DATA_LOOKUP_OFFSET_ID];
-            vram_put(tempTile);
-            vram_put(tempTile+1);
-            vram_adr(NTADR_A(14, 13));
-            vram_put(tempTile+16);
-            vram_put(tempTile+17);
-            vram_adr(NAMETABLE_A + 0x03db);
-            tempTile = currentMapTileData[((crateTile)<<2)+TILE_DATA_LOOKUP_OFFSET_PALETTE];
-            tempTile = tempTile | (tempTile<<2) | (tempTile<<4) | (tempTile<<6);
-            vram_put(tempTile);
-
-            break;
-    }
-
-    vram_adr(NTADR_A(14, 20));
-    tempTile = currentMapTileData[((goalTile)<<2)+TILE_DATA_LOOKUP_OFFSET_ID];
-    vram_put(tempTile);
-    vram_put(tempTile+1);
-    vram_adr(NTADR_A(14, 21));
-    vram_put(tempTile+16);
-    vram_put(tempTile+17);
-    vram_adr(NAMETABLE_A + 0x03eb);
-    tempTile = currentMapTileData[((goalTile)<<2)+TILE_DATA_LOOKUP_OFFSET_PALETTE];
-    tempTile = tempTile | (tempTile<<2) | (tempTile<<4) | (tempTile<<6);
-    vram_put(tempTile);
+    vram_adr(0x2000);
+    vram_write(&introScreenData[0], 0x400);
 
 
     // We purposely leave sprites off, so they do not clutter the view. 
