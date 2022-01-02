@@ -394,7 +394,7 @@ void handle_player_movement() {
                     break;
                 case GAME_STYLE_CRATES: 
                     for (i = 0; i != 120; ++i) {
-                        if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_GAP) {
+                        if (totalCrateCount != playerCrateCount) {
                             // Sorry, you didn't get em all. Plz try again.
                             collisionTempTileId = 1;
                         }

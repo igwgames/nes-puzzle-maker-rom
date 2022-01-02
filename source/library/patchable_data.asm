@@ -16,7 +16,7 @@ _totalGameLevels:
     .byte 1 ;1
 .export _totalGameLevels
 
-_gameLevelData:; 128 (FIXME Need full levels, but its gonna break shit until I move this into a different bank)
+_gameLevelData:; 0x80 (FIXME Need full levels, but its gonna break shit until I move this into a different bank)
     /*
     .byte $01, $23, $45, $67, $89, $ab,
     .byte $12, $34, $56, $78, $9a, $bc,
@@ -47,8 +47,8 @@ _gameLevelData:; 128 (FIXME Need full levels, but its gonna break shit until I m
     ; Extra data...
     ; Tile id for border
     .byte $02
-    ; Gameplay mode FIXME: implement
-    .byte $00 
+    ; Gameplay mode
+    .byte $0
     
     ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
     .byte $44
@@ -73,7 +73,7 @@ _gameLevelData:; 128 (FIXME Need full levels, but its gonna break shit until I m
     ; Extra data...
     ; Tile id for border
     .byte $02
-    ; Gameplay mode FIXME: implement
+    ; Gameplay mode
     .byte $00 
     
     ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)

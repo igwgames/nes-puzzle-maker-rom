@@ -128,7 +128,7 @@ void update_hud() {
             for (i = 0; i != 16; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_COLLECTABLE) {
                     tempTileIndex = i;
-                    tempTileId = (i<<2);
+                    tempTileId = (i<<1);
                     break;
                 }
             }
@@ -163,7 +163,7 @@ void update_hud() {
             for (i = 0; i != 16; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_CRATE) {
                     tempTileIndex = i;
-                    tempTileId = (i<<2);
+                    tempTileId = (i<<1);
                     break;
                 }
             }
