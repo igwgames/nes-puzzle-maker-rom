@@ -5,18 +5,18 @@
 ; you want! These warnings only apply if your rom will continue to be used with the  web-based editor.
 
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
-.asciiz "PATCH TARGET 1.00"
+.asciiz "PATCH TARGET 1.00" ; 0x12
 
 ; These are imported in map.h for the most part
 _gameName:
-    .asciiz "     Retro Puzzle Maker     "
+    .asciiz "     Retro Puzzle Maker     " ; 1b
 .export _gameName
 
 _totalGameLevels: 
-    .byte 1
+    .byte 1 ;1
 .export _totalGameLevels
 
-_gameLevelData:
+_gameLevelData:; 128 (FIXME Need full levels, but its gonna break shit until I move this into a different bank)
     /*
     .byte $01, $23, $45, $67, $89, $ab,
     .byte $12, $34, $56, $78, $9a, $bc,
@@ -54,6 +54,34 @@ _gameLevelData:
     .byte $44
     ; Unused
     .byte $67
+
+    ; ---
+
+    .byte $01, $11, $11, $11, $11, $11
+    .byte $01, $22, $22, $22, $22, $21
+    .byte $01, $21, $06, $00, $12, $21
+    .byte $01, $21, $50, $00, $12, $21
+    .byte $01, $21, $00, $00, $12, $21
+
+    .byte $00, $00, $00, $00, $00, $00
+    .byte $01, $21, $50, $45, $12, $21
+    .byte $01, $21, $00, $40, $12, $21
+    .byte $01, $22, $17, $11, $22, $21
+    .byte $01, $11, $11, $11, $11, $11
+
+
+    ; Extra data...
+    ; Tile id for border
+    .byte $02
+    ; Gameplay mode FIXME: implement
+    .byte $00 
+    
+    ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
+    .byte $44
+    ; Unused
+    .byte $67
+
+
 .export _gameLevelData
 
 ; FIXME: Move to patch area
