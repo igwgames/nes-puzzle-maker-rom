@@ -6,7 +6,6 @@
 #include "source/configuration/game_states.h"
 #include "source/menus/text_helpers.h"
 #include "source/menus/input_helpers.h"
-#include "source/game_data/game_data.h"
 #include "source/map/map.h"
 
 CODE_BANK(PRG_BANK_INTRO_SCREEN);
@@ -26,6 +25,7 @@ void draw_intro_screen() {
 
 
     vram_adr(NTADR_A(3,2));
+    /*
     vram_put(' ' + 0x60);
 
     titleLen = GAME_DATA_OFFSET_TITLE_LENGTH;
@@ -53,10 +53,10 @@ void draw_intro_screen() {
     vram_adr(NTADR_A(3, 25));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
-    }
+    }*/
 
-    for (i = 0; i != 8; ++i) {
-        switch (currentMapTileData[(i<<2) + TILE_DATA_LOOKUP_OFFSET_COLLISION]) {
+    for (i = 0; i != 16; ++i) {
+        switch (tileCollisionTypes[i]) {
             case TILE_COLLISION_COLLECTABLE:
                 coinTile = i;
                 break;
@@ -72,7 +72,7 @@ void draw_intro_screen() {
         }
     }
 
-    switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+    switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
             put_str(NTADR_A(7, 16), "Get to the finish!");
             break;

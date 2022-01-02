@@ -37,10 +37,7 @@ SPRITE_DEF2IMG=tools/sprite_def2img/sprite_def2img
 
 SOUND_BANK=0
 
-SOURCE_LEVELS_TMX=$(strip $(call rwildcard, levels/, *.tmx))
-SOURCE_LEVELS_C=$(subst levels/, temp/level_, $(patsubst %.tmx, %.c, $(SOURCE_LEVELS_TMX)))
-
-SOURCE_C=$(SOURCE_LEVELS_C) $(strip $(call rwildcard, source/, *.c))
+SOURCE_C=$(strip $(call rwildcard, source/, *.c))
 SOURCE_S=$(patsubst source/, temp/, $(patsubst %.c, %.s, $(SOURCE_C)))
 SOURCE_O=$(addprefix temp/, $(notdir $(patsubst %.s, %.o, $(SOURCE_S))))
 SOURCE_DIRS=$(sort $(dir $(call rwildcard, source, %))) temp
@@ -110,9 +107,6 @@ temp/%.o: temp/%.s
 temp/%.s: temp/%.c
 	$(MAIN_COMPILER) -Oi $< --add-source --include-dir ./tools/cc65/include -o $(patsubst %.o, %.s, $@)
 
-temp/level_overworld.c: levels/overworld.tmx
-	$(TMX2C) 3 overworld $< $(patsubst %.c, %, $@)
-
 sound/sfx/generated/sfx.s: sound/sfx/sfx.nsf
 	$(SFX_CONVERTER) sound/sfx/sfx.nsf -ca65 -ntsc && sleep 1 && $(AFTER_SFX_CONVERTER)
 
@@ -136,13 +130,10 @@ s3_upload:
 
 clean:
 	-rm -f rom/*.nes
-	-rm -rf temp/levels
 	-rm -f temp/*
 	-rm -f sounds/sfx/generated/*.s
 	-rm -f graphics/generated/*.png
-	mkdir temp/levels
 	touch temp/empty
-	touch temp/levels/empty
 
 run:
 	$(MAIN_EMULATOR) rom/$(ROM_NAME).nes

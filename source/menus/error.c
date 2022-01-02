@@ -1,7 +1,6 @@
 #include "source/neslib_asm/neslib.h"
 #include "source/library/bank_helpers.h"
 #include "source/menus/text_helpers.h"
-#include "source/library/itoa.h"
 #include "source/menus/error.h"
 #include "source/graphics/palettes.h"
 #include "source/configuration/system_constants.h"
@@ -52,10 +51,6 @@ void _print_variable_data_and_exit(const char *errorId, const char *errorDescrip
     put_str(NTADR_A(2, 10), errorDescription);
 
     if (numberName != NULL) {
-        itoa(number, buffer);
-        put_str(NTADR_A(2, 20), numberName);
-        vram_put(':'+0x60);
-        put_str(NTADR_A(2, 21), buffer);
     }
     
     // Turn the screen back on

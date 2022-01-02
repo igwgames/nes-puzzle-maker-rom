@@ -6,7 +6,7 @@
 #include "source/configuration/game_states.h"
 #include "source/menus/text_helpers.h"
 #include "source/configuration/game_info.h"
-#include "source/game_data/game_data.h"
+#include "source/map/map.h"
 
 CODE_BANK(PRG_BANK_CREDITS_MENU);
 
@@ -20,9 +20,10 @@ void draw_win_screen() {
 
 	set_chr_bank_0(CHR_BANK_MENU);
     set_chr_bank_1(CHR_BANK_MENU);
-
+/*
     vram_adr(NTADR_A(3,2));
     vram_put(' ' + 0x60);
+
 
     for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
         if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
@@ -37,7 +38,7 @@ void draw_win_screen() {
         keep_going:
         vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
     }
-    vram_put(' ' + 0x60);
+    vram_put(' ' + 0x60);*/
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(8, 5), "Congratulations!");
@@ -63,7 +64,7 @@ void draw_win_screen() {
     vram_put('0' + screenBuffer[4] + 0x60);
 
 
-    switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+    switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
             // Do nothing; nothing special to show
             break;
@@ -101,6 +102,7 @@ void draw_credits_screen() {
     vram_adr(NTADR_A(3,2));
     vram_put(' ' + 0x60);
 
+    /*
     for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
         if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
             // If all that's left is spaces, don't keep printing
@@ -115,18 +117,22 @@ void draw_credits_screen() {
         vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
     }
     vram_put(' ' + 0x60);
-
+    */
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(10, 4), "  Credits  ");
 
     put_str(NTADR_A(4, 8), "Game Design");
+    // FIXME: This whole thing needs to be unfucked
+    /*
     vram_adr(NTADR_A(5, 9));
     for (i = 0; i != GAME_DATA_OFFSET_AUTHOR_LENGTH; ++i) {
         vram_put(currentGameData[GAME_DATA_OFFSET_AUTHOR+i] + 0x60);
     }
+    */
 
     put_str(NTADR_A(4, 12), "Music");
+    /*
     switch (currentGameData[GAME_DATA_OFFSET_SONG_ID]) {
         case SONG_OVERWORLD:
         case SONG_TITLE:
@@ -141,9 +147,10 @@ void draw_credits_screen() {
             put_str(NTADR_A(7, 16), "via OpenGameArt");
             break;
 
-    }
+    }*/
 
     put_str(NTADR_A(4, 19), "Artwork");
+    /*
     switch (currentGameData[GAME_DATA_OFFSET_TILESET_ID]) {
         case CHR_BANK_ARCADE:
 
@@ -155,7 +162,8 @@ void draw_credits_screen() {
             put_str(NTADR_A(5, 21), "DragonDePlatino");
             put_str(NTADR_A(7, 24), "via OpenGameArt");
     }
-
+    */
+   /*
     switch (currentGameData[GAME_DATA_OFFSET_SPRITE_ID]) {
         case GAME_SPRITE_ARCADE:
         case GAME_SPRITE_SLIME:
@@ -171,7 +179,7 @@ void draw_credits_screen() {
                 put_str(NTADR_A(5, 22), "RefreshGames");
             }
             break;
-    }
+    }*/
 
 
     // Hide all existing sprites

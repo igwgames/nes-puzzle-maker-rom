@@ -36,8 +36,8 @@
 // to the top-left sprite in the "down" animation, you'll get the first animation 
 // for that direction. It simplifies some logic.
 #define SPRITE_DIRECTION_STATIONARY 0x02
-#define SPRITE_DIRECTION_LEFT 0x24
-#define SPRITE_DIRECTION_RIGHT 0x20
+#define SPRITE_DIRECTION_LEFT 0x0c
+#define SPRITE_DIRECTION_RIGHT 0x08
 #define SPRITE_DIRECTION_UP 0x04
 #define SPRITE_DIRECTION_DOWN 0x00
 

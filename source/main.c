@@ -21,7 +21,6 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/sprites/sprite_definitions.h"
 #include "source/menus/input_helpers.h"
 #include "source/menus/game_over.h"
-#include "source/game_data/game_data.h"
 #include "source/menus/intro.h"
 
 
@@ -78,7 +77,6 @@ void main() {
 
                 fade_out();
                 
-                load_game();
                 load_map(); // Needed to get proper tile data loaded 
 
                 banked_call(PRG_BANK_INTRO_SCREEN, draw_intro_screen);
@@ -96,7 +94,6 @@ void main() {
                 fade_out();
                 oam_clear();
 
-                load_game();
                 load_map();
 
                 ppu_off();
@@ -105,7 +102,8 @@ void main() {
                 banked_call(PRG_BANK_MAP_LOGIC, init_map);
                 banked_call(PRG_BANK_MAP_LOGIC, load_sprites);
                 // Set player position -- NOTE: this might not actually be ideal here. 
-                playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
+                // playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
+                playerSpriteTileId = 0x40;
 
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
@@ -117,7 +115,8 @@ void main() {
                 set_rand(frameCount);
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
-                    music_play(currentGameData[GAME_DATA_OFFSET_SONG_ID]);
+                    // Song 0: title, song 1: gameplay. No choices.
+                    music_play(1);
                 }
                 
                 // Map drawing is complete; let the player play the game!

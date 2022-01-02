@@ -3,7 +3,6 @@
 #include "source/map/map.h"
 #include "source/menus/text_helpers.h"
 #include "source/configuration/game_info.h"
-#include "source/game_data/game_data.h"
 #include "source/globals.h"
 #include "source/menus/error.h"
 
@@ -42,10 +41,11 @@ void draw_hud() {
 
     set_vram_update(NULL);
     
-    // TODO: Implement 6bit encoding?
+    /*
     memcpy(screenBuffer, (&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), GAME_DATA_OFFSET_TITLE_LENGTH);
     screenBuffer[GAME_DATA_OFFSET_TITLE_LENGTH] = NULL;
     put_hud_str(NTADR_A(1, 26), screenBuffer);
+    */
 
     
 }
@@ -74,7 +74,7 @@ void draw_editor_hud() {
         vram_put(0xf9);
     }
 
-    if (currentLevelId < (MAX_GAME_LEVELS-1)) {
+    if (currentLevelId < (totalGameLevels-1)) {
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 64 + 30);
         vram_put(0xea);
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 96 + 30);
@@ -121,14 +121,14 @@ void draw_editor_hud() {
 }
 
 void update_hud() {
-    switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+    switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
             break;
         case GAME_STYLE_COIN:
-            for (i = 0; i != 8; ++i) {
-                if (currentMapTileData[(i<<2) + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_COLLECTABLE) {
-                    tempTileIndex = (i<<2);
-                    tempTileId = currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_ID];
+            for (i = 0; i != 16; ++i) {
+                if (tileCollisionTypes[i] == TILE_COLLISION_COLLECTABLE) {
+                    tempTileIndex = i;
+                    tempTileId = (i<<2);
                     break;
                 }
             }
@@ -145,7 +145,7 @@ void update_hud() {
             screenBuffer[i++] = tempTileId+17;
             screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
             screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = (currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_PALETTE] << 6) | 0x3f;
+            screenBuffer[i++] = (tilePalettes[tempTileIndex] << 6) | 0x3f;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
@@ -160,10 +160,10 @@ void update_hud() {
 
             break;
         case GAME_STYLE_CRATES:
-            for (i = 0; i != 8; ++i) {
-                if (currentMapTileData[(i<<2) + TILE_DATA_LOOKUP_OFFSET_COLLISION] == TILE_COLLISION_CRATE) {
-                    tempTileIndex = (i<<2);
-                    tempTileId = currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_ID];
+            for (i = 0; i != 16; ++i) {
+                if (tileCollisionTypes[i] == TILE_COLLISION_CRATE) {
+                    tempTileIndex = i;
+                    tempTileId = (i<<2);
                     break;
                 }
             }
@@ -180,7 +180,7 @@ void update_hud() {
             screenBuffer[i++] = tempTileId+17;
             screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
             screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = (currentMapTileData[tempTileIndex + TILE_DATA_LOOKUP_OFFSET_PALETTE] << 6) | 0x3f;
+            screenBuffer[i++] = (tilePalettes[tempTileIndex] << 6) | 0x3f;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;

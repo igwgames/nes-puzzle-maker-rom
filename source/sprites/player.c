@@ -11,9 +11,9 @@
 #include "source/menus/error.h"
 #include "source/graphics/hud.h"
 #include "source/graphics/game_text.h"
-#include "Source/game_data/game_data.h"
 #include "source/menus/error.h"
 #include "source/map/load_map.h"
+#include "source/map/map.h"
 
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
@@ -55,16 +55,9 @@ ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionY);
 
 // TODO: axe all text communication stuff.
  const unsigned char* introductionText = 
-                                "Welcome to nes-starter-kit! I " 
-                                "am an NPC.                    "
-                                "                              "
-
-                                "Hope you're having fun!       "
-                                "                              "
-                                "- Chris";
+                                "a";
 const unsigned char* movedText = 
-                                "Hey, you put me on another    "
-                                "screen! Cool!";
+                                "A";
 
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
 void update_player_sprite() {
@@ -387,13 +380,12 @@ void handle_player_movement() {
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             collisionTempTileId = 0;
-            // FIXME: Game style should be read from a variable from the game
-            switch (currentGameData[GAME_DATA_OFFSET_GAME_STYLE]) {
+            switch (currentGameStyle) {
                 case GAME_STYLE_MAZE:
                     // Do nothing; you're just allowed to pass.
                     break;
                 case GAME_STYLE_COIN:
-                    for (i = 0; i != 64; ++i) {
+                    for (i = 0; i != 120; ++i) {
                         if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_COLLECTABLE) {
                             // Sorry, you didn't get em all. Plz try again.
                             collisionTempTileId = 1;
@@ -401,7 +393,7 @@ void handle_player_movement() {
                     }
                     break;
                 case GAME_STYLE_CRATES: 
-                    for (i = 0; i != 64; ++i) {
+                    for (i = 0; i != 120; ++i) {
                         if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_GAP) {
                             // Sorry, you didn't get em all. Plz try again.
                             collisionTempTileId = 1;
@@ -413,7 +405,7 @@ void handle_player_movement() {
             }
             if (!collisionTempTileId) {
                 ++currentLevelId;
-                if (currentLevelId == MAX_GAME_LEVELS) {
+                if (currentLevelId == totalGameLevels) {
                     gameState = GAME_STATE_CREDITS;
                 } else {
                     gameState = GAME_STATE_LOAD_LEVEL;
@@ -424,7 +416,7 @@ void handle_player_movement() {
             break;
         default:
             // Stop you when you hit an unknown tile... idk seems better than walking?
-            rawTileId = tempChara;
+            nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
     }
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;

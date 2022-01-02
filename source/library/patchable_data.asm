@@ -12,6 +12,10 @@ _gameName:
     .asciiz "     Retro Puzzle Maker     "
 .export _gameName
 
+_totalGameLevels: 
+    .byte 64
+.export _totalGameLevels
+
 _gameLevelData:
     /*
     .byte $01, $23, $45, $67, $89, $ab,
@@ -62,3 +66,4 @@ _tilePalettes:
     .byte $00, $01, $02, $03, $00, $01, $02, $03
     .byte $00, $01, $02, $03, $00, $01, $02, $03
 .export _tilePalettes
+

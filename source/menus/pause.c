@@ -6,7 +6,6 @@
 #include "source/configuration/game_states.h"
 #include "source/menus/text_helpers.h"
 #include "source/menus/input_helpers.h"
-#include "source/game_data/game_data.h"
 
 CODE_BANK(PRG_BANK_PAUSE_MENU);
 
@@ -30,7 +29,7 @@ void draw_pause_screen() {
     put_str(NTADR_B(12, 18), "Restart");
 
 
-    vram_adr(NTADR_B(3,2));
+/*    vram_adr(NTADR_B(3,2));
     vram_put(' ' + 0x60);
 
     for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
@@ -47,7 +46,7 @@ void draw_pause_screen() {
         vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
     }
     vram_put(' ' + 0x60);
-
+*/
 
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),

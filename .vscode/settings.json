@@ -4,6 +4,7 @@
         "load_map.h": "c",
         "game_data.h": "c",
         "titlebs.h": "c",
-        "system_constants.h": "c"
+        "system_constants.h": "c",
+        "palettes.h": "c"
     },
     }

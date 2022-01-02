@@ -11,7 +11,6 @@
 #include "source/sprites/player.h"
 #include "source/sprites/sprite_definitions.h"
 #include "source/sprites/map_sprites.h"
-#include "source/game_data/game_data.h"
 #include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_MAP_LOGIC);
@@ -27,6 +26,8 @@ unsigned char assetTable[64];
 
 unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];
 unsigned char currentMapTileData[32];
+
+ZEROPAGE_DEF(unsigned char, currentGameStyle);
 
 // unsigned char currentMapSpritePersistance[64];
 
