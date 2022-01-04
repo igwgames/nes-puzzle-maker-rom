@@ -12,7 +12,6 @@
 // previous versions were created since mid-2011, there were many updates
 
 // Edits for nes-starter-kit by cppchriscpp
-// - Added split_y method that supports y splits based on na_th_an's NESDev code.
 // - Added reset method to reset the console to startup state.
 
 
@@ -156,15 +155,6 @@ void __fastcall__ scroll(unsigned int x,unsigned int y);
 //warning: only X scroll could be changed in this version
 
 void __fastcall__ split(unsigned int x,unsigned int y);
-
-//set both x and y scroll after screen split invoked by the sprite 0 hit
-//warning: all CPU time between the function call and the actual split point will be wasted!
-//warning: the program loop has to fit into the frame time, ppu_wait_frame should not be used
-//         otherwise empty frames without split will be inserted, resulting in jumpy screen
-//warning: X and Y scroll can be changed in this version, but nametable registers will not be changed.
-//         It is easiest to use this for Y-only scrolling.
-
-void __fastcall__ split_y(unsigned int x,unsigned int y);
 
 //select current chr bank for sprites, 0..1
 

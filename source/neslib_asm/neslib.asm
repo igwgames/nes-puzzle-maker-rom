@@ -30,7 +30,7 @@
 	.export _set_vram_update,_flush_vram_update
 	.export _memcpy,_memfill,_delay
 
-	.export _split_y,_reset,_wait_for_sprite0_hit
+	.export _reset,_wait_for_sprite0_hit
 
 ;NMI handler
 
@@ -1040,88 +1040,6 @@ _wait_for_sprite0_hit:
 		bne @looper
 	rts
 
-
-;;void __fastcall__ split_y(unsigned int x,unsigned int y);
-
-; Using na_tha_an's trickery for y scroll from here: https://forums.nesdev.com/viewtopic.php?f=2&t=16435
-; Thanks dude!
-   ; Extract SCROLL_Y1, SCROLL_X1, WRITE1 from parameters.
-
-_split_y:
-   sta <TEMP
-
-   txa
-   bne @1
-   lda <TEMP
-   cmp #240
-   bcs @1
-   sta <SCROLL_Y1
-   lda #0
-   sta <TEMP
-   beq @2   ;bra
-
-@1:
-   sec
-   lda <TEMP
-   sbc #240
-   sta <SCROLL_Y1
-   lda #8               ;; Bit 3
-   sta <TEMP
-@2:
-
-   jsr popax
-   sta <SCROLL_X1
-   txa
-   and #$01
-   asl a
-   asl a                ;; Bit 2
-   ora <TEMP               ;; From Y
-   sta <WRITE1            ;; Store!
-
-   ; Calculate WRITE2 = ((Y & $F8) << 2) | (X >> 3)
-
-   lda <SCROLL_Y1
-   and #$F8
-   asl a
-   asl a
-   sta <TEMP             ;; TEMP = (Y & $F8) << 2
-   lda <SCROLL_X1
-   lsr a
-   lsr a
-   lsr a                ;; A = (X >> 3)
-   ora <TEMP             ;; A = (X >> 3) | ((Y & $F8) << 2)
-   sta <WRITE2            ;; Store!
-
-   ; Wait for sprite 0 hit
-
-@3:
-   bit PPU_STATUS
-   bvs @3
-@4:
-   bit PPU_STATUS
-   bvc @4
-
-	; Wait a few cycles to align with the *next* line.
-	; @cppchriscpp hack
-	ldx #0
-	@looper:
-		inx
-		cpx #44
-		bne @looper
-
-
-   ; Set scroll value
-   lda PPU_STATUS
-   lda <WRITE1
-   sta PPU_ADDR
-   lda <SCROLL_Y1
-   sta PPU_SCROLL
-   lda <SCROLL_X1
-   ldx <WRITE2
-   sta PPU_SCROLL
-   stx PPU_ADDR
-   
-   rts
 
 ;void __fastcall__ bank_spr(unsigned char n);
 
