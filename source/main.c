@@ -74,14 +74,14 @@ void main() {
                 gameKeys = 0;
                 gameCrates = 0;
 
+                if (introScreenEnabled) {
+                    fade_out();
+                    load_map(); // Needed to get proper tile data loaded 
 
-                fade_out();
-                
-                load_map(); // Needed to get proper tile data loaded 
-
-                banked_call(PRG_BANK_INTRO_SCREEN, draw_intro_screen);
-                fade_in();
-                banked_call(PRG_BANK_INTRO_SCREEN, handle_intro_input);
+                    banked_call(PRG_BANK_INTRO_SCREEN, draw_intro_screen);
+                    fade_in();
+                    banked_call(PRG_BANK_INTRO_SCREEN, handle_intro_input);
+                }
 
 
                 music_stop();

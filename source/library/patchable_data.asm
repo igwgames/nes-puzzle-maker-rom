@@ -208,4 +208,9 @@ _creditsScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 .export _creditsScreenData: absolute
+
+_introScreenEnabled:
+    .byte $00
+.export _introScreenEnabled
+
 .reloc
