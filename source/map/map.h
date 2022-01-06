@@ -140,6 +140,7 @@ extern const unsigned char tilePalettes[];
 
 extern const unsigned char gameLevelData[];
 extern const unsigned char totalGameLevels;
+extern const unsigned char singleLevelOverride;
 
 // Simplest style - just get to the end of each level.
 #define GAME_STYLE_MAZE 0

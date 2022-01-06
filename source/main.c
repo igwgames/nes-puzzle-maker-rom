@@ -22,6 +22,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/input_helpers.h"
 #include "source/menus/game_over.h"
 #include "source/menus/intro.h"
+#include "source/graphics/palettes.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -47,6 +48,20 @@ void initialize_variables() {
     bank_spr(1);
 }   
 
+CODE_BANK(PRG_BANK_TITLE);
+void set_up_graphics() {
+    // FIXME: Can remove this from a lot of other places.
+    set_vram_update(NULL);
+    // FIXME: Hardcode new palette
+	pal_bg(titlePalette);
+	pal_spr(titlePalette);
+
+	set_chr_bank_0(CHR_BANK_MENU);
+    set_chr_bank_1(CHR_BANK_MENU);
+	oam_clear();
+}
+CODE_BANK_POP();
+
 void main() {
     fade_out_instant();
     gameState = GAME_STATE_SYSTEM_INIT;
@@ -56,6 +71,12 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
+                banked_call(PRG_BANK_TITLE, set_up_graphics);
+                if (singleLevelOverride != 255) {
+                    gameState = GAME_STATE_POST_TITLE;
+                    fade_in_fast();
+                    continue;
+                }
                 gameState = GAME_STATE_TITLE_DRAW;
                 break;
 
@@ -69,6 +90,10 @@ void main() {
                 break;
             case GAME_STATE_POST_TITLE:
                 currentLevelId = 0;
+                if (singleLevelOverride != 255) {
+                    currentLevelId = singleLevelOverride;
+                }
+
 
                 gameTime = frameCount;
                 gameKeys = 0;

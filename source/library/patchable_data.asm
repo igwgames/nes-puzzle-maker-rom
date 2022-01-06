@@ -11,7 +11,7 @@
 
 ; These are imported in map.h for the most part
 _gameName:
-    .asciiz "     Retro Puzzle Maker     " ; 1b
+    .asciiz "     Retro Puzzle Maker     " ; 1c
 .export _gameName: absolute
 
 _totalGameLevels: 
@@ -211,6 +211,10 @@ _creditsScreenData:
 
 _introScreenEnabled:
     .byte $00
-.export _introScreenEnabled
+.export _introScreenEnabled: absolute
+
+_singleLevelOverride:
+    ; .byte $ff
+.export _singleLevelOverride: absolute
 
 .reloc
