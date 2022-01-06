@@ -90,16 +90,14 @@ void main() {
                 break;
             case GAME_STATE_POST_TITLE:
                 currentLevelId = 0;
-                if (singleLevelOverride != 255) {
-                    currentLevelId = singleLevelOverride;
-                }
-
 
                 gameTime = frameCount;
                 gameKeys = 0;
                 gameCrates = 0;
 
-                if (introScreenEnabled) {
+                if (singleLevelOverride != 255) {
+                    currentLevelId = singleLevelOverride;
+                } else if (introScreenEnabled ) {
                     fade_out();
                     load_map(); // Needed to get proper tile data loaded 
 
