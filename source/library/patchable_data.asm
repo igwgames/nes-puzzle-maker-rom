@@ -209,6 +209,14 @@ _creditsScreenData:
 
 .export _creditsScreenData: absolute
 
+_gamePaletteData:
+    .byte $0f, $0a, $19, $2a, $0f, $11, $21, $31, $0f, $16, $28, $2a, $0f, $01, $06, $30
+.export _gamePaletteData: absolute
+
+_spritePalette: 
+    .byte $0f, $01, $21, $31
+.export _spritePalette
+
 _introScreenEnabled:
     .byte $00
 .export _introScreenEnabled: absolute

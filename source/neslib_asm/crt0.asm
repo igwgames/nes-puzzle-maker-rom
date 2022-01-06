@@ -300,7 +300,7 @@ detectNTSC:
 .segment "CHR_00"
 
 	; We just put the ascii tiles into both sprites and tiles. If you want to get more clever you could do something else.
-	.incbin "graphics/ascii.chr"
+	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_01"
 	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_02"
@@ -310,9 +310,9 @@ detectNTSC:
 ; and make the rom a predictable size. Note that if you do this you'll have to tweak the engine to support it! There's
 ; hopefully a guide on how to do this in the repo.
 .segment "CHR_03"
-	.incbin "graphics/zoria.chr"
+	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_04"
-	.incbin "graphics/zoria_desert.chr"
+	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_05"
 	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_06"
@@ -320,7 +320,7 @@ detectNTSC:
 .segment "CHR_07"
 	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_08"
-	.incbin "graphics/sprites.chr"
+	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_09"
 	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_0A"
@@ -366,7 +366,7 @@ detectNTSC:
 .segment "CHR_1E"
 	.incbin "graphics/tiles_mod.chr"
 .segment "CHR_1F"
-	.incbin "graphics/qr.chr"
+	.incbin "graphics/tiles_mod.chr"
 
 ; MMC1 needs a reset stub in every bank that will put us into a known state. This defines it for all banks.
 .repeat (SYS_PRG_BANKS-1), I

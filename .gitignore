@@ -14,6 +14,7 @@ tools/chr2img/src/node_modules
 !tools/zip_readme
 graphics/generated/*.png
 graphics/generated/*.bmp
+graphics/unused/*
 rom/*.nes
 temp/*
 !temp/empty

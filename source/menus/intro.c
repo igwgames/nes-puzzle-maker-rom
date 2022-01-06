@@ -20,8 +20,6 @@ CODE_BANK(PRG_BANK_INTRO_SCREEN);
 
 void draw_intro_screen() {
     ppu_off();
-    pal_bg(titlePalette);
-	pal_spr(titlePalette);
     scroll(0, 0);
 
 	set_chr_bank_0(CHR_BANK_MENU);

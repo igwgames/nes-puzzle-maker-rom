@@ -53,8 +53,8 @@ void set_up_graphics() {
     // FIXME: Can remove this from a lot of other places.
     set_vram_update(NULL);
     // FIXME: Hardcode new palette
-	pal_bg(titlePalette);
-	pal_spr(titlePalette);
+	pal_bg(gamePaletteData);
+	pal_spr(spritePalette);
 
 	set_chr_bank_0(CHR_BANK_MENU);
     set_chr_bank_1(CHR_BANK_MENU);

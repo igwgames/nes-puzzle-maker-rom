@@ -31,8 +31,6 @@ void _print_static_screen() {
     ppu_off();
     set_chr_bank_0(CHR_BANK_MENU);
     set_chr_bank_1(CHR_BANK_MENU);
-    pal_bg(errorPalette);
-    pal_spr(errorPalette);
     scroll(0, 0);
     oam_hide_rest(0);
     clear_screen();

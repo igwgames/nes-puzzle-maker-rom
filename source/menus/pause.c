@@ -15,8 +15,6 @@ void draw_pause_screen() {
     ppu_off();
     clear_screen_with_border_b();
     // We reuse the title palette here, though we have the option of making our own if needed.
-    // pal_bg(titlePalette);
-	// pal_spr(titlePalette);
     scroll(256, 0);
 
 	// set_chr_bank_0(CHR_BANK_MENU);
