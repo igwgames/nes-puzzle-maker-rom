@@ -8,7 +8,6 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/configuration/game_states.h"
 #include "source/menus/title.h"
 #include "source/globals.h"
-#include "source/menus/error.h"
 #include "source/menus/credits.h"
 #include "source/map/load_map.h"
 #include "source/map/map.h"
@@ -139,7 +138,7 @@ void main() {
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
                     // Song 0: title, song 1: gameplay. No choices.
-                    music_play(1);
+                    music_play(4);
                 }
                 
                 // Map drawing is complete; let the player play the game!
@@ -199,8 +198,6 @@ void main() {
                 fade_out();
                 reset();
                 break;
-            //default:
-                //crash_error_use_banked_details(ERR_UNKNOWN_GAME_STATE, ERR_UNKNOWN_GAME_STATE_EXPLANATION, "gameState value", gameState);
                 
         }
         ppu_wait_nmi();

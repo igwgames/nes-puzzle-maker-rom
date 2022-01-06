@@ -3,7 +3,6 @@
 #include "source/configuration/system_constants.h"
 #include "source/configuration/game_states.h"
 #include "source/library/bank_helpers.h"
-#include "source/menus/error.h"
 #include "source/graphics/game_text.h"
 #include "source/graphics/hud.h"
 

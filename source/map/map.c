@@ -11,7 +11,6 @@
 #include "source/sprites/player.h"
 #include "source/sprites/sprite_definitions.h"
 #include "source/sprites/map_sprites.h"
-#include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_MAP_LOGIC);
 

@@ -4,7 +4,6 @@
 #include "source/menus/text_helpers.h"
 #include "source/configuration/game_info.h"
 #include "source/globals.h"
-#include "source/menus/error.h"
 
 CODE_BANK(PRG_BANK_HUD);
 

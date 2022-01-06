@@ -6,7 +6,6 @@
 #include "source/sprites/sprite_definitions.h"
 #include "source/map/map.h"
 #include "source/library/bank_helpers.h"
-#include "source/menus/error.h"
 #include "source/sprites/collision.h"
 
 CODE_BANK(PRG_BANK_MAP_SPRITES);
@@ -312,6 +311,8 @@ void update_map_sprites() {
 void do_sprite_movement_with_collision() {
     // Set currentSpriteData to the sprite speed for now (NOTE: we overwrite this after the switch statement) 
     // We'll then add/subtract it from sprX and sprY
+    // Do nothing 
+    /*
     currentSpriteData = currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_MOVE_SPEED];
     switch (currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_CURRENT_DIRECTION]) {
         case SPRITE_DIRECTION_LEFT:
@@ -395,6 +396,6 @@ void do_sprite_movement_with_collision() {
             }
 
             break;
-    }
+    }*/
 
 }
