@@ -214,7 +214,7 @@ _introScreenEnabled:
 .export _introScreenEnabled: absolute
 
 _singleLevelOverride:
-    ; .byte $ff
+    .byte $ff
 .export _singleLevelOverride: absolute
 
 .reloc
