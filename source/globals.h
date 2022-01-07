@@ -78,5 +78,9 @@ extern const unsigned char RUNTIME_MODE;
 
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderTile);
 
-extern unsigned char gamePaletteData[16];
-extern unsigned char spritePalette[4];
+extern const unsigned char gamePaletteData[16];
+extern const unsigned char spritePalette[4];
+
+extern const unsigned char titleSong;
+extern const unsigned char gameplaySong;
+extern const unsigned char creditsSong;

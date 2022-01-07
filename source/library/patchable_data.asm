@@ -225,4 +225,16 @@ _singleLevelOverride:
     .byte $ff
 .export _singleLevelOverride: absolute
 
+_titleSong:
+    .byte $00
+.export _titleSong :absolute
+
+_gameplaySong:
+    .byte $03
+.export _gameplaySong: absolute
+
+_creditsSong:
+    .byte 1
+.export _creditsSong
+
 .reloc

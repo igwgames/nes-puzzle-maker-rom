@@ -81,7 +81,7 @@ void main() {
 
             case GAME_STATE_TITLE_DRAW:
                 banked_call(PRG_BANK_TITLE, draw_title_screen);
-                music_play(SONG_TITLE);
+                music_play(titleSong);
                 fade_in();
                 break;
             case GAME_STATE_TITLE_INPUT:
@@ -138,7 +138,7 @@ void main() {
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
                     // Song 0: title, song 1: gameplay. No choices.
-                    music_play(4);
+                    music_play(gameplaySong);
                 }
                 
                 // Map drawing is complete; let the player play the game!
@@ -182,7 +182,8 @@ void main() {
                 break;
             case GAME_STATE_CREDITS:
                 music_stop();
-                sfx_play(SFX_WIN, SFX_CHANNEL_1);
+                // sfx_play(SFX_WIN, SFX_CHANNEL_1);
+                music_play(creditsSong);
 
                 fade_out();
                 // Draw the "you won" screen
