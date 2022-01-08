@@ -15,8 +15,6 @@ void draw_win_screen() {
     clear_screen_with_border();
     scroll(0, 0);
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
 /*
     vram_adr(NTADR_A(3,2));
     vram_put(' ' + 0x60);
@@ -90,8 +88,6 @@ void draw_credits_screen() {
     // clear_screen_with_border();
     scroll(0, 0);
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
 
     vram_adr(0x2000);
     vram_write(&creditsScreenData[0], 0x400);

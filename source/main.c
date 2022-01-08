@@ -55,8 +55,8 @@ void set_up_graphics() {
 	pal_bg(gamePaletteData);
 	pal_spr(spritePalette);
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
+	set_chr_bank_0(0);
+    set_chr_bank_1(0);
 	oam_clear();
 }
 CODE_BANK_POP();

@@ -17,8 +17,6 @@ void draw_pause_screen() {
     // We reuse the title palette here, though we have the option of making our own if needed.
     scroll(256, 0);
 
-	// set_chr_bank_0(CHR_BANK_MENU);
-    // set_chr_bank_1(CHR_BANK_MENU);
 
     // Just write "- Paused -" on the screen... there's plenty of nicer things you could do if you wanna spend time!
     put_str(NTADR_B(11, 7), "- Paused -");

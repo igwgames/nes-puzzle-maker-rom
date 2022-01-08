@@ -18,8 +18,6 @@ void draw_title_screen() {
 	set_vram_update(NULL);
     ppu_off();
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
 	//clear_screen();
 	oam_clear();
 

@@ -22,8 +22,6 @@ void draw_intro_screen() {
     ppu_off();
     scroll(0, 0);
 
-	set_chr_bank_0(CHR_BANK_MENU);
-    set_chr_bank_1(CHR_BANK_MENU);
 
     vram_adr(0x2000);
     vram_write(&introScreenData[0], 0x400);
