@@ -44,10 +44,11 @@ void initialize_variables() {
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
-    bank_spr(1);
+    bank_spr(0);
 }   
 
-CODE_BANK(PRG_BANK_TITLE);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 void set_up_graphics() {
     // FIXME: Can remove this from a lot of other places.
     set_vram_update(NULL);
@@ -55,11 +56,8 @@ void set_up_graphics() {
 	pal_bg(gamePaletteData);
 	pal_spr(spritePalette);
 
-	set_chr_bank_0(0);
-    set_chr_bank_1(0);
 	oam_clear();
 }
-CODE_BANK_POP();
 
 void main() {
     fade_out_instant();
@@ -70,7 +68,7 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
-                banked_call(PRG_BANK_TITLE, set_up_graphics);
+                set_up_graphics();
                 if (singleLevelOverride != 255) {
                     gameState = GAME_STATE_POST_TITLE;
                     fade_in_fast();
@@ -80,12 +78,12 @@ void main() {
                 break;
 
             case GAME_STATE_TITLE_DRAW:
-                banked_call(PRG_BANK_TITLE, draw_title_screen);
+                draw_title_screen();
                 music_play(titleSong);
                 fade_in();
                 break;
             case GAME_STATE_TITLE_INPUT:
-                banked_call(PRG_BANK_TITLE, handle_title_input);
+                handle_title_input();
                 break;
             case GAME_STATE_POST_TITLE:
                 currentLevelId = 0;
@@ -100,9 +98,9 @@ void main() {
                     fade_out();
                     load_map(); // Needed to get proper tile data loaded 
 
-                    banked_call(PRG_BANK_INTRO_SCREEN, draw_intro_screen);
+                    draw_intro_screen();
                     fade_in();
-                    banked_call(PRG_BANK_INTRO_SCREEN, handle_intro_input);
+                    handle_intro_input();
                 }
 
 
@@ -119,10 +117,10 @@ void main() {
                 load_map();
 
                 ppu_off();
-                banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a_inline);
+                draw_current_map_to_a_inline();
                 ppu_on_all();
-                banked_call(PRG_BANK_MAP_LOGIC, init_map);
-                banked_call(PRG_BANK_MAP_LOGIC, load_sprites);
+                init_map();
+                load_sprites();
                 // Set player position -- NOTE: this might not actually be ideal here. 
                 // playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
                 playerSpriteTileId = 0x40;
@@ -130,7 +128,7 @@ void main() {
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
-                banked_call(PRG_BANK_HUD, draw_hud);
+                draw_hud();
                 ppu_on_all();
 
                 // Seed the random number generator here, using the time since console power on as a seed
@@ -151,17 +149,17 @@ void main() {
             case GAME_STATE_RUNNING:
                 // TODO: Might be nice to have this only called when we have something to update, and maybe only update the piece we 
                 // care about. (For example, if you get a key, update the key count; not everything!
-                banked_call(PRG_BANK_HUD, update_hud);
-                banked_call(PRG_BANK_MAP_SPRITES, update_map_sprites);
-                banked_call(PRG_BANK_PLAYER_SPRITE, handle_player_movement);
-                banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
+                update_hud();
+                update_map_sprites();
+                handle_player_movement();
+                update_player_sprite();
                 break;
             case GAME_STATE_PAUSED:
                 sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);  
                 fade_out();
-                banked_call(PRG_BANK_PAUSE_MENU, draw_pause_screen);
+                draw_pause_screen();
                 fade_in();
-                banked_call(PRG_BANK_PAUSE_MENU, handle_pause_input);
+                handle_pause_input();
                 if (gameState != GAME_STATE_RUNNING) {
                     break;
                 }
@@ -171,11 +169,11 @@ void main() {
                 sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
                 fade_out();
                 // banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
-                banked_call(PRG_BANK_MAP_LOGIC, init_map);
+                init_map();
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
-                banked_call(PRG_BANK_HUD, draw_hud);
+                draw_hud();
                 ppu_on_all();
                 fade_in();
 
@@ -187,15 +185,15 @@ void main() {
 
                 fade_out();
                 // Draw the "you won" screen
-                banked_call(PRG_BANK_CREDITS_MENU, draw_win_screen);
+                draw_win_screen();
                 fade_in();
-                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+                wait_for_start();
                 fade_out();
 
                 // Folow it up with the credits.
-                banked_call(PRG_BANK_CREDITS_MENU, draw_credits_screen);
+                draw_credits_screen();
                 fade_in();
-                banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+                wait_for_start();
                 fade_out();
                 reset();
                 break;

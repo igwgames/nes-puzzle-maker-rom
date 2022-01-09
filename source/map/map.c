@@ -12,7 +12,8 @@
 #include "source/sprites/sprite_definitions.h"
 #include "source/sprites/map_sprites.h"
 
-CODE_BANK(PRG_BANK_MAP_LOGIC);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 ZEROPAGE_DEF(unsigned char, playerOverworldPosition);
 ZEROPAGE_DEF(int, xScrollPosition);
@@ -242,13 +243,4 @@ void draw_current_map_to_a_inline() {
 
     vram_adr(0x23c0);
     vram_write(&assetTable[0], 64);
-}
-
-// TODO: May want to move this into the kernel; reproduced in a couple places now
-void put_map_str(unsigned int adr, const char* str) {
-	vram_adr(adr);
-	while(1) {
-		if(!*str) break;
-		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
-	}
 }

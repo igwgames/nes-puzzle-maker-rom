@@ -1,4 +1,4 @@
-#define PRG_BANK_INTRO_SCREEN 2
+#define PRG_BANK_INTRO_SCREEN 0
 
 extern const unsigned char introScreenData[];
 

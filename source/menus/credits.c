@@ -8,32 +8,13 @@
 #include "source/configuration/game_info.h"
 #include "source/map/map.h"
 
-CODE_BANK(PRG_BANK_CREDITS_MENU);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 void draw_win_screen() {
     ppu_off();
     clear_screen_with_border();
     scroll(0, 0);
-
-/*
-    vram_adr(NTADR_A(3,2));
-    vram_put(' ' + 0x60);
-
-
-    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
-        if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
-            // If all that's left is spaces, don't keep printing
-            for (j = i; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
-                if (currentGameData[GAME_DATA_OFFSET_TITLE+j] != ' ' && currentGameData[GAME_DATA_OFFSET_TITLE+j] != 0) {
-                    goto keep_going;
-                }
-            }
-            break;
-        }
-        keep_going:
-        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
-    }
-    vram_put(' ' + 0x60);*/
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(8, 5), "Congratulations!");

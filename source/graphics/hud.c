@@ -5,7 +5,10 @@
 #include "source/configuration/game_info.h"
 #include "source/globals.h"
 
-CODE_BANK(PRG_BANK_HUD);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
+
+// TODO: This file is CHONKY. Can we improve?
 
 ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 

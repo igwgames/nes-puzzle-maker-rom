@@ -1,6 +1,6 @@
 #include "source/library/bank_helpers.h"
 
-#define PRG_BANK_MAP_LOGIC 1
+#define PRG_BANK_MAP_LOGIC 0
 
 // This defines how many pixels to move the screen during each frame of the screen scroll animation.
 // Must be a multiple of 2 (or w`hatever value is set below)

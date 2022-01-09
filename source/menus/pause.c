@@ -7,7 +7,8 @@
 #include "source/menus/text_helpers.h"
 #include "source/menus/input_helpers.h"
 
-CODE_BANK(PRG_BANK_PAUSE_MENU);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 unsigned char editorSelectedPosition;
 

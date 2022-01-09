@@ -1,5 +1,5 @@
 #include "source/library/bank_helpers.h"
-#define PRG_BANK_PLAYER_SPRITE 2
+#define PRG_BANK_PLAYER_SPRITE 0
 
 // Top-left tile of the sprite of the player facing downward.
 #define PLAYER_SPRITE_TILE_ID 0x00

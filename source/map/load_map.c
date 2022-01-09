@@ -7,53 +7,8 @@
 #include "source/graphics/palettes.h"
 #include "source/sprites/player.h"
 
-CODE_BANK(PRG_BANK_MAP_LOGIC);
-const unsigned char arcadeTileData[] = {
-    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x02, 0x01, TILE_COLLISION_WALKABLE, 0,
-    0x04, 0x01, TILE_COLLISION_SOLID, 0,
-    0x06, 0x01, TILE_COLLISION_SOLID, 0,
-    0x08, 0x02, TILE_COLLISION_CRATE, 0,
-    0x0a, 0x02, TILE_COLLISION_GAP, 0,
-    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
-    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
-};
-
-const unsigned char zoriaDesertTileData[] = {
-    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x02, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x04, 0x00, TILE_COLLISION_SOLID, 0,
-    0x06, 0x01, TILE_COLLISION_SOLID, 0,
-    0x08, 0x00, TILE_COLLISION_CRATE, 0,
-    0x0a, 0x00, TILE_COLLISION_GAP, 0,
-    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
-    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
-};
-
-const unsigned char zoriaTileData[] = {
-    0x00, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x02, 0x00, TILE_COLLISION_WALKABLE, 0,
-    0x04, 0x00, TILE_COLLISION_SOLID, 0,
-    0x06, 0x00, TILE_COLLISION_SOLID, 0,
-    0x08, 0x01, TILE_COLLISION_CRATE, 0,
-    0x0a, 0x00, TILE_COLLISION_GAP, 0,
-    0x0c, 0x02, TILE_COLLISION_COLLECTABLE, 0,
-    0x0e, 0x02, TILE_COLLISION_LEVEL_END, 0
-};
-
-const unsigned char spritePalettes[] = {
-    // One set per sprite, in order they appear in chr
-    0x0f, 0x01, 0x21, 0x36,
-    0x0f, 0x09, 0x1a, 0x27,
-    0x0f, 0x16, 0x26, 0x37,
-    0x0f, 0x06, 0x16, 0x30,
-    0x0f, 0x06, 0x16, 0x26,
-    0x0f, 0x06, 0x16, 0x26
-};
-
 unsigned char palette[16];
 
-CODE_BANK_POP();
 
 // Loads the map at the player's current position into the ram variable given. 
 // Kept in a separate file, as this must remain in the primary bank so it can

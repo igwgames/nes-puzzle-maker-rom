@@ -1,6 +1,6 @@
 
 // Draws and handles a very simple pause screen.
-#define PRG_BANK_CREDITS_MENU 1
+#define PRG_BANK_CREDITS_MENU 0
 
 extern const unsigned char creditsScreenData[];
 

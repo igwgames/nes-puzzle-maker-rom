@@ -4,8 +4,10 @@
 ; NOTE: If you're editing the raw code of your own game you can ignore the warnings in this file, and move it wherever
 ; you want! These warnings only apply if your rom will continue to be used with the  web-based editor.
 
-.segment "PRG_RELOC"
-.org $ebff
+; FIXME: Make static again maybe
+.segment "ROM_00"
+.align 16
+
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
 .asciiz "PATCH TARGET 1.00" ; 0x12
 
@@ -82,6 +84,8 @@ _gameLevelData:; 0x80 (FIXME Need full levels, but its gonna break shit until I 
     .byte $44
     ; Unused
     .byte $67
+; rest of the levels
+.res $f80
 
 
 .export _gameLevelData: absolute
@@ -236,5 +240,3 @@ _gameplaySong:
 _creditsSong:
     .byte 1
 .export _creditsSong
-
-.reloc

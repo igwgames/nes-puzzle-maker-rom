@@ -8,7 +8,8 @@
 #include "source/menus/input_helpers.h"
 #include "source/map/map.h"
 
-CODE_BANK(PRG_BANK_INTRO_SCREEN);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 #define titleLen tempChar1
 
@@ -34,6 +35,6 @@ void draw_intro_screen() {
 }
 
 void handle_intro_input() {
-    banked_call(PRG_BANK_MENU_INPUT_HELPERS, wait_for_start);
+    wait_for_start();
 
 }

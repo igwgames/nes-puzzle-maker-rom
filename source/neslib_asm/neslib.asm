@@ -48,12 +48,6 @@ nmi:
 
 @doUpdate:
 
-	lda nmiChrTileBank
-	cmp #NO_CHR_BANK 
-	beq @no_chr_chg
-		jsr _set_chr_bank_0
-	@no_chr_chg:
-
 	lda #>OAM_BUF		;update OAM
 	sta PPU_OAM_DMA
 
@@ -142,12 +136,6 @@ nmi:
 	sta <FRAME_CNT2
 
 @skipNtsc:
-    ; Bank swapping time! Switch to the music bank for sfx, etc...
-    lda BP_BANK
-    sta NMI_BANK_TEMP
-    lda #SOUND_BANK
-    jsr _set_prg_bank
-
 	;play music, the code is modified to put data into output buffer instead of APU registers
     
 
@@ -234,9 +222,6 @@ nmi:
 	sta $400E
 	lda <BUF_400F
 	sta $400F
-
-    lda NMI_BANK_TEMP
-    jsr _set_prg_bank
 
 	pla
 	tay
@@ -1160,16 +1145,6 @@ _vram_write:
 
 _music_play:
 
-	; @cppchriscpp Edit - forcing a swap to the music bank
-	; Need to temporarily swap banks to pull this off. 
-	tax ; Put our song into x for a moment...
-	; Being extra careful and setting BP_BANK to ours in case an nmi fires while we're doing this.
-	lda BP_BANK
-	pha
-	lda #SOUND_BANK
-	sta BP_BANK
-	mmc1_register_write MMC1_PRG
-	txa ; bring back the song number!
 
 
 	ldx #<music_data
@@ -1182,11 +1157,6 @@ _music_play:
 	
 	lda #1
 	sta <MUSIC_PLAY
-
-	; Remember when we stored the old bank into BP_BANK and swapped? Time to roll back.
-	pla
-	sta BP_BANK
-	mmc1_register_write MMC1_PRG
 
 	rts
 
@@ -1226,17 +1196,6 @@ _music_pause:
 _sfx_play:
 
 .if(FT_SFX_ENABLE)
-	; TODO: Should I be blocking interrupts while doing weird bank stuff?
-	; @cppchriscpp Edit - forcing a swap to the music bank
-	; Need to temporarily swap banks to pull this off. 
-	tay ; Put our song into y for a moment...
-	; Being extra careful and setting BP_BANK to ours in case an nmi fires while we're doing this.
-	lda BP_BANK
-	pha
-	lda #SOUND_BANK
-	sta BP_BANK
-	mmc1_register_write MMC1_PRG
-	tya ; bring back the song number!
 
 	and #$03
 	tax
@@ -1244,11 +1203,6 @@ _sfx_play:
 	tax
 	jsr popa
 	jsr FamiToneSfxPlay
-
-	; Remember when we stored the old bank into BP_BANK and swapped? Time to roll back.
-	pla
-	sta BP_BANK
-	mmc1_register_write MMC1_PRG
 
 	rts
 

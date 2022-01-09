@@ -8,8 +8,8 @@
 #include "source/configuration/game_info.h"
 #include "source/map/map.h"
 
-CODE_BANK(PRG_BANK_TITLE);
-
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 #define selectedOption tempChara
 

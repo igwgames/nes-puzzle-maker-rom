@@ -7,7 +7,8 @@
 #include "source/menus/text_helpers.h"
 #include "source/menus/input_helpers.h"
 
-CODE_BANK(PRG_BANK_GAME_OVER);
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
 
 void draw_game_over_screen() {
     ppu_off();
