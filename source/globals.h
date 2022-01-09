@@ -77,6 +77,7 @@ extern const unsigned char RUNTIME_MODE;
 #define RUNTIME_MODE_EDITOR_EXPORT 2
 
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderTile);
+ZEROPAGE_EXTERN(unsigned char, currentMapBorderAsset);
 
 extern const unsigned char gamePaletteData[16];
 extern const unsigned char spritePalette[4];

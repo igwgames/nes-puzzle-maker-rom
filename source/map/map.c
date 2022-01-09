@@ -59,11 +59,13 @@ void load_sprites() {
 
 // Clears the asset table. Set containsHud to 1 to set the HUD bytes to use palette 4 (will break the coloring logic if you use the
 // last few rows for the map.)
-void clear_asset_table(containsHud) {
+void clear_asset_table() {
     // Fill it with the border color, duplicating it to all 4 2bit pieces
-    tempChara = tilePalettes[currentMapBorderTile >> 1];
-    tempChara += (tempChara << 2);
-    tempChara += (tempChara << 4);
+    for (i = 0; i != sizeof(assetTable); ++i) {
+        assetTable[i] = currentMapBorderAsset;
+    }
+
+    /*
     // Loop over assetTable to clear it out. 
     for (i = 0; i != sizeof(assetTable) - 8; ++i) {
         assetTable[i] = tempChara;
@@ -72,6 +74,7 @@ void clear_asset_table(containsHud) {
     for (; i != sizeof(assetTable); ++i) {
         assetTable[i] = containsHud == 0 ? tempChara : 0xff;
     }
+    */
 }
 
 // Loads the assets from assetTable (for the row *ending* with j) into mapScreenBuffer
@@ -174,7 +177,7 @@ void draw_current_map_to_a_inline() {
 
     // Prepare to draw on the first nametable
     set_vram_update(NULL);
-    clear_asset_table(0);
+    clear_asset_table();
     // Make some tweaks for text areas outside the normal map
 
     // Border tile 
@@ -240,41 +243,6 @@ void draw_current_map_to_a_inline() {
     vram_adr(0x23c0);
     vram_write(&assetTable[0], 64);
 }
-
-// A quick, low-tech glamour-free way to transition between screens.
-void do_fade_screen_transition() {
-    load_map();
-    load_sprites();
-    clear_asset_table(1);
-    fade_out_fast();
-
-/*    
-    // Now that the screen is clear, migrate the player's sprite a bit..
-    if (playerDirection == SPRITE_DIRECTION_LEFT) {
-        playerXPosition = (SCREEN_EDGE_RIGHT << PLAYER_POSITION_SHIFT);
-    } else if (playerDirection == SPRITE_DIRECTION_RIGHT) {
-        playerXPosition = (SCREEN_EDGE_LEFT << PLAYER_POSITION_SHIFT);
-    } else if (playerDirection == SPRITE_DIRECTION_UP) {
-        playerYPosition = (SCREEN_EDGE_BOTTOM << PLAYER_POSITION_SHIFT);
-    } else if (playerDirection == SPRITE_DIRECTION_DOWN) {
-        playerYPosition = (SCREEN_EDGE_TOP << PLAYER_POSITION_SHIFT);
-    }
-    */
-    // Actually move the sprite too, since otherwise this won't happen until after we un-blank the screen.
-    banked_call(PRG_BANK_PLAYER_SPRITE, update_player_sprite);
-
-    // Draw the updated map to the screen...
-    ppu_off();
-    draw_current_map_to_a_inline();
-    ppu_on_all();
-    
-    // Update sprites once to make sure we don't show a flash of the old sprite positions.
-    banked_call(PRG_BANK_MAP_SPRITES, update_map_sprites);
-    fade_in_fast();
-    // Aand we're back!
-    gameState = GAME_STATE_RUNNING;
-}
-
 
 // TODO: May want to move this into the kernel; reproduced in a couple places now
 void put_map_str(unsigned int adr, const char* str) {

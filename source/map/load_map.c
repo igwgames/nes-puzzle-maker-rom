@@ -65,7 +65,18 @@ void load_map() {
     
     tempInt1 = currentLevelId << 6;
 
-    currentMapBorderTile = gameLevelData[60 + tempInt1] << 1;
+    currentMapBorderTile = gameLevelData[60 + tempInt1];
+    currentMapBorderAsset = tilePalettes[currentMapBorderTile];
+    currentMapBorderAsset += (currentMapBorderAsset << 2);
+    currentMapBorderAsset += (currentMapBorderAsset << 4);
+    if (currentMapBorderTile < 8) {
+        currentMapBorderTile <<= 1;
+    } else {
+        currentMapBorderTile -= 8;
+        currentMapBorderTile <<= 1;
+        currentMapBorderTile += 32;
+    }
+
 
     // Iterate a second time to bump all values up to their array index equivalents, to save us computation later.
     for (i = 0, j = 0; i != 60; ++i) {
