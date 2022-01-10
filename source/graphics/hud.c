@@ -42,6 +42,11 @@ void draw_hud() {
     }
 
     set_vram_update(NULL);
+
+    vram_adr(NAMETABLE_A + HUD_POSITION_START + 0x22);
+    for (i = 0; i != 0x1c; ++i) {
+        vram_put(gameName[i] + 0x60);
+    }
     
     /*
     memcpy(screenBuffer, (&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), GAME_DATA_OFFSET_TITLE_LENGTH);
