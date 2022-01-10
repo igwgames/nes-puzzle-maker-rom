@@ -83,7 +83,8 @@ void main() {
                 fade_in();
                 break;
             case GAME_STATE_TITLE_INPUT:
-                handle_title_input();
+                wait_for_start();
+                gameState = GAME_STATE_POST_TITLE;
                 break;
             case GAME_STATE_POST_TITLE:
                 currentLevelId = 0;
@@ -150,7 +151,6 @@ void main() {
                 // TODO: Might be nice to have this only called when we have something to update, and maybe only update the piece we 
                 // care about. (For example, if you get a key, update the key count; not everything!
                 update_hud();
-                update_map_sprites();
                 handle_player_movement();
                 update_player_sprite();
                 break;

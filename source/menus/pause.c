@@ -55,7 +55,7 @@ void handle_pause_input() {
     editorSelectedPosition = 0;
     screenBuffer[0] = MSB(NTADR_B(10, 16));
     screenBuffer[1] = LSB(NTADR_B(10, 16));
-    screenBuffer[2] = 0xe2; // FIXME: Constant
+    screenBuffer[2] = 0xe2;
     screenBuffer[3] = MSB(NTADR_B(10, 18));
     screenBuffer[4] = LSB(NTADR_B(10, 18));
     screenBuffer[5] = ' ' + 0x60;

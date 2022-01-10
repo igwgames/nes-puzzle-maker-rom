@@ -9,6 +9,19 @@
 
 unsigned char palette[16];
 
+void do_beef(void) {
+    if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
+        currentMapOrig[j] = 0;
+        ++totalKeyCount;
+    } else if (tempChar1 == TILE_COLLISION_CRATE) {
+        currentMapOrig[j] = 0;
+        ++totalCrateCount;
+    } else if (tempChar1 == TILE_COLLISION_GAP) {
+        currentMapOrig[j] = 0;
+    } else {
+        currentMapOrig[j] = currentMap[j];
+    }
+}
 
 // Loads the map at the player's current position into the ram variable given. 
 // Kept in a separate file, as this must remain in the primary bank so it can
@@ -38,35 +51,14 @@ void load_map() {
         j = i<<1;
         currentMap[j] = (gameLevelData[i + tempInt1] & 0xf0) >> 4;
 
-        // NOTE: I don't like repeating this twice, cleaning that up might help save some space
         tempChar1 = tileCollisionTypes[currentMap[j]];
-        if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
-            currentMapOrig[j] = 0;
-            ++totalKeyCount;
-        } else if (tempChar1 == TILE_COLLISION_CRATE) {
-            currentMapOrig[j] = 0;
-            ++totalCrateCount;
-        } else if (tempChar1 == TILE_COLLISION_GAP) {
-            currentMapOrig[j] = 0;
-        } else {
-            currentMapOrig[j] = currentMap[j];
-        }
+        do_beef();
 
         ++j;
         currentMap[j] = (gameLevelData[i + tempInt1] & 0x0f);
 
         tempChar1 = tileCollisionTypes[currentMap[j]];
-        if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
-            currentMapOrig[j] = 0;
-            ++totalKeyCount;
-        } else if (tempChar1 == TILE_COLLISION_CRATE) {
-            currentMapOrig[j] = 0;
-            ++totalCrateCount;
-        } else if (tempChar1 == TILE_COLLISION_GAP) {
-            currentMapOrig[j] = 0;
-        } else {
-            currentMapOrig[j] = currentMap[j];
-        }
+        do_beef();
     }
     playerGridPositionX = gameLevelData[tempInt1 + 62] & 0x0f;
     playerGridPositionY = gameLevelData[tempInt1 + 62] >> 4;

@@ -31,6 +31,9 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionX);
 ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionY);
 
+ZEROPAGE_DEF(signed char, animationPositionX);
+ZEROPAGE_DEF(signed char, animationPositionY);
+
 
 // Huge pile of temporary variables
 #define rawXPosition tempChar1
@@ -57,6 +60,9 @@ ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionY);
 const unsigned char* movedText = 
                                 "A";
 
+CODE_BANK_POP();
+
+// Code here goes in PRG instead. because space is hard
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
 void update_player_sprite() {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
@@ -64,6 +70,16 @@ void update_player_sprite() {
     rawXPosition = (PLAY_AREA_LEFT + (playerGridPositionX << 4));
     rawYPosition = (PLAY_AREA_TOP + (playerGridPositionY << 4));
     rawTileId = playerSpriteTileId + playerDirection;
+
+    if (animationPositionX) {
+        rawXPosition += animationPositionX;
+        rawTileId += 2 + (((animationPositionX >> 2) & 0x01) << 1);
+    }
+
+    if (animationPositionY) {
+        rawYPosition += animationPositionY;
+        rawTileId += 2 + (((animationPositionY >> 2) & 0x01) << 1);
+    }
 
 
     if (playerInvulnerabilityTime && frameCount & PLAYER_INVULNERABILITY_BLINK_MASK) {
@@ -81,6 +97,8 @@ void update_player_sprite() {
     }
 
 }
+
+CODE_BANK(0);
 
 void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
 
@@ -205,7 +223,7 @@ void handle_player_movement() {
     }
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
 
-    movementInProgress = PLAYER_TILE_MOVE_FRAMES;
+    movementInProgress = 1;
     // TODO: Take special action based on the game type?
     switch (tileCollisionTypes[currentMap[rawTileId]]) {
         // Ids are multiplied by 4, which is their index 
@@ -417,15 +435,40 @@ void handle_player_movement() {
             nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
     }
+
+    if (playerGridPositionX > nextPlayerGridPositionX) {
+        for (i = 0; i < 8; ++i) {
+            animationPositionX = 0 - (i<<1);
+            update_player_sprite();
+            delay(2);
+        }
+    } else if (playerGridPositionX < nextPlayerGridPositionX) {
+        for (i = 0; i < 8; ++i) {
+            animationPositionX = (i<<1);
+            update_player_sprite();
+            delay(2);
+        }
+    }
+
+    if (playerGridPositionY > nextPlayerGridPositionY) {
+        for (i = 0; i < 8; ++i) {
+            animationPositionY = 0 - (i<<1);
+            update_player_sprite();
+            delay(2);
+        }
+
+    } else if (playerGridPositionY < nextPlayerGridPositionY) {
+        for (i = 0; i < 8; ++i) {
+            animationPositionY = (i<<1);
+            update_player_sprite();
+            delay(2);
+        }
+    }
+    update_player_sprite();
+    animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
 
 
 
 }
 
-void test_player_tile_collision() {
-}
-
-#define currentMapSpriteIndex tempChar1
-void handle_player_sprite_collision() {
-}

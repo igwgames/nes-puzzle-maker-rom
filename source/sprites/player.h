@@ -45,6 +45,10 @@ ZEROPAGE_EXTERN(unsigned char, playerGridPositionX);
 ZEROPAGE_EXTERN(unsigned char, playerGridPositionY);
 ZEROPAGE_EXTERN(unsigned char, movementInProgress);
 
+ZEROPAGE_EXTERN(signed char, animationPositionX);
+ZEROPAGE_EXTERN(signed char, animationPositionY);
+
+
 // Helper macro to convert the player's X and Y position into a position on the map
 #define PLAYER_MAP_POSITION(xPos, yPos) (xPos>>4) + (yPos & 0xf0)
 

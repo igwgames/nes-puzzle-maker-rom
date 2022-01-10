@@ -30,11 +30,3 @@ void draw_title_screen() {
 
 	gameState = GAME_STATE_TITLE_INPUT;
 }
-
-void handle_title_input() {
-	controllerState = pad_trigger(0);
-	if (controllerState & PAD_START) {
-		gameState = GAME_STATE_POST_TITLE;
-	}
-	
-}
