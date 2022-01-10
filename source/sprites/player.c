@@ -73,12 +73,12 @@ void update_player_sprite() {
 
     if (animationPositionX) {
         rawXPosition += animationPositionX;
-        rawTileId += 2 + (((animationPositionX >> 2) & 0x01) << 1);
+        rawTileId += 2 + (((animationPositionX >> 3) & 0x01) << 1);
     }
 
     if (animationPositionY) {
         rawYPosition += animationPositionY;
-        rawTileId += 2 + (((animationPositionY >> 2) & 0x01) << 1);
+        rawTileId += 2 + (((animationPositionY >> 3) & 0x01) << 1);
     }
 
 
