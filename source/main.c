@@ -22,6 +22,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/game_over.h"
 #include "source/menus/intro.h"
 #include "source/graphics/palettes.h"
+#include "graphics/splash.h"
 
 
 // Method to set a bunch of variables to default values when the system starts up.
@@ -31,8 +32,6 @@ void initialize_variables() {
     playerOverworldPosition = 0; // Which tile on the overworld to start with; 0-62
     playerHealth = 5; // Player's starting health - how many hearts to show on the HUD.
     playerMaxHealth = 5; // Player's max health - how many hearts to let the player collect before it doesn't count.
-    playerXPosition = (128 << PLAYER_POSITION_SHIFT); // X position on the screen to start (increasing numbers as you go left to right. Just change the number)
-    playerYPosition = (128 << PLAYER_POSITION_SHIFT); // Y position on the screen to start (increasing numbers as you go top to bottom. Just change the number)
     playerDirection = SPRITE_DIRECTION_DOWN; // What direction to have the player face to start.
 
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
@@ -50,9 +49,7 @@ void initialize_variables() {
 #pragma code-name ("CODE")
 #pragma rodata-name ("CODE")
 void set_up_graphics() {
-    // FIXME: Can remove this from a lot of other places.
     set_vram_update(NULL);
-    // FIXME: Hardcode new palette
 	pal_bg(gamePaletteData);
 	pal_spr(spritePalette);
 
@@ -78,6 +75,16 @@ void main() {
                 break;
 
             case GAME_STATE_TITLE_DRAW:
+
+                ppu_off();
+                vram_adr(0x2000);
+                vram_unrle(splash);
+                ppu_on_all();
+                fade_in();
+                delay(30);
+                wait_for_start();
+                fade_out();
+            
                 draw_title_screen();
                 music_play(titleSong);
                 fade_in();
@@ -148,8 +155,6 @@ void main() {
                 break;
 
             case GAME_STATE_RUNNING:
-                // TODO: Might be nice to have this only called when we have something to update, and maybe only update the piece we 
-                // care about. (For example, if you get a key, update the key count; not everything!
                 update_hud();
                 handle_player_movement();
                 update_player_sprite();

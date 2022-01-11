@@ -15,16 +15,6 @@ ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 #define tempTileId tempChar1
 #define tempTileIndex tempChar2
 
-// FIXME: Merge with original; no different anymore
-void put_hud_str(unsigned int adr, const char* str) {
-	vram_adr(adr);
-	while(1) {
-		if(!*str) break;
-		vram_put((*str++)+0x60);//-0x20 because ASCII code 0x20 is placed in tile 80 of the CHR
-	}
-}
-
-
 void draw_hud() {
     vram_adr(NAMETABLE_A + HUD_POSITION_START);
     for (i = 0; i != 160; ++i) {
@@ -47,12 +37,6 @@ void draw_hud() {
     for (i = 0; i != 0x1c; ++i) {
         vram_put(gameName[i] + 0x60);
     }
-    
-    /*
-    memcpy(screenBuffer, (&(currentGameData[0]) + GAME_DATA_OFFSET_TITLE), GAME_DATA_OFFSET_TITLE_LENGTH);
-    screenBuffer[GAME_DATA_OFFSET_TITLE_LENGTH] = NULL;
-    put_hud_str(NTADR_A(1, 26), screenBuffer);
-    */
 
     
 }

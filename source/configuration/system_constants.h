@@ -12,7 +12,6 @@
 #define ROOM_WIDTH_MAP_TILES 16
 #define ROOM_HEIGHT_MAP_TILES 12
 
-// FIXME: Kill ascii bank entirely
 #define CHR_BANK_MENU 1
 #define CHR_BANK_TILES 1
 #define CHR_BANK_SPRITES 8

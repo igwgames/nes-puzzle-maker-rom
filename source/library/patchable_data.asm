@@ -20,20 +20,7 @@ _totalGameLevels:
     .byte 1 ;1
 .export _totalGameLevels: absolute
 
-_gameLevelData:; 0x80 (FIXME Need full levels, but its gonna break shit until I move this into a different bank)
-    /*
-    .byte $01, $23, $45, $67, $89, $ab,
-    .byte $12, $34, $56, $78, $9a, $bc,
-    .byte $23, $45, $67, $89, $ab, $cd,
-    .byte $34, $56, $78, $9a, $bc, $de,
-    .byte $45, $67, $09, $ab, $cd, $ef,
-
-    .byte $01, $23, $45, $67, $89, $ab,
-    .byte $10, $00, $56, $78, $9a, $bc,
-    .byte $20, $45, $67, $89, $ab, $cd,
-    .byte $34, $56, $78, $9a, $bc, $de,
-    .byte $45, $67, $89, $ab, $cd, $ef,
-    */
+_gameLevelData:; 128 (4096 total, res for rest)
     
     .byte $01, $11, $11, $11, $11, $11
     .byte $01, $22, $22, $22, $22, $21

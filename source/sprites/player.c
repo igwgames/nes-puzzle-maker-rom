@@ -16,11 +16,6 @@
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
 // Some useful global variables
-ZEROPAGE_DEF(int, playerXPosition);
-ZEROPAGE_DEF(int, playerYPosition);
-// FIXME: axe
-ZEROPAGE_DEF(int, playerXVelocity);
-ZEROPAGE_DEF(int, playerYVelocity);
 ZEROPAGE_DEF(unsigned char, playerGridPositionX);
 ZEROPAGE_DEF(unsigned char, playerGridPositionY);
 ZEROPAGE_DEF(unsigned char, movementInProgress);
@@ -53,12 +48,6 @@ ZEROPAGE_DEF(signed char, animationPositionY);
 
 #define collisionTempXInt tempInt3
 #define collisionTempYInt tempInt4
-
-// TODO: axe all text communication stuff.
- const unsigned char* introductionText = 
-                                "a";
-const unsigned char* movedText = 
-                                "A";
 
 CODE_BANK_POP();
 
@@ -224,7 +213,6 @@ void handle_player_movement() {
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
 
     movementInProgress = 1;
-    // TODO: Take special action based on the game type?
     switch (tileCollisionTypes[currentMap[rawTileId]]) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:

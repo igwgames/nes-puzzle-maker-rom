@@ -41,7 +41,6 @@ void __fastcall__ set_chr_bank_1(unsigned char bank_id);
 
 // Set the current mirroring mode. Your options are MIRROR_LOWER_BANK, MIRROR_UPPER_BANK, 
 // MIRROR_HORIZONTAL, and MIRROR_VERTICAL.
-// TODO: This could use a better home...
 void __fastcall__ set_mirroring(unsigned char mirroring);
 
 // ===== nes-c-boilerplate code end

@@ -11,7 +11,7 @@ MMC1_PRG	=$e000
 		
 			resetstub_entry:
 				jmp start
-				; FIXME: If we need space kill this, it's extra padding. The whole thing could probably go tbh
+				; NOTE: If we need space kill this, it's extra padding. The whole thing could probably go tbh
 				sei
 				ldx #$FF
 				txs
