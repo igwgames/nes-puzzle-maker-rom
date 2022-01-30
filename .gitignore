@@ -16,6 +16,7 @@ graphics/generated/*.png
 graphics/generated/*.bmp
 graphics/unused/*
 rom/*.nes
+rom/*.dbg
 temp/*
 !temp/empty
 todo.md
