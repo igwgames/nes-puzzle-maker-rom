@@ -39,7 +39,7 @@ _gameLevelData:; 128 (4096 total, res for rest)
     ; Tile id for border
     .byte $02
     ; Gameplay mode
-    .byte $0
+    .byte $2
     
     ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
     .byte $44
