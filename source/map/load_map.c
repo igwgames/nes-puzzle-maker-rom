@@ -15,9 +15,9 @@ void do_beef(void) {
         ++totalKeyCount;
     } else if (tempChar1 == TILE_COLLISION_CRATE) {
         currentMapOrig[j] = 0;
-        ++totalCrateCount;
     } else if (tempChar1 == TILE_COLLISION_GAP) {
         currentMapOrig[j] = 0;
+        ++totalCrateCount;
     } else {
         currentMapOrig[j] = currentMap[j];
     }

@@ -217,9 +217,9 @@ void handle_player_movement() {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
-        case TILE_COLLISION_GAP: // Hole for crate/ball - no action on its own
             // Walkable.. Go !
             break;
+        case TILE_COLLISION_GAP:
         case TILE_COLLISION_SOLID: // Solid 1
             // Nope, go back. These are solid.
                 nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
@@ -244,6 +244,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId];
 
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         ++playerCrateCount;
@@ -257,6 +258,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId];
 
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
