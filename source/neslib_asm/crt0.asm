@@ -305,7 +305,7 @@ resetstub_in "STUB_PRG"
 
 music_data:
 
-	.incbin "sound/music/music.bin"
+	.res 5632
 	
 music_dummy_data:
 
