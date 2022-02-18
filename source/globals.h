@@ -85,3 +85,4 @@ extern const unsigned char spritePalette[4];
 extern const unsigned char titleSong;
 extern const unsigned char gameplaySong;
 extern const unsigned char creditsSong;
+extern const unsigned char movementSpeed;

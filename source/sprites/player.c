@@ -437,13 +437,13 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionX = 0 - (i<<1);
             update_player_sprite();
-            delay(2);
+            delay(movementSpeed);
         }
     } else if (playerGridPositionX < nextPlayerGridPositionX) {
         for (i = 0; i < 8; ++i) {
             animationPositionX = (i<<1);
             update_player_sprite();
-            delay(2);
+            delay(movementSpeed);
         }
     }
 
@@ -451,14 +451,14 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionY = 0 - (i<<1);
             update_player_sprite();
-            delay(2);
+            delay(movementSpeed);
         }
 
     } else if (playerGridPositionY < nextPlayerGridPositionY) {
         for (i = 0; i < 8; ++i) {
             animationPositionY = (i<<1);
             update_player_sprite();
-            delay(2);
+            delay(movementSpeed);
         }
     }
     update_player_sprite();

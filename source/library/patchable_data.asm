@@ -227,3 +227,7 @@ _gameplaySong:
 _creditsSong:
     .byte 1
 .export _creditsSong
+
+_movementSpeed:
+    .byte 2
+.export _movementSpeed
