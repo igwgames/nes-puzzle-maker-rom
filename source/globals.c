@@ -19,8 +19,8 @@ ZEROPAGE_DEF(unsigned char, currentLevelId);
 ZEROPAGE_DEF(unsigned char, playerSpriteTileId);
 
 ZEROPAGE_DEF(unsigned int, gameTime);
-ZEROPAGE_DEF(unsigned char, gameKeys);
-ZEROPAGE_DEF(unsigned char, gameCrates);
+ZEROPAGE_DEF(unsigned int, gameKeys);
+ZEROPAGE_DEF(unsigned int, gameCrates);
 
 
 ZEROPAGE_DEF(unsigned char, selectedGameId);

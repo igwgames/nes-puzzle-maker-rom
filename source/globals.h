@@ -21,8 +21,8 @@ ZEROPAGE_EXTERN(unsigned char, playerSpriteTileId);
 
 
 ZEROPAGE_EXTERN(unsigned int, gameTime);
-ZEROPAGE_EXTERN(unsigned char, gameKeys);
-ZEROPAGE_EXTERN(unsigned char, gameCrates);
+ZEROPAGE_EXTERN(unsigned int, gameKeys);
+ZEROPAGE_EXTERN(unsigned int, gameCrates);
 
 
 ZEROPAGE_EXTERN(unsigned char, selectedGameId);

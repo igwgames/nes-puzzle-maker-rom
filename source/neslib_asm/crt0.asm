@@ -280,8 +280,6 @@ detectNTSC:
 
 	jmp _main			;no parameters
 
-	.include "source/library/patchable_data.asm"
-
 	.include "source/neslib_asm/ft_drv/driver.s"
     .include "source/library/bank_helpers.asm"
 	.include "source/neslib_asm/neslib.asm"
@@ -302,7 +300,7 @@ resetstub_in "STUB_PRG"
 
 
 .segment "ROM_00"
-
+.include "source/library/patchable_data.asm"
 music_data:
 
 	.res 5632
@@ -312,6 +310,8 @@ music_dummy_data:
 	.byte $0D,$00,$0D,$00,$0D,$00,$0D,$00,$00,$10,$0E,$B8,$0B,$0F,$00,$16
 	.byte $00,$01,$40,$06,$96,$00,$18,$00,$22,$00,$22,$00,$22,$00,$22,$00
 	.byte $22,$00,$00,$3F
+
+.segment "CODE"
 
 .if(FT_SFX_ENABLE)
 sounds_data:

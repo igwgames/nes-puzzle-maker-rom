@@ -39,23 +39,27 @@ void draw_win_screen() {
     vram_put('0' + screenBuffer[3] + 0x60);
     vram_put('0' + screenBuffer[4] + 0x60);
 
-
+    tempChar1 = 0;
     switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
             // Do nothing; nothing special to show
+            tempChar1 = 1;
             break;
         case GAME_STYLE_COIN:
-            put_str(NTADR_A(5, 22), "Coins collected:     ");
-
-            vram_put('0' + (gameKeys / 10) + 0x60);
-            vram_put('0' + (gameKeys % 10) + 0x60);
+            put_str(NTADR_A(5, 22), "Coins collected:   ");
+            tempInt1 = gameKeys;
             break;
         case GAME_STYLE_CRATES:
-            put_str(NTADR_A(5, 22), "Crates Removed:     ");
-            vram_put('0' + (gameCrates / 10) + 0x60);
-            vram_put('0' + (gameCrates % 10) + 0x60);
+            put_str(NTADR_A(5, 22), "Crates Removed:   ");
+            tempInt1 = gameCrates;
             break;
-
+    }
+    // NOTE: If there are space issues, we might benefit from incrementing these 
+    // "smartly" and replacing this with & 0x0f, &0xf0, (>>8)& 0x0f, etc
+    if (tempChar1 == 0) {
+        vram_put('0' + ((tempInt1 / 100) % 10) + 0x60);
+        vram_put('0' +((tempInt1 / 10) % 10) + 0x60);
+        vram_put('0' + ((tempInt1 % 10)) + 0x60);
     }
 
     // Hide all existing sprites
