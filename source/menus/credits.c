@@ -46,11 +46,11 @@ void draw_win_screen() {
             tempChar1 = 1;
             break;
         case GAME_STYLE_COIN:
-            put_str(NTADR_A(5, 22), "Coins collected:   ");
+            put_str(NTADR_A(5, 22), coinsCollectedText);
             tempInt1 = gameKeys;
             break;
         case GAME_STYLE_CRATES:
-            put_str(NTADR_A(5, 22), "Crates Removed:   ");
+            put_str(NTADR_A(5, 22), cratesRemovedText);
             tempInt1 = gameCrates;
             break;
     }

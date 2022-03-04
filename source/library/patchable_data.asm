@@ -231,3 +231,11 @@ _creditsSong:
 _movementSpeed:
     .byte 2
 .export _movementSpeed
+
+_coinsCollectedText: 
+    .asciiz "Coins collected:   "
+.export _coinsCollectedText
+
+_cratesRemovedText: 
+    .asciiz "Crates Removed:    "
+.export _cratesRemovedText

@@ -86,3 +86,5 @@ extern const unsigned char titleSong;
 extern const unsigned char gameplaySong;
 extern const unsigned char creditsSong;
 extern const unsigned char movementSpeed;
+extern const unsigned char coinsCollectedText[];
+extern const unsigned char cratesRemovedText[];

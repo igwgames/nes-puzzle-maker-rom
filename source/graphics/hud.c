@@ -49,10 +49,10 @@ void update_hud() {
             for (i = 0; i != 16; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_COLLECTABLE) {
                     tempTileIndex = i;
-                    tempTileId = (i<<1);
                     break;
                 }
             }
+            tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
             i = 0;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
@@ -84,10 +84,10 @@ void update_hud() {
             for (i = 0; i != 16; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_CRATE) {
                     tempTileIndex = i;
-                    tempTileId = (i<<1);
                     break;
                 }
             }
+            tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
             i = 0;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
