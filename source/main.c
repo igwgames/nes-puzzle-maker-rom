@@ -36,7 +36,6 @@ void initialize_variables() {
 
     lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
-    movementInProgress = 0;
     playerGridPositionX = 0;
     playerGridPositionY = 0;
     selectedGameId = 0;

@@ -37,18 +37,32 @@ void draw_hud() {
     for (i = 0; i != 0x1c; ++i) {
         vram_put(gameName[i] + 0x60);
     }
+    if (enableLevelShow) {
+        vram_adr(NAMETABLE_A + HUD_POSITION_START + 0x82);
+        vram_put('L' + 0x60);
+        vram_put('e' + 0x60);
+        vram_put('v' + 0x60);
+        vram_put('e' + 0x60);
+        vram_put('l' + 0x60);
+        vram_put(':' + 0x60);
+    }
+}
 
-    
+void draw_num_to_sb(unsigned char num) {
+    screenBuffer[i++] = (num / 10) + '0' + 0x60;
+    screenBuffer[i++] = (num % 10) + '0' + 0x60;
+
 }
 
 void update_hud() {
+    i = 0;
     switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
             break;
         case GAME_STYLE_COIN:
-            for (i = 0; i != 16; ++i) {
-                if (tileCollisionTypes[i] == TILE_COLLISION_COLLECTABLE) {
-                    tempTileIndex = i;
+            for (j = 0; j != 16; ++j) {
+                if (tileCollisionTypes[j] == TILE_COLLISION_COLLECTABLE) {
+                    tempTileIndex = j;
                     break;
                 }
             }
@@ -70,20 +84,15 @@ void update_hud() {
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
-            screenBuffer[i++] = (playerKeyCount / 10) + '0' + 0x60;
-            screenBuffer[i++] = (playerKeyCount % 10) + '0' + 0x60;
+            draw_num_to_sb(playerKeyCount);
             screenBuffer[i++] = '/' + 0x60;
-            screenBuffer[i++] = (totalKeyCount / 10) + '0' + 0x60;
-            screenBuffer[i++] = (totalKeyCount % 10) + '0' + 0x60;
-
-            screenBuffer[i++] = NT_UPD_EOF;
-            set_vram_update(screenBuffer);
+            draw_num_to_sb(totalKeyCount);
 
             break;
         case GAME_STYLE_CRATES:
-            for (i = 0; i != 16; ++i) {
-                if (tileCollisionTypes[i] == TILE_COLLISION_CRATE) {
-                    tempTileIndex = i;
+            for (j = 0; j != 16; ++j) {
+                if (tileCollisionTypes[j] == TILE_COLLISION_CRATE) {
+                    tempTileIndex = j;
                     break;
                 }
             }
@@ -105,32 +114,28 @@ void update_hud() {
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
-            screenBuffer[i++] = (playerCrateCount / 10) + '0' + 0x60;
-            screenBuffer[i++] = (playerCrateCount % 10) + '0' + 0x60;
+            draw_num_to_sb(playerCrateCount);
             screenBuffer[i++] = '/' + 0x60;
-            screenBuffer[i++] = (totalCrateCount / 10) + '0' + 0x60;
-            screenBuffer[i++] = (totalCrateCount % 10) + '0' + 0x60;
-
-            screenBuffer[i++] = NT_UPD_EOF;
-            set_vram_update(screenBuffer);
+            draw_num_to_sb(totalCrateCount);
 
             break;
     }
+
+
+    // FIXME: Test all 3 gamemodes, including raw!
+    if (enableLevelShow) {
+        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x88) | NT_UPD_HORZ;
+        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x88);
+        screenBuffer[i++] = 5;
+        draw_num_to_sb(currentLevelId + 1);
+        screenBuffer[i++] = '/' + 0x60;
+        draw_num_to_sb(totalGameLevels);
+    }
+    screenBuffer[i++] = NT_UPD_EOF;
+    set_vram_update(screenBuffer);
+
 }
 
 void update_editor_hud() {
-
-    tempTileId = HUD_EDITOR_TILES_SPRITE_START + (editorSelectedTileId << 4);
-
-    if (editorSelectedTileId == TILE_EDITOR_POSITION_LEFT) {
-        tempTileId = 4;
-    } else if (editorSelectedTileId == TILE_EDITOR_POSITION_RIGHT) {
-        tempTileId = 236;
-    }
-
-    oam_spr(tempTileId, 15, HUD_SELECTOR_SPRITE_ID, 0x00, HUD_SELECTOR_SPRITE_OAM);
-    oam_spr(tempTileId+8, 15, HUD_SELECTOR_SPRITE_ID+1, 0x00, HUD_SELECTOR_SPRITE_OAM+4);
-    oam_spr(tempTileId, 23, HUD_SELECTOR_SPRITE_ID+16, 0x00, HUD_SELECTOR_SPRITE_OAM+8);
-    oam_spr(tempTileId+8, 23, HUD_SELECTOR_SPRITE_ID+17, 0x00, HUD_SELECTOR_SPRITE_OAM+12);
 
 }

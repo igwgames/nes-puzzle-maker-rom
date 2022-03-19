@@ -16,7 +16,7 @@ _gameName:
 .export _gameName: absolute
 
 _totalGameLevels: 
-    .byte 1 ;1
+    .byte 10 ;1
 .export _totalGameLevels: absolute
 
 _gameLevelData:; 128 (4096 total, res for rest)
@@ -242,3 +242,7 @@ _cratesRemovedText:
 _enableUndo:
     .byte 1
 .export _enableUndo
+
+_enableLevelShow:
+    .byte 0
+.export _enableLevelShow

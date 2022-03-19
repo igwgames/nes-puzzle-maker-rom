@@ -187,10 +187,9 @@ void handle_player_movement() {
         return;
     }
 
-    if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B)) {
+    if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B) && undoActionType[undoPosition] != 255) {
         if (thisLevelMoves == 0) { return; }
         // UNDO!!
-        if (undoPosition == 255) { undoPosition = (NUMBER_OF_UNDOS - 1); }
         
         playerGridPositionX = undoPlayerFromPositionsX[undoPosition];
         playerGridPositionY = undoPlayerFromPositionsY[undoPosition];
@@ -217,9 +216,11 @@ void handle_player_movement() {
             currentMap[rawTileId] = collisionTempTileId;
             update_single_tile(undoBlockToPositionsX[undoPosition], undoBlockToPositionsY[undoPosition], collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
         }
-
+        
+        undoActionType[undoPosition] = 255;
         --thisLevelMoves;
         --undoPosition;
+        if (undoPosition == 255) { undoPosition = (NUMBER_OF_UNDOS - 1); }
         update_hud();
         return;
     }

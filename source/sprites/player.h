@@ -43,7 +43,6 @@ ZEROPAGE_EXTERN(int, playerYVelocity);
 ZEROPAGE_EXTERN(unsigned char, playerDirection);
 ZEROPAGE_EXTERN(unsigned char, playerGridPositionX);
 ZEROPAGE_EXTERN(unsigned char, playerGridPositionY);
-ZEROPAGE_EXTERN(unsigned char, movementInProgress);
 
 ZEROPAGE_EXTERN(signed char, animationPositionX);
 ZEROPAGE_EXTERN(signed char, animationPositionY);

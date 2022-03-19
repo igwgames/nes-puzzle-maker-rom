@@ -92,3 +92,4 @@ extern const unsigned char cratesRemovedText[];
 ZEROPAGE_EXTERN(unsigned char, thisLevelMoves);
 
 extern const unsigned char enableUndo;
+extern const unsigned char enableLevelShow;
