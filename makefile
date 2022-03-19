@@ -126,7 +126,7 @@ rebuild_tools:
 	pkg -d --public tools/tmx2c/src/index.js --output tools/tmx2c/tmx2c.exe -t node8-windows-x64
 
 s3_upload:
-	mc cp ./rom/starter.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v2-4.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v2-4.nes
+	mc cp ./rom/starter.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes
 
 clean:
 	-rm -f rom/*.nes

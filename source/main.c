@@ -119,6 +119,7 @@ void main() {
             case GAME_STATE_LOAD_LEVEL_1: // Used to start music in the case above.
                 playerKeyCount = 0;
                 playerCrateCount = 0;
+                thisLevelMoves = 0;
                 fade_out();
                 oam_clear();
 

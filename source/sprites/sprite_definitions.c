@@ -15,5 +15,3 @@
 //           Byte 6 is used for movement speed on enemies and npcs.
 //           Byte 7 is used for health on enemy sprites in our `add_sword` branch.
 // NOTE: This array cannot contain more than 64 sprites, or other logic will break.
-const unsigned char spriteDefinitions[] = {
-};

@@ -88,3 +88,7 @@ extern const unsigned char creditsSong;
 extern const unsigned char movementSpeed;
 extern const unsigned char coinsCollectedText[];
 extern const unsigned char cratesRemovedText[];
+
+ZEROPAGE_EXTERN(unsigned char, thisLevelMoves);
+
+extern const unsigned char enableUndo;

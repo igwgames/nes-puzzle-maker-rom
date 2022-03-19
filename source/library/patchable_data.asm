@@ -4,7 +4,6 @@
 ; NOTE: If you're editing the raw code of your own game you can ignore the warnings in this file, and move it wherever
 ; you want! These warnings only apply if your rom will continue to be used with the  web-based editor.
 
-; FIXME: Make static again maybe
 .segment "ROM_00"
 .align 16
 
@@ -39,7 +38,7 @@ _gameLevelData:; 128 (4096 total, res for rest)
     ; Tile id for border
     .byte $02
     ; Gameplay mode
-    .byte $2
+    .byte $1
     
     ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
     .byte $44
@@ -239,3 +238,7 @@ _coinsCollectedText:
 _cratesRemovedText: 
     .asciiz "Crates Removed:    "
 .export _cratesRemovedText
+
+_enableUndo:
+    .byte 1
+.export _enableUndo
