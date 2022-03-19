@@ -18,7 +18,6 @@ CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 // Some useful global variables
 ZEROPAGE_DEF(unsigned char, playerGridPositionX);
 ZEROPAGE_DEF(unsigned char, playerGridPositionY);
-ZEROPAGE_DEF(unsigned char, movementInProgress);
 ZEROPAGE_DEF(unsigned char, playerControlsLockTime);
 ZEROPAGE_DEF(unsigned char, playerInvulnerabilityTime);
 ZEROPAGE_DEF(unsigned char, playerDirection);
@@ -188,12 +187,6 @@ void handle_player_movement() {
         return;
     }
 
-    if (movementInProgress) {
-        // One input at a time, bud...
-        --movementInProgress;
-        return;
-    }
-
     if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B)) {
         if (thisLevelMoves == 0) { return; }
         // UNDO!!
@@ -274,7 +267,6 @@ void handle_player_movement() {
     }
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
 
-    //movementInProgress = 1;
     switch (tileCollisionTypes[currentMap[rawTileId]]) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
