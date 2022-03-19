@@ -24,12 +24,12 @@ _gameLevelData:; 128 (4096 total, res for rest)
     .byte $01, $11, $11, $11, $11, $11
     .byte $01, $22, $22, $22, $22, $21
     .byte $01, $21, $06, $00, $12, $21
-    .byte $01, $21, $50, $00, $12, $21
+    .byte $01, $21, $45, $00, $12, $21
     .byte $01, $21, $00, $00, $12, $21
 
     .byte $00, $00, $00, $00, $00, $00
     .byte $01, $21, $50, $45, $12, $21
-    .byte $01, $21, $00, $40, $12, $21
+    .byte $01, $21, $45, $40, $12, $21
     .byte $01, $22, $17, $11, $22, $21
     .byte $01, $11, $11, $11, $11, $11
 
@@ -200,7 +200,7 @@ _creditsScreenData:
 .export _creditsScreenData: absolute
 
 _gamePaletteData:
-    .byte $0f, $0a, $19, $2a, $0f, $11, $21, $31, $0f, $16, $28, $2a, $0f, $01, $06, $30
+    .byte $0f, $0a, $19, $2a, $0f, $11, $21, $31, $0f, $16, $28, $2a, $0f, $10, $20, $30
 .export _gamePaletteData: absolute
 
 _spritePalette: 
