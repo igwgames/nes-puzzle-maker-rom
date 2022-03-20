@@ -30,7 +30,8 @@ So, you made a game with `puzzle.nes.science` and now you wanna tweak it. Awesom
 with an IPS patch. The tool gives you a (kinda secret) way to do this.
 
 Go to [the tool](https://puzzle.nes.science) and load the game you want to export. Now, open the developer tools. The
-easiest way to do this is to right-click any element and choose "Inspect" or "Inspect Element". Within the tools, find
+easiest way to do this is to right-click any element and choose "Inspect" or "Inspect Element". On the standalone app
+you can hit alt and find it in the menu above. Within the tools, find
 the "Console" tab, and paste the following in: 
 
 ```javascript
