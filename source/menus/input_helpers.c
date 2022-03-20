@@ -4,9 +4,6 @@
 #include "source/library/bank_helpers.h"
 #include "source/menus/input_helpers.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
-
 void wait_for_start() {
     while (1) {
         lastControllerState = controllerState;

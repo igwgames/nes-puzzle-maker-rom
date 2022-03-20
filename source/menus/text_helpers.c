@@ -1,7 +1,10 @@
 #include "source/neslib_asm/neslib.h"
 #include "source/menus/text_helpers.h"
 #include "source/globals.h"
-#include "source/graphics/game_text.h"
+
+// Rather than have a full ASCII table, we skip the first 32 characters so we have a little room for extra 
+// data later in the bank. We have to subtract this constantly though, so we made a constant.
+#define TEXT_ASCII_SKIPPED_CHARACTERS 0x60
 
 // Put a string on the screen at X/Y coordinates given in adr.
 void put_str(unsigned int adr, const char *str) {

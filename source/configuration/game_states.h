@@ -8,15 +8,4 @@
 #define GAME_STATE_LOAD_LEVEL_1     26 // Secondary; available to do some trickery in main.c around music playing
 #define GAME_STATE_RUNNING          50
 #define GAME_STATE_PAUSED           100
-#define GAME_STATE_SCREEN_SCROLL    150
 #define GAME_STATE_CREDITS          250
-
-#define GAME_STATE_EDITOR           70
-#define GAME_STATE_EDITOR_INIT      71
-
-#define GAME_STATE_EDITOR_INFO      72
-#define GAME_STATE_EDITOR_REDRAW    73
-
-#define GAME_STATE_INTRO            80
-
-#define GAME_STATE_EDITOR_EXPORT    74

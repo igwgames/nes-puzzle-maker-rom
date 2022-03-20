@@ -36,12 +36,8 @@ ZEROPAGE_EXTERN(unsigned char, editorSelectedTileId);
 // Draw the HUD
 void draw_hud();
 
-void draw_editor_hud();
-
 // Update the number of hearts, coins, etc in the hud.
 void update_hud();
-
-void update_editor_hud();
 
 // Draw a string using hud characters...
 void put_hud_str(unsigned int adr, const char* str);

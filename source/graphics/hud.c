@@ -2,19 +2,18 @@
 #include "source/graphics/hud.h"
 #include "source/map/map.h"
 #include "source/menus/text_helpers.h"
-#include "source/configuration/game_info.h"
 #include "source/globals.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("CODE")
-
-// TODO: This file is CHONKY. Can we improve?
 
 ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
 #define tempTileId tempChar1
 #define tempTileIndex tempChar2
 
+// Draw the "hud" at the top of the screen, with its border and attributes. Also the level if the user turned
+// that feature on.
 void draw_hud() {
     vram_adr(NAMETABLE_A + HUD_POSITION_START);
     for (i = 0; i != 160; ++i) {
@@ -48,12 +47,14 @@ void draw_hud() {
     }
 }
 
+// Draw a number to "screenBuffer". Isolated so we do the /10 and %10 in one spot
 void draw_num_to_sb(unsigned char num) {
     screenBuffer[i++] = (num / 10) + '0' + 0x60;
     screenBuffer[i++] = (num % 10) + '0' + 0x60;
 
 }
 
+// Do an ad-hoc update to the hud without resetting the screen. Handles coin/box count, current level, etc.
 void update_hud() {
     i = 0;
     switch (currentGameStyle) {
@@ -121,11 +122,9 @@ void update_hud() {
             break;
     }
 
-
-    // FIXME: Test all 3 gamemodes, including raw!
     if (enableLevelShow) {
-        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x88) | NT_UPD_HORZ;
-        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x88);
+        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x89) | NT_UPD_HORZ;
+        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x89);
         screenBuffer[i++] = 5;
         draw_num_to_sb(currentLevelId + 1);
         screenBuffer[i++] = '/' + 0x60;
@@ -133,9 +132,5 @@ void update_hud() {
     }
     screenBuffer[i++] = NT_UPD_EOF;
     set_vram_update(screenBuffer);
-
-}
-
-void update_editor_hud() {
 
 }

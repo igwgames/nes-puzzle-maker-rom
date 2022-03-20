@@ -11,17 +11,12 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/menus/credits.h"
 #include "source/map/load_map.h"
 #include "source/map/map.h"
-#include "source/graphics/game_text.h"
 #include "source/graphics/hud.h"
 #include "source/graphics/fade_animation.h"
 #include "source/sprites/player.h"
 #include "source/menus/pause.h"
-#include "source/sprites/map_sprites.h"
-#include "source/sprites/sprite_definitions.h"
 #include "source/menus/input_helpers.h"
-#include "source/menus/game_over.h"
 #include "source/menus/intro.h"
-#include "source/graphics/palettes.h"
 #include "graphics/splash.h"
 
 
@@ -29,31 +24,15 @@ This has the main loop for the game, which is then used to call out to other cod
 // Note that if variables aren't set in this method, they will start at 0 on NES startup.
 void initialize_variables() {
 
-    playerOverworldPosition = 0; // Which tile on the overworld to start with; 0-62
-    playerHealth = 5; // Player's starting health - how many hearts to show on the HUD.
-    playerMaxHealth = 5; // Player's max health - how many hearts to let the player collect before it doesn't count.
     playerDirection = SPRITE_DIRECTION_DOWN; // What direction to have the player face to start.
-
-    lastPlayerSpriteCollisionId = NO_SPRITE_HIT;
 
     playerGridPositionX = 0;
     playerGridPositionY = 0;
-    selectedGameId = 0;
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
     bank_spr(0);
 }   
-
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
-void set_up_graphics() {
-    set_vram_update(NULL);
-	pal_bg(gamePaletteData);
-	pal_spr(spritePalette);
-
-	oam_clear();
-}
 
 void main() {
     fade_out_instant();
@@ -64,8 +43,15 @@ void main() {
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
                 initialize_variables();
-                set_up_graphics();
+                set_vram_update(NULL);
+                pal_bg(gamePaletteData);
+                pal_spr(spritePalette);
+
+                oam_clear();
+
+                // Trick to allow us to patch the rom from the editor to pick the starting level, for testing.
                 if (singleLevelOverride != 255) {
+                    // Jump straight into the game without showing the title
                     gameState = GAME_STATE_POST_TITLE;
                     fade_in_fast();
                     continue;
@@ -75,15 +61,19 @@ void main() {
 
             case GAME_STATE_TITLE_DRAW:
 
+                // Draw splash screen using data in rle format
                 ppu_off();
                 vram_adr(0x2000);
                 vram_unrle(splash);
                 ppu_on_all();
                 fade_in();
+                // Wait a few... 
+                // If you're editing your own copy, please consider leaving this, since the tool helped you get here.
+                // Please? I can't stop you from deleting the splash, of course, it'd just make me happy to see it.
                 delay(30);
                 wait_for_start();
                 fade_out();
-            
+                
                 draw_title_screen();
                 music_play(titleSong);
                 fade_in();
@@ -128,9 +118,8 @@ void main() {
                 draw_current_map_to_a_inline();
                 ppu_on_all();
                 init_map();
-                load_sprites();
-                // Set player position -- NOTE: this might not actually be ideal here. 
-                // playerSpriteTileId = ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0x01)<<3) + ((currentGameData[GAME_DATA_OFFSET_SPRITE_ID] & 0xfe)<<5);
+
+                // Aim the player down to start
                 playerSpriteTileId = 0x40;
 
                 
@@ -143,7 +132,6 @@ void main() {
                 set_rand(frameCount);
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
-                    // Song 0: title, song 1: gameplay. No choices.
                     music_play(gameplaySong);
                 }
                 
@@ -173,7 +161,6 @@ void main() {
                 // Pause has its own mini main loop in handle_input to make logic easier.
                 sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
                 fade_out();
-                // banked_call(PRG_BANK_MAP_LOGIC, draw_current_map_to_a);
                 init_map();
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
@@ -185,7 +172,6 @@ void main() {
                 break;
             case GAME_STATE_CREDITS:
                 music_stop();
-                // sfx_play(SFX_WIN, SFX_CHANNEL_1);
                 music_play(creditsSong);
 
                 fade_out();

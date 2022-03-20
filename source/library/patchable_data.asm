@@ -4,7 +4,8 @@
 ; NOTE: If you're editing the raw code of your own game you can ignore the warnings in this file, and move it wherever
 ; you want! These warnings only apply if your rom will continue to be used with the  web-based editor.
 
-.segment "ROM_00"
+; Also note, if you want to patch in a game from the editor, check out "game.json" in the 
+
 .align 16
 
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
@@ -16,7 +17,7 @@ _gameName:
 .export _gameName: absolute
 
 _totalGameLevels: 
-    .byte 10 ;1
+    .byte 1 ;1
 .export _totalGameLevels: absolute
 
 _gameLevelData:; 128 (4096 total, res for rest)

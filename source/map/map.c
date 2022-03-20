@@ -5,31 +5,19 @@
 #include "source/configuration/game_states.h"
 #include "source/globals.h"
 #include "source/configuration/system_constants.h"
-#include "source/graphics/palettes.h"
 #include "source/graphics/hud.h"
 #include "source/graphics/fade_animation.h"
 #include "source/sprites/player.h"
-#include "source/sprites/sprite_definitions.h"
-#include "source/sprites/map_sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("CODE")
-
-ZEROPAGE_DEF(unsigned char, playerOverworldPosition);
-ZEROPAGE_DEF(int, xScrollPosition);
-ZEROPAGE_DEF(int, yScrollPosition);
 
 unsigned char currentMap[120];
 unsigned char currentMapOrig[120];
 
 unsigned char assetTable[64];
 
-unsigned char currentMapSpriteData[(16 * MAP_MAX_SPRITES)];
-unsigned char currentMapTileData[32];
-
 ZEROPAGE_DEF(unsigned char, currentGameStyle);
-
-// unsigned char currentMapSpritePersistance[64];
 
 unsigned char mapScreenBuffer[0x5c];
 
@@ -41,21 +29,8 @@ void init_map() {
 
 }
 
-// Reusing a few temporary vars for the sprite function below.
-#define currentValue tempInt1
-#define spritePosition tempChar4
-#define spriteDefinitionIndex tempChar5
-#define mapSpriteDataIndex tempChar6
+// Reusing a few temporary vars for the sprite functions below.
 #define tempArrayIndex tempInt3
-#define editorSelectedTileObject tempChar7
-#define editorAttrX tempChar8
-#define editorAttrY tempChar9
-#define tempEditorTile tempChar2
-
-// Load the sprites from the current map
-void load_sprites() {
-    // Do nothing; part of map.
-}
 
 // Clears the asset table. Set containsHud to 1 to set the HUD bytes to use palette 4 (will break the coloring logic if you use the
 // last few rows for the map.)
@@ -64,17 +39,6 @@ void clear_asset_table() {
     for (i = 0; i != sizeof(assetTable); ++i) {
         assetTable[i] = currentMapBorderAsset;
     }
-
-    /*
-    // Loop over assetTable to clear it out. 
-    for (i = 0; i != sizeof(assetTable) - 8; ++i) {
-        assetTable[i] = tempChara;
-    }
-    // The last row of the asset table uses the 4th palette to show the HUD correctly.
-    for (; i != sizeof(assetTable); ++i) {
-        assetTable[i] = containsHud == 0 ? tempChara : 0xff;
-    }
-    */
 }
 
 // Loads the assets from assetTable (for the row *ending* with j) into mapScreenBuffer
@@ -95,40 +59,6 @@ void load_palette_to_map_screen_buffer(int attributeTableAdr) {
     mapScreenBuffer[tempArrayIndex++] = assetTable[j];
     mapScreenBuffer[tempArrayIndex++] = NT_UPD_EOF;
 }
-
-// Now based on where we are in the map, shift them appropriately.
-// This builds up the palette bytes - which comprise of 2 bits per 16x16 tile. It's a bit confusing...
-void update_asset_table_based_on_current_value(unsigned char reverseAttributes) {
-    if ((i & 0x01) == 0) {
-        // Even/left
-        if (((i >> 3) & 0x01) == reverseAttributes) {
-            // top
-            currentValue >>= 6;
-        } else {
-            //bottom
-            currentValue >>= 2;
-        }
-    } else {
-        // Odd/right
-        if (((i >> 3) & 0x01) == reverseAttributes) {
-            // Top
-            currentValue >>= 4;
-        } else {
-            // Bottom 
-            currentValue >>= 0;
-        }
-    }
-    assetTable[j] += currentValue;
-}
-
-
-// We need to reuse some variables here to save on memory usage. So, use #define to give them readable names.
-// Note that this is ONLY a rename; if something relies on the original variable, that impacts this one too.
-#define currentMemoryLocation tempInt2
-// NOTE: tempChar1-tempChar3 are in use by update_player_sprite, which we call here. (Confusing, I know...)
-#define bufferIndex tempChar8 
-#define otherLoopIndex tempChar9
-
 
 // This is an ascii space
 #define BLANK_TILE 0x80

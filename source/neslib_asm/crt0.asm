@@ -281,14 +281,12 @@ detectNTSC:
 	jmp _main			;no parameters
 
 	.include "source/neslib_asm/ft_drv/driver.s"
-    .include "source/library/bank_helpers.asm"
 	.include "source/neslib_asm/neslib.asm"
 
 .segment "CHR_00"
 
 	; We just put the ascii tiles into both sprites and tiles. If you want to get more clever you could do something else.
 	.incbin "graphics/tiles_mod.chr"
-.segment "CHR_01"
 
 
 resetstub_in "STUB_PRG"
@@ -323,10 +321,3 @@ sounds_data:
 .if(FT_DPCM_ENABLE)
 	.incbin "sound/samples/samples.bin"
 .endif
-
-.segment "PRG_BOOP"
-	_PATCHED_BYTE:
-	_RUNTIME_MODE:
-	.byte 0
-
-.export _RUNTIME_MODE

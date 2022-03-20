@@ -8,12 +8,10 @@
 ZEROPAGE_DEF(unsigned char, i);
 ZEROPAGE_DEF(unsigned char, j);
 
-ZEROPAGE_DEF(unsigned char, playerHealth);
 ZEROPAGE_DEF(unsigned char, playerKeyCount);
 ZEROPAGE_DEF(unsigned char, totalKeyCount);
 ZEROPAGE_DEF(unsigned char, playerCrateCount);
 ZEROPAGE_DEF(unsigned char, totalCrateCount);
-ZEROPAGE_DEF(unsigned char, playerMaxHealth);
 ZEROPAGE_DEF(unsigned char, gameState);
 ZEROPAGE_DEF(unsigned char, currentLevelId);
 ZEROPAGE_DEF(unsigned char, playerSpriteTileId);
@@ -22,8 +20,6 @@ ZEROPAGE_DEF(unsigned int, gameTime);
 ZEROPAGE_DEF(unsigned int, gameKeys);
 ZEROPAGE_DEF(unsigned int, gameCrates);
 
-
-ZEROPAGE_DEF(unsigned char, selectedGameId);
 
 ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x30);
 

@@ -6,7 +6,7 @@
 # ===== USER SETTINGS START HERE =====
 
 # The name of the output rom, without the trailing .nes.
-ROM_NAME=starter
+ROM_NAME=puzzle
 
 # ===== USER SETTINGS END HERE =====
 
@@ -27,12 +27,10 @@ AFTER_SFX_CONVERTER=mv sound/sfx/sfx.s sound/sfx/generated/sfx.s
 
 # Built-in tools: 
 CHR2IMG=tools/chr2img/chr2img
-TMX2C=tools/tmx2c/tmx2c
 SPRITE_DEF2IMG=tools/sprite_def2img/sprite_def2img
 
 # Javascript versions of built-in tools: (Uncomment these if you're working on the tools)
 # CHR2IMG=node tools/chr2img/src/index.js
-# TMX2C=node tools/tmx2c/src/index.js
 # SPRITE_DEF2IMG=node tools/sprite_def2img/src/index.js
 
 SOUND_BANK=0
@@ -55,7 +53,6 @@ CONFIG_FILE_PATH=tools/cc65_config/game
 
 # These are the configuration files loaded by the line above. You probably don't have to change these.
 CONFIG_FILE=$(CONFIG_FILE_PATH).cfg
-CONFIG_ASM=$(CONFIG_FILE_PATH)_constants.asm
 
 # Path to 7-Zip - only used for generating tools zip. There's a 99.9% chance you don't care about this.
 7ZIP="/cygdrive/c/Program Files/7-Zip/7z"
@@ -72,7 +69,6 @@ ifdef CIRCLECI
 	AFTER_SFX_CONVERTER=echo Skipping SFX Generation...
 	# We don't have our nice toolkit here, so we have to use node directly
 	CHR2IMG=node tools/chr2img/src/index.js
-	TMX2C=node tools/tmx2c/src/index.js
 	SPRITE_DEF2IMG=node tools/sprite_def2img/src/index.js
 
 endif
@@ -88,8 +84,7 @@ endif
 
 build: rom/$(ROM_NAME).nes 
 
-temp/base.asm: $(CONFIG_ASM)
-	echo ".include \"$(CONFIG_ASM)\"" > temp/base.asm
+temp/base.asm: source/neslib_asm/crt0.asm
 	echo ".include \"source/neslib_asm/crt0.asm\"" >> temp/base.asm
 
 temp/crt0.o: source/neslib_asm/crt0.asm source/neslib_asm/neslib.asm temp/base.asm $(SOURCE_CRT0_GRAPHICS) sound/music/music.bin sound/music/samples.bin sound/sfx/generated/sfx.s source/library/patchable_data.asm
@@ -113,20 +108,8 @@ sound/sfx/generated/sfx.s: sound/sfx/sfx.nsf
 rom/$(ROM_NAME).nes: temp/crt0.o $(SOURCE_O)
 	$(MAIN_LINKER) -C $(CONFIG_FILE) -o rom/$(ROM_NAME).nes temp/*.o tools/cc65/lib/nes.lib  --dbgfile rom/$(ROM_NAME).dbg
 
-# Build up the tool zip that's saved on the website/etc. There's a 99.9% chance you don't care about this.
-# Meant to be run from the base folder of nes-starter-kit - all node stuff must be compiled!
-build_tool_zip: 
-	-rm -f temp/tools.zip
-	$(7ZIP) a temp/tools.zip tools/cc65 tools/chr2img/chr2img.exe tools/chr2img/LICENSE tools/nessc tools/nesst tools/tmx2c/tmx2c.exe tools/sprite_def2img/sprite_def2img.exe tools/sprite_Def2img/LICENSE tools/tmx2c/LICENSE tools/neslib_famitracker tools/misc tools/install_cygwin.bat ./tools/zip_readme/readme.txt
-
-# Build up the 3 tools that we use as part of nes-starter-kit - use this when we bump versions
-rebuild_tools:
-	pkg -d --public tools/chr2img/src/index.js --output tools/chr2img/chr2img.exe -t node8-windows-x64
-	pkg -d --public tools/sprite_def2img/src/index.js --output tools/sprite_def2img/sprite_def2img.exe -t node8-windows-x64
-	pkg -d --public tools/tmx2c/src/index.js --output tools/tmx2c/tmx2c.exe -t node8-windows-x64
-
 s3_upload:
-	mc cp ./rom/starter.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes
+	mc cp ./rom/puzzle.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v3-1.nes
 
 clean:
 	-rm -f rom/*.nes

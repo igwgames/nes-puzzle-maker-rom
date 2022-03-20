@@ -1,11 +1,8 @@
 {
     "terminal.integrated.shell.windows": "C:\\cygwin64\\bin\\bash.exe",
     "files.associations": {
-        "load_map.h": "c",
-        "game_data.h": "c",
-        "titlebs.h": "c",
-        "system_constants.h": "c",
-        "palettes.h": "c",
-        "game_text.h": "c"
+        "fade_animation.h": "c",
+        "player.h": "c",
+        "input_helpers.h": "c"
     },
-    }
+}

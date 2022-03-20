@@ -10,12 +10,10 @@ ZEROPAGE_EXTERN(unsigned char, gameState);
 
 ZEROPAGE_EXTERN(unsigned char, i);
 ZEROPAGE_EXTERN(unsigned char, j);
-ZEROPAGE_EXTERN(unsigned char, playerHealth);
 ZEROPAGE_EXTERN(unsigned char, playerKeyCount);
 ZEROPAGE_EXTERN(unsigned char, totalKeyCount);
 ZEROPAGE_EXTERN(unsigned char, playerCrateCount);
 ZEROPAGE_EXTERN(unsigned char, totalCrateCount);
-ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
 ZEROPAGE_EXTERN(unsigned char, currentLevelId);
 ZEROPAGE_EXTERN(unsigned char, playerSpriteTileId);
 
@@ -24,8 +22,6 @@ ZEROPAGE_EXTERN(unsigned int, gameTime);
 ZEROPAGE_EXTERN(unsigned int, gameKeys);
 ZEROPAGE_EXTERN(unsigned int, gameCrates);
 
-
-ZEROPAGE_EXTERN(unsigned char, selectedGameId);
 
 ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x30);
 
@@ -62,19 +58,11 @@ ZEROPAGE_EXTERN(int, tempInt6);
 
 extern const unsigned int bitToByte[8];
 
-// TODO: There might be a nicer home for these
 // Get the absolute value of a number, the lazy person's way.
 #define ABS(x) ((x) > 0 ? x : 0-(x))
 
 // Set a memory address to a value. Very, very raw.
 #define SET_ADDR_VALUE(addr, value) *(unsigned char*)(addr) = value
-
-// Defined in crt0, at 0xbff (fixed address) so it can be patched by outside programs.
-extern const unsigned char RUNTIME_MODE;
-
-#define RUNTIME_MODE_NORMAL 0
-#define RUNTIME_MODE_SINGLE_GAME 1
-#define RUNTIME_MODE_EDITOR_EXPORT 2
 
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderTile);
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderAsset);

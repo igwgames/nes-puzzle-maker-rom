@@ -4,7 +4,7 @@ MMC1_CHR1	=$c000
 MMC1_PRG	=$e000
 
 
-; MMC1 needs a reset stub in every bank that will put us into a known state. This defines it for all banks.
+; Needs a reset stub in every bank that will put us into a known state. This defines it for any given bank
 .macro resetstub_in segname
 	.segment segname
 		.scope

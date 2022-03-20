@@ -1,5 +1,4 @@
 #include "source/menus/intro.h"
-#include "source/graphics/palettes.h"
 #include "source/configuration/system_constants.h"
 #include "source/globals.h"
 #include "source/neslib_asm/neslib.h"
@@ -19,6 +18,7 @@
 #define goalTile tempChar5
 #define tempTile tempChar6
 
+// Load the intro screen from user data
 void draw_intro_screen() {
     ppu_off();
     scroll(0, 0);

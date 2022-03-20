@@ -4,8 +4,6 @@
 #include "source/configuration/game_states.h"
 #include "source/configuration/system_constants.h"
 #include "source/menus/text_helpers.h"
-#include "source/graphics/palettes.h"
-#include "source/configuration/game_info.h"
 #include "source/map/map.h"
 
 #pragma code-name ("CODE")
@@ -13,19 +11,17 @@
 
 #define selectedOption tempChara
 
-// Rewrite to pull in custom data
+// Draws custom data from the patched area onto the screen, then moves on.
 void draw_title_screen() {
 	set_vram_update(NULL);
     ppu_off();
 
-	//clear_screen();
 	oam_clear();
 
 	vram_adr(0x2000);
 	vram_write(&titleScreenData[0], 0x400);
     
 
-	// put_str(NTADR_A(10, 16), "Press Start!");
 	ppu_on_all();
 
 	gameState = GAME_STATE_TITLE_INPUT;

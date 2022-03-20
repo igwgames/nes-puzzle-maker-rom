@@ -5,21 +5,14 @@
 #include "source/map/map.h"
 #include "source/configuration/game_states.h"
 #include "source/configuration/system_constants.h"
-#include "source/sprites/collision.h"
-#include "source/sprites/sprite_definitions.h"
-#include "source/sprites/map_sprites.h"
 #include "source/graphics/hud.h"
-#include "source/graphics/game_text.h"
 #include "source/map/load_map.h"
 #include "source/map/map.h"
-
-CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
 // Some useful global variables
 ZEROPAGE_DEF(unsigned char, playerGridPositionX);
 ZEROPAGE_DEF(unsigned char, playerGridPositionY);
 ZEROPAGE_DEF(unsigned char, playerControlsLockTime);
-ZEROPAGE_DEF(unsigned char, playerInvulnerabilityTime);
 ZEROPAGE_DEF(unsigned char, playerDirection);
 
 ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionX);
@@ -28,9 +21,10 @@ ZEROPAGE_DEF(unsigned char, nextPlayerGridPositionY);
 ZEROPAGE_DEF(signed char, animationPositionX);
 ZEROPAGE_DEF(signed char, animationPositionY);
 
+
+// Lots of data to handle tracking player movements, so we can let them undo them
 #define NUMBER_OF_UNDOS 25
 ZEROPAGE_DEF(unsigned char, undoPosition);
-
 unsigned char undoPlayerFromPositionsX[25];
 unsigned char undoPlayerFromPositionsY[25];
 unsigned char undoBlockFromPositionsX[25];
@@ -49,19 +43,11 @@ unsigned char undoActionType[25];
 #define collisionTempDirection tempChar4
 #define collisionTempX tempChar4
 #define collisionTempY tempChar5
-#define collisionTempYBottom tempChar7
 
 #define collisionTempTileId tempChar8
-#define collisionTempTileObject tempChar9
 
 
 #define collisionTempValue tempInt1
-#define tempSpriteCollisionY tempInt2
-
-#define collisionTempXInt tempInt3
-#define collisionTempYInt tempInt4
-
-CODE_BANK_POP();
 
 // Code here goes in PRG instead. because space is hard
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
@@ -83,24 +69,14 @@ void update_player_sprite() {
     }
 
 
-    if (playerInvulnerabilityTime && frameCount & PLAYER_INVULNERABILITY_BLINK_MASK) {
-        // If the player is invulnerable, we hide their sprite about half the time to do a flicker animation.
-        oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
-        oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
-        oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
-        oam_spr(SPRITE_OFFSCREEN, SPRITE_OFFSCREEN, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
-
-    } else {
-        oam_spr(rawXPosition, rawYPosition, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
-        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
-        oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
-        oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
-    }
+    oam_spr(rawXPosition, rawYPosition, rawTileId, 0x00, PLAYER_SPRITE_INDEX);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
+    oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
+    oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
 
 }
 
-CODE_BANK(0);
-
+// Updates a single tile on the map visually
 void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
 
     if (newTile > 7) {
@@ -164,7 +140,8 @@ void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile,
     set_vram_update(NULL);
 }
 
-void set_from_params(void) {
+// Set up the undo array from the current parameters. Some things will have to be overridden.
+void set_undos_from_params(void) {
     ++thisLevelMoves;
     ++undoPosition;
     if (undoPosition > NUMBER_OF_UNDOS) {
@@ -177,6 +154,7 @@ void set_from_params(void) {
     undoActionType[undoPosition] = TILE_COLLISION_WALKABLE;
 }
 
+// Handle the player hitting buttons, and move em around!
 void handle_player_movement() {
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
@@ -203,6 +181,8 @@ void handle_player_movement() {
         }
 
         sfx_play(SFX_HURT, SFX_CHANNEL_1);
+
+        // Redraw parts of the map if it was changed
         if (undoBlockFromId[undoPosition] != 255) {
             rawTileId = undoBlockFromPositionsX[undoPosition] + (undoBlockFromPositionsY[undoPosition] * 12);
             collisionTempTileId = undoBlockFromId[undoPosition];
@@ -273,7 +253,7 @@ void handle_player_movement() {
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
             // Walkable.. Go !
-            set_from_params();
+            set_undos_from_params();
             break;
         case TILE_COLLISION_GAP:
         case TILE_COLLISION_SOLID: // Solid 1
@@ -283,12 +263,6 @@ void handle_player_movement() {
         case TILE_COLLISION_CRATE:
             // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
             switch (collisionTempDirection) {
-                // TODO: This is ugly... what can we do to pretty it up?
-
-                // FIXME: The order of the operations below is wrong, but my brain is falling apart so I can't fix it
-                // We need to run set_params() then set the to variable to the tile we're overwriting, not the new one! 
-                // Then we need to do the same with the second updated tile. Ooof brain
-
                 case PAD_RIGHT:
                     if (nextPlayerGridPositionX == 11) {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
@@ -297,7 +271,7 @@ void handle_player_movement() {
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+1]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
                         currentMap[rawTileId+1] = currentMap[rawTileId];
@@ -319,7 +293,7 @@ void handle_player_movement() {
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
                         ++playerCrateCount;
                         ++gameCrates;
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -355,7 +329,7 @@ void handle_player_movement() {
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-1]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -374,7 +348,7 @@ void handle_player_movement() {
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -410,7 +384,7 @@ void handle_player_movement() {
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-12]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -430,7 +404,7 @@ void handle_player_movement() {
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -466,7 +440,7 @@ void handle_player_movement() {
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+12]];
                     if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
                         // Do it
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -486,7 +460,7 @@ void handle_player_movement() {
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP) {
-                        set_from_params();
+                        set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
 
@@ -524,14 +498,14 @@ void handle_player_movement() {
         case TILE_COLLISION_COLLECTABLE:
             ++playerKeyCount;
             ++gameKeys;
-            set_from_params();
+            set_undos_from_params();
             undoBlockFromId[undoPosition] = currentMap[rawTileId];
             currentMap[rawTileId] = currentMapOrig[rawTileId];
             undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
             undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
             undoActionType[undoPosition] = TILE_COLLISION_COLLECTABLE;
 
-            update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], currentMapTileData[TILE_DATA_LOOKUP_OFFSET_PALETTE]);
+            update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
             update_hud();
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
             break;
@@ -608,8 +582,6 @@ void handle_player_movement() {
     update_player_sprite();
     animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
-
-
 
 }
 

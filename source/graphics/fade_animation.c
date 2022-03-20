@@ -2,8 +2,7 @@
 #include "source/globals.h"
 #include "source/neslib_asm/neslib.h"
 
-// This file purposely left in the kernel so it can easily be called from anywhere without a bank swap.
-
+// Use this to fade the screen in/out with various timeouts
 
 // Internal functions that the other ones call with a set number of frames.
 void _fade_out(unsigned char speed) {

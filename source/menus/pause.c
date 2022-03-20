@@ -1,5 +1,4 @@
 #include "source/menus/pause.h"
-#include "source/graphics/palettes.h"
 #include "source/configuration/system_constants.h"
 #include "source/globals.h"
 #include "source/neslib_asm/neslib.h"
@@ -15,7 +14,6 @@ unsigned char editorSelectedPosition;
 void draw_pause_screen() {
     ppu_off();
     clear_screen_with_border_b();
-    // We reuse the title palette here, though we have the option of making our own if needed.
     scroll(256, 0);
 
 
@@ -25,26 +23,6 @@ void draw_pause_screen() {
     put_str(NTADR_B(12, 16), "Continue");
     put_str(NTADR_B(12, 18), "Restart");
 
-
-/*    vram_adr(NTADR_B(3,2));
-    vram_put(' ' + 0x60);
-
-    for (i = 0; i != GAME_DATA_OFFSET_TITLE_LENGTH; ++i) {
-        if (currentGameData[GAME_DATA_OFFSET_TITLE+i] == ' ' || currentGameData[GAME_DATA_OFFSET_TITLE+i] == 0) {
-            // If all that's left is spaces, don't keep printing
-            for (j = i; j != GAME_DATA_OFFSET_TITLE_LENGTH; ++j) {
-                if (currentGameData[GAME_DATA_OFFSET_TITLE+j] != ' ' && currentGameData[GAME_DATA_OFFSET_TITLE+j] != 0) {
-                    goto keep_going;
-                }
-            }
-            break;
-        }
-        keep_going:
-        vram_put(currentGameData[GAME_DATA_OFFSET_TITLE+i] + 0x60);
-    }
-    vram_put(' ' + 0x60);
-*/
-
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
     // you will have to hide all sprites, then put them back after. 
@@ -52,6 +30,7 @@ void draw_pause_screen() {
 }
 
 void handle_pause_input() {
+    // Show a few options, and regularly update the tiles to show where the user has selected
     editorSelectedPosition = 0;
     screenBuffer[0] = MSB(NTADR_B(10, 16));
     screenBuffer[1] = LSB(NTADR_B(10, 16));

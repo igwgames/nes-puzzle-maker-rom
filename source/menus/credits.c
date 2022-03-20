@@ -1,11 +1,9 @@
 #include "source/menus/credits.h"
-#include "source/graphics/palettes.h"
 #include "source/configuration/system_constants.h"
 #include "source/globals.h"
 #include "source/neslib_asm/neslib.h"
 #include "source/configuration/game_states.h"
 #include "source/menus/text_helpers.h"
-#include "source/configuration/game_info.h"
 #include "source/map/map.h"
 
 #pragma code-name ("CODE")
@@ -70,7 +68,6 @@ void draw_win_screen() {
 
 void draw_credits_screen() {
     ppu_off();
-    // clear_screen_with_border();
     scroll(0, 0);
 
 
