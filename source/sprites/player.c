@@ -73,7 +73,6 @@ void update_player_sprite() {
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
     oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
-
 }
 
 // Updates a single tile on the map visually
@@ -173,8 +172,8 @@ void handle_player_movement() {
         playerGridPositionY = undoPlayerFromPositionsY[undoPosition];
 
         if (undoActionType[undoPosition] == TILE_COLLISION_COLLECTABLE) {
-            --playerKeyCount;
-            --gameKeys;
+            --playerCollectableCount;
+            --gameCollectableCount;
         } else if (undoActionType[undoPosition] == TILE_COLLISION_GAP) {
             --gameCrates;
             --playerCrateCount;
@@ -496,8 +495,8 @@ void handle_player_movement() {
             }
             break;
         case TILE_COLLISION_COLLECTABLE:
-            ++playerKeyCount;
-            ++gameKeys;
+            ++playerCollectableCount;
+            ++gameCollectableCount;
             set_undos_from_params();
             undoBlockFromId[undoPosition] = currentMap[rawTileId];
             currentMap[rawTileId] = currentMapOrig[rawTileId];

@@ -85,9 +85,9 @@ void update_hud() {
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
-            draw_num_to_sb(playerKeyCount);
+            draw_num_to_sb(playerCollectableCount);
             screenBuffer[i++] = '/' + 0x60;
-            draw_num_to_sb(totalKeyCount);
+            draw_num_to_sb(totalCollectableCount);
 
             break;
         case GAME_STYLE_CRATES:

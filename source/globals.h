@@ -10,8 +10,8 @@ ZEROPAGE_EXTERN(unsigned char, gameState);
 
 ZEROPAGE_EXTERN(unsigned char, i);
 ZEROPAGE_EXTERN(unsigned char, j);
-ZEROPAGE_EXTERN(unsigned char, playerKeyCount);
-ZEROPAGE_EXTERN(unsigned char, totalKeyCount);
+ZEROPAGE_EXTERN(unsigned char, playerCollectableCount);
+ZEROPAGE_EXTERN(unsigned char, totalCollectableCount);
 ZEROPAGE_EXTERN(unsigned char, playerCrateCount);
 ZEROPAGE_EXTERN(unsigned char, totalCrateCount);
 ZEROPAGE_EXTERN(unsigned char, currentLevelId);
@@ -19,7 +19,7 @@ ZEROPAGE_EXTERN(unsigned char, playerSpriteTileId);
 
 
 ZEROPAGE_EXTERN(unsigned int, gameTime);
-ZEROPAGE_EXTERN(unsigned int, gameKeys);
+ZEROPAGE_EXTERN(unsigned int, gameCollectableCount);
 ZEROPAGE_EXTERN(unsigned int, gameCrates);
 
 
@@ -81,3 +81,5 @@ ZEROPAGE_EXTERN(unsigned char, thisLevelMoves);
 
 extern const unsigned char enableUndo;
 extern const unsigned char enableLevelShow;
+
+ZEROPAGE_EXTERN(unsigned char, keyCount);

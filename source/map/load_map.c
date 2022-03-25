@@ -12,7 +12,7 @@ unsigned char palette[16];
 void update_map_replace_spriteish(void) {
     if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
         currentMapOrig[j] = 0;
-        ++totalKeyCount;
+        ++totalCollectableCount;
     } else if (tempChar1 == TILE_COLLISION_CRATE) {
         currentMapOrig[j] = 0;
     } else if (tempChar1 == TILE_COLLISION_GAP) {
@@ -25,7 +25,7 @@ void update_map_replace_spriteish(void) {
 
 // Loads the map at the player's current position into the ram variable for the map. 
 void load_map() {
-    totalKeyCount = 0;
+    totalCollectableCount = 0;
     totalCrateCount = 0;
 
     // Each map is 64 bytes in total, so find the index to start looking at

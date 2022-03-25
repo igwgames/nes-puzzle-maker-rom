@@ -8,8 +8,8 @@
 ZEROPAGE_DEF(unsigned char, i);
 ZEROPAGE_DEF(unsigned char, j);
 
-ZEROPAGE_DEF(unsigned char, playerKeyCount);
-ZEROPAGE_DEF(unsigned char, totalKeyCount);
+ZEROPAGE_DEF(unsigned char, playerCollectableCount);
+ZEROPAGE_DEF(unsigned char, totalCollectableCount);
 ZEROPAGE_DEF(unsigned char, playerCrateCount);
 ZEROPAGE_DEF(unsigned char, totalCrateCount);
 ZEROPAGE_DEF(unsigned char, gameState);
@@ -17,7 +17,7 @@ ZEROPAGE_DEF(unsigned char, currentLevelId);
 ZEROPAGE_DEF(unsigned char, playerSpriteTileId);
 
 ZEROPAGE_DEF(unsigned int, gameTime);
-ZEROPAGE_DEF(unsigned int, gameKeys);
+ZEROPAGE_DEF(unsigned int, gameCollectableCount);
 ZEROPAGE_DEF(unsigned int, gameCrates);
 
 

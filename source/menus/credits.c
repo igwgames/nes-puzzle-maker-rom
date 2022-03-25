@@ -45,7 +45,7 @@ void draw_win_screen() {
             break;
         case GAME_STYLE_COIN:
             put_str(NTADR_A(5, 22), coinsCollectedText);
-            tempInt1 = gameKeys;
+            tempInt1 = gameCollectableCount;
             break;
         case GAME_STYLE_CRATES:
             put_str(NTADR_A(5, 22), cratesRemovedText);
