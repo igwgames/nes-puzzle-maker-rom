@@ -61,5 +61,4 @@ const unsigned int bitToByte[8] = {
 ZEROPAGE_DEF(unsigned char, currentMapBorderTile);
 ZEROPAGE_DEF(unsigned char, currentMapBorderAsset);
 
-ZEROPAGE_DEF(unsigned char, thisLevelMoves);
 ZEROPAGE_DEF(unsigned char, keyCount);

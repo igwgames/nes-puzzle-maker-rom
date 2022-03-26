@@ -23,20 +23,23 @@ ZEROPAGE_DEF(signed char, animationPositionY);
 
 
 // Lots of data to handle tracking player movements, so we can let them undo them
-#define NUMBER_OF_UNDOS 25
+// NOTE: Each undo requires 9 bytes, so 50 = 450 bytes. It's kind of a lot...
+#define NUMBER_OF_UNDOS 50u
 ZEROPAGE_DEF(unsigned char, undoPosition);
-unsigned char undoPlayerFromPositionsX[25];
-unsigned char undoPlayerFromPositionsY[25];
-unsigned char undoBlockFromPositionsX[25];
-unsigned char undoBlockToPositionsX[25];
-unsigned char undoBlockFromPositionsY[25];
-unsigned char undoBlockToPositionsY[25];
-unsigned char undoBlockFromId[25];
-unsigned char undoBlockToId[25];
-unsigned char undoActionType[25];
+unsigned char undoPlayerFromPositionsX[NUMBER_OF_UNDOS];
+unsigned char undoPlayerFromPositionsY[NUMBER_OF_UNDOS];
+unsigned char undoBlockFromPositionsX[NUMBER_OF_UNDOS];
+unsigned char undoBlockToPositionsX[NUMBER_OF_UNDOS];
+unsigned char undoBlockFromPositionsY[NUMBER_OF_UNDOS];
+unsigned char undoBlockToPositionsY[NUMBER_OF_UNDOS];
+unsigned char undoBlockFromId[NUMBER_OF_UNDOS];
+unsigned char undoBlockToId[NUMBER_OF_UNDOS];
+unsigned char undoActionType[NUMBER_OF_UNDOS];
 
 ZEROPAGE_DEF(unsigned char, currentCollision);
 ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
+ZEROPAGE_DEF(unsigned char, currentUndoAction);
+ZEROPAGE_DEF(unsigned char, playerDidMove);
 
 
 // Huge pile of temporary variables
@@ -51,6 +54,12 @@ ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
 
 
 #define collisionTempValue tempInt1
+
+void clear_undo(void) {
+    for (i = 0; i != NUMBER_OF_UNDOS; ++i) {
+        undoActionType[i] = 255;
+    }
+}
 
 // Code here goes in PRG instead. because space is hard
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
@@ -144,11 +153,6 @@ void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile,
 
 // Set up the undo array from the current parameters. Some things will have to be overridden.
 void set_undos_from_params(void) {
-    ++thisLevelMoves;
-    ++undoPosition;
-    if (undoPosition > NUMBER_OF_UNDOS) {
-        undoPosition = 0;
-    }
     undoPlayerFromPositionsX[undoPosition] = playerGridPositionX;
     undoPlayerFromPositionsY[undoPosition] = playerGridPositionY;
     undoBlockFromId[undoPosition] = 255;
@@ -166,23 +170,31 @@ void handle_player_movement() {
         gameState = GAME_STATE_PAUSED;
         return;
     }
+    
+    // tempoarily track the position we'd undo, if the user were to ask
+    tempChar1 = undoPosition - 1;
+    if (tempChar1 == 255) {
+        tempChar1 = (NUMBER_OF_UNDOS - 1);
+    }
 
-    if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B) && undoActionType[undoPosition] != 255) {
-        if (thisLevelMoves == 0) { return; }
+    if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B) && tempChar1 != (NUMBER_OF_UNDOS - 1) && undoActionType[tempChar1] != 255) {
+        undo_again:
         // UNDO!!
+        undoPosition = tempChar1;
+        currentUndoAction = undoActionType[undoPosition];
         
         playerGridPositionX = undoPlayerFromPositionsX[undoPosition];
         playerGridPositionY = undoPlayerFromPositionsY[undoPosition];
 
-        if (undoActionType[undoPosition] == TILE_COLLISION_COLLECTABLE) {
+        if (currentUndoAction == TILE_COLLISION_COLLECTABLE) {
             --playerCollectableCount;
             --gameCollectableCount;
-        } else if (undoActionType[undoPosition] == TILE_COLLISION_GAP) {
+        } else if (currentUndoAction == TILE_COLLISION_GAP) {
             --gameCrates;
             --playerCrateCount;
-        } else if (undoActionType[undoPosition] == TILE_COLLISION_KEY) {
+        } else if (currentUndoAction == TILE_COLLISION_KEY) {
             --keyCount;
-        } else if (undoActionType[undoPosition] == TILE_COLLISION_LOCK) {
+        } else if (currentUndoAction == TILE_COLLISION_LOCK) {
             ++keyCount;
         }
 
@@ -204,13 +216,20 @@ void handle_player_movement() {
         }
         
         undoActionType[undoPosition] = 255;
-        --thisLevelMoves;
-        --undoPosition;
-        if (undoPosition == 255) { undoPosition = (NUMBER_OF_UNDOS - 1); }
+        
+        tempChar1 = undoPosition - 1;
+        if (tempChar1 == 255) {
+            tempChar1 = (NUMBER_OF_UNDOS - 1);
+        }
+        if (undoActionType[tempChar1] == TILE_COLLISION_ICE && tempChar1 != 0) {
+            goto undo_again;
+        }
+        
         update_hud();
         return;
     }
     
+    shouldKeepMoving = 0;
     go_again:
     nextPlayerGridPositionX = playerGridPositionX;
     nextPlayerGridPositionY = playerGridPositionY;
@@ -255,7 +274,12 @@ void handle_player_movement() {
     }
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
     currentCollision = tileCollisionTypes[currentMap[rawTileId]];
-    shouldKeepMoving = 0;
+
+    if (currentCollision == TILE_COLLISION_ICE) {
+        ++shouldKeepMoving;
+    } else {
+        shouldKeepMoving = 0;
+    }
 
     switch (currentCollision) {
         // Ids are multiplied by 4, which is their index 
@@ -265,8 +289,8 @@ void handle_player_movement() {
             set_undos_from_params();
             break;
         case TILE_COLLISION_ICE:
-            shouldKeepMoving = 1;
             set_undos_from_params();
+            undoActionType[undoPosition] = TILE_COLLISION_ICE;
             break;
         case TILE_COLLISION_GAP:
         case TILE_COLLISION_SOLID: // Solid 1
@@ -282,7 +306,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+1]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
@@ -340,7 +364,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-1]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
@@ -395,7 +419,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-12]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
@@ -451,7 +475,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+12]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
@@ -585,18 +609,22 @@ void handle_player_movement() {
             break;
     }
 
+    // Track whether we should actually try to move
+    playerDidMove = 0;
     if (playerGridPositionX > nextPlayerGridPositionX) {
         for (i = 0; i < 8; ++i) {
             animationPositionX = 0 - (i<<1);
             update_player_sprite();
             delay(movementSpeed);
         }
+        playerDidMove = 1;
     } else if (playerGridPositionX < nextPlayerGridPositionX) {
         for (i = 0; i < 8; ++i) {
             animationPositionX = (i<<1);
             update_player_sprite();
             delay(movementSpeed);
         }
+        playerDidMove = 1;
     }
 
     if (playerGridPositionY > nextPlayerGridPositionY) {
@@ -605,6 +633,7 @@ void handle_player_movement() {
             update_player_sprite();
             delay(movementSpeed);
         }
+        playerDidMove = 1;
 
     } else if (playerGridPositionY < nextPlayerGridPositionY) {
         for (i = 0; i < 8; ++i) {
@@ -612,12 +641,20 @@ void handle_player_movement() {
             update_player_sprite();
             delay(movementSpeed);
         }
+        playerDidMove = 1;
     }
+
     update_player_sprite();
     animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
-    if (shouldKeepMoving) {
-        goto go_again;
+
+    if (playerDidMove) { 
+        ++undoPosition;
+        if (undoPosition == (NUMBER_OF_UNDOS)) { undoPosition = 0; }
+        if (shouldKeepMoving) {
+            goto go_again;
+        }
     }
+
 }
 

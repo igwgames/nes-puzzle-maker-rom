@@ -17,6 +17,7 @@ ZEROPAGE_EXTERN(unsigned char, playerGridPositionY);
 // Used to animate the player's movement between tiles
 ZEROPAGE_EXTERN(signed char, animationPositionX);
 ZEROPAGE_EXTERN(signed char, animationPositionY);
+ZEROPAGE_EXTERN(unsigned char, undoPosition);
 
 
 // Helper macro to convert the player's X and Y position into a position on the map
@@ -27,3 +28,6 @@ void handle_player_movement();
 
 // Update the player's sprite, and put it onto the screen as necessary
 void update_player_sprite();
+
+// Wipe the undo list
+void clear_undo(void);

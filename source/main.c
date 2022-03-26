@@ -108,8 +108,9 @@ void main() {
             case GAME_STATE_LOAD_LEVEL_1: // Used to start music in the case above.
                 playerCollectableCount = 0;
                 playerCrateCount = 0;
-                thisLevelMoves = 0;
+                undoPosition = 0;
                 keyCount = 0;
+                clear_undo();
                 fade_out();
                 oam_clear();
 
