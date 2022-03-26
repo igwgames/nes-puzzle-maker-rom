@@ -21,7 +21,7 @@ ZEROPAGE_DEF(unsigned int, gameCollectableCount);
 ZEROPAGE_DEF(unsigned int, gameCrates);
 
 
-ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x30);
+ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x50);
 
 ZEROPAGE_DEF(unsigned char, everyOtherCycle);
 
@@ -62,3 +62,4 @@ ZEROPAGE_DEF(unsigned char, currentMapBorderTile);
 ZEROPAGE_DEF(unsigned char, currentMapBorderAsset);
 
 ZEROPAGE_DEF(unsigned char, thisLevelMoves);
+ZEROPAGE_DEF(unsigned char, keyCount);

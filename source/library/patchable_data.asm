@@ -28,7 +28,7 @@ _gameLevelData:; 128 (4096 total, res for rest)
     .byte $01, $21, $45, $00, $12, $21
     .byte $01, $21, $00, $00, $12, $21
 
-    .byte $00, $00, $00, $00, $00, $00
+    .byte $00, $00, $00, $00, $a9, $00
     .byte $01, $21, $50, $45, $12, $21
     .byte $01, $21, $45, $40, $12, $21
     .byte $01, $22, $17, $11, $22, $21
@@ -79,7 +79,7 @@ _gameLevelData:; 128 (4096 total, res for rest)
 
 _tileCollisionTypes:
     .byte $00, $00, $01, $01, $04, $03, $05, $07
-    .byte $00, $00, $00, $00, $00, $00, $00, $00
+    .byte $0a, $08, $09, $00, $00, $00, $00, $00
 .export _tileCollisionTypes: absolute
 
 _tilePalettes:
@@ -245,5 +245,9 @@ _enableUndo:
 .export _enableUndo
 
 _enableLevelShow:
-    .byte 0
+    .byte 1
 .export _enableLevelShow
+
+_enableKeyCount:
+    .byte 1
+.export _enableKeyCount

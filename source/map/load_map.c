@@ -13,7 +13,7 @@ void update_map_replace_spriteish(void) {
     if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
         currentMapOrig[j] = 0;
         ++totalCollectableCount;
-    } else if (tempChar1 == TILE_COLLISION_CRATE) {
+    } else if (tempChar1 == TILE_COLLISION_CRATE || tempChar1 == TILE_COLLISION_LOCK || tempChar1 == TILE_COLLISION_KEY) {
         currentMapOrig[j] = 0;
     } else if (tempChar1 == TILE_COLLISION_GAP) {
         currentMapOrig[j] = 0;

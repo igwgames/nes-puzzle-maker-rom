@@ -81,5 +81,6 @@ ZEROPAGE_EXTERN(unsigned char, thisLevelMoves);
 
 extern const unsigned char enableUndo;
 extern const unsigned char enableLevelShow;
+extern const unsigned char enableKeyCount;
 
 ZEROPAGE_EXTERN(unsigned char, keyCount);

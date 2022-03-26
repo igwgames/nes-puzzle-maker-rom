@@ -109,6 +109,7 @@ void main() {
                 playerCollectableCount = 0;
                 playerCrateCount = 0;
                 thisLevelMoves = 0;
+                keyCount = 0;
                 fade_out();
                 oam_clear();
 

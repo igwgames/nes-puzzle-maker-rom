@@ -35,6 +35,8 @@ unsigned char undoBlockFromId[25];
 unsigned char undoBlockToId[25];
 unsigned char undoActionType[25];
 
+ZEROPAGE_DEF(unsigned char, currentCollision)
+
 
 // Huge pile of temporary variables
 #define rawXPosition tempChar1
@@ -177,6 +179,10 @@ void handle_player_movement() {
         } else if (undoActionType[undoPosition] == TILE_COLLISION_GAP) {
             --gameCrates;
             --playerCrateCount;
+        } else if (undoActionType[undoPosition] == TILE_COLLISION_KEY) {
+            --keyCount;
+        } else if (undoActionType[undoPosition] == TILE_COLLISION_LOCK) {
+            ++keyCount;
         }
 
         sfx_play(SFX_HURT, SFX_CHANNEL_1);
@@ -246,8 +252,9 @@ void handle_player_movement() {
         return; 
     }
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
+    currentCollision = tileCollisionTypes[currentMap[rawTileId]];
 
-    switch (tileCollisionTypes[currentMap[rawTileId]]) {
+    switch (currentCollision) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
@@ -495,18 +502,39 @@ void handle_player_movement() {
             }
             break;
         case TILE_COLLISION_COLLECTABLE:
-            ++playerCollectableCount;
-            ++gameCollectableCount;
+        case TILE_COLLISION_KEY:
+            if (currentCollision == TILE_COLLISION_COLLECTABLE) {
+                ++playerCollectableCount;
+                ++gameCollectableCount;
+            } else {
+                ++keyCount;
+            }
             set_undos_from_params();
             undoBlockFromId[undoPosition] = currentMap[rawTileId];
             currentMap[rawTileId] = currentMapOrig[rawTileId];
             undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
             undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
-            undoActionType[undoPosition] = TILE_COLLISION_COLLECTABLE;
+            undoActionType[undoPosition] = currentCollision;
 
             update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
             update_hud();
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
+            break;
+        case TILE_COLLISION_LOCK:
+            if (keyCount == 0) {
+                nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
+            } else {
+                --keyCount;
+                set_undos_from_params();
+                undoBlockFromId[undoPosition] = currentMap[rawTileId];
+                currentMap[rawTileId] = currentMapOrig[rawTileId];
+                undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
+                undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
+                undoActionType[undoPosition] = currentCollision;
+                update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
+                update_hud();
+                sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
+            }
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
             collisionTempTileId = 0;
