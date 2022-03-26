@@ -35,7 +35,8 @@ unsigned char undoBlockFromId[25];
 unsigned char undoBlockToId[25];
 unsigned char undoActionType[25];
 
-ZEROPAGE_DEF(unsigned char, currentCollision)
+ZEROPAGE_DEF(unsigned char, currentCollision);
+ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
 
 
 // Huge pile of temporary variables
@@ -210,6 +211,7 @@ void handle_player_movement() {
         return;
     }
     
+    go_again:
     nextPlayerGridPositionX = playerGridPositionX;
     nextPlayerGridPositionY = playerGridPositionY;
 
@@ -253,12 +255,17 @@ void handle_player_movement() {
     }
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
     currentCollision = tileCollisionTypes[currentMap[rawTileId]];
+    shouldKeepMoving = 0;
 
     switch (currentCollision) {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_UNUSED:
             // Walkable.. Go !
+            set_undos_from_params();
+            break;
+        case TILE_COLLISION_ICE:
+            shouldKeepMoving = 1;
             set_undos_from_params();
             break;
         case TILE_COLLISION_GAP:
@@ -609,6 +616,8 @@ void handle_player_movement() {
     update_player_sprite();
     animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
-
+    if (shouldKeepMoving) {
+        goto go_again;
+    }
 }
 

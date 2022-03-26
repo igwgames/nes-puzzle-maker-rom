@@ -47,11 +47,7 @@ void draw_hud() {
     }
     if (enableKeyCount) {
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 0x62);
-        vram_put('K' + 0x60);
-        vram_put('e' + 0x60);
-        vram_put('y' + 0x60);
-        vram_put('s' + 0x60);
-        vram_put(':' + 0x60);
+        vram_put(0xf8);
     }
 }
 
@@ -139,8 +135,8 @@ void update_hud() {
         draw_num_to_sb(totalGameLevels);
     }
     if (enableKeyCount) {
-        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x69) | NT_UPD_HORZ;
-        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x69);
+        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x63) | NT_UPD_HORZ;
+        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x63);
         screenBuffer[i++] = 2;
         draw_num_to_sb(keyCount);
 

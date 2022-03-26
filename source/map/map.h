@@ -30,6 +30,7 @@ void draw_current_map_to_a_inline();
 #define TILE_COLLISION_LEVEL_END 7
 #define TILE_COLLISION_LOCK 8
 #define TILE_COLLISION_KEY 9
+#define TILE_COLLISION_ICE 0xa
 
 extern const unsigned char gameName[];
 extern const unsigned char tileCollisionTypes[];

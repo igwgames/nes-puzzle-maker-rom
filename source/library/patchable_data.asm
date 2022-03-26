@@ -22,13 +22,13 @@ _totalGameLevels:
 
 _gameLevelData:; 128 (4096 total, res for rest)
     
-    .byte $01, $11, $11, $11, $11, $11
-    .byte $01, $22, $22, $22, $22, $21
-    .byte $01, $21, $06, $00, $12, $21
+    .byte $01, $99, $99, $99, $99, $99
+    .byte $01, $22, $22, $22, $22, $28
+    .byte $01, $21, $06, $00, $12, $28
     .byte $01, $21, $45, $00, $12, $21
     .byte $01, $21, $00, $00, $12, $21
 
-    .byte $00, $00, $00, $00, $a9, $00
+    .byte $00, $00, $00, $00, $cb, $00
     .byte $01, $21, $50, $45, $12, $21
     .byte $01, $21, $45, $40, $12, $21
     .byte $01, $22, $17, $11, $22, $21
@@ -79,12 +79,12 @@ _gameLevelData:; 128 (4096 total, res for rest)
 
 _tileCollisionTypes:
     .byte $00, $00, $01, $01, $04, $03, $05, $07
-    .byte $0a, $08, $09, $00, $00, $00, $00, $00
+    .byte $00, $0a, $00, $08, $09, $00, $00, $00
 .export _tileCollisionTypes: absolute
 
 _tilePalettes:
     .byte $00, $01, $02, $03, $00, $01, $02, $03
-    .byte $00, $01, $02, $03, $00, $01, $02, $03
+    .byte $01, $01, $02, $03, $00, $01, $02, $03
 .export _tilePalettes: absolute
 
 _titleScreenData:
