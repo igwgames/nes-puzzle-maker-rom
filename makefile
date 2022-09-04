@@ -109,7 +109,7 @@ rom/$(ROM_NAME).nes: temp/crt0.o $(SOURCE_O)
 	$(MAIN_LINKER) -C $(CONFIG_FILE) -o rom/$(ROM_NAME).nes temp/*.o tools/cc65/lib/nes.lib  --dbgfile rom/$(ROM_NAME).dbg
 
 s3_upload:
-	mc cp ./rom/puzzle.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v4-1.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v4-1.nes
+	mc cp ./rom/puzzle.nes  s3/cpprograms-nes-games-https/retro-puzzle-maker-v5-1.nes && mc policy public s3/cpprograms-nes-games-https/retro-puzzle-maker-v5-1.nes
 
 clean:
 	-rm -f rom/*.nes
