@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build_rom:
     runs-on: ubuntu-latest
-    container: cppchriscpp/create-nes-game:1.0.4
+    container: cppchriscpp/create-nes-game:v1.0.4
 
     name: Compile rom
     steps:
