@@ -1,4 +1,6 @@
 #include "source/c/menus/intro.h"
+#include "source/c/mapper.h"
+#include "source/c/library/user_data.h"
 #include "source/c/configuration/system_constants.h"
 #include "source/c/globals.h"
 #include "source/c/neslib.h"
@@ -20,21 +22,17 @@
 
 // Load the intro screen from user data
 void draw_intro_screen() {
+    unrom_set_prg_bank(BANK_USER_DATA);
     ppu_off();
     scroll(0, 0);
 
 
     vram_adr(0x2000);
-    vram_write(&introScreenData[0], 0x400);
+    vram_write((unsigned char*)&user_introScreenData[0], 0x400);
 
 
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),
     // you will have to hide all sprites, then put them back after. 
     ppu_on_bg();
-}
-
-void handle_intro_input() {
-    wait_for_start();
-
 }

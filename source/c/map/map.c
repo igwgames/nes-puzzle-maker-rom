@@ -1,6 +1,7 @@
 #include "source/c/map/map.h"
 #include "source/c/map/load_map.h"
 #include "source/c/neslib.h"
+#include "source/c/library/user_data.h"
 #include "source/c/library/bank_helpers.h"
 #include "source/c/configuration/game_states.h"
 #include "source/c/globals.h"
@@ -9,8 +10,8 @@
 #include "source/c/graphics/fade_animation.h"
 #include "source/c/sprites/player.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
+#pragma code-name ("PLAYER")
+#pragma rodata-name ("PLAYER")
 
 unsigned char currentMap[120];
 unsigned char currentMapOrig[120];
@@ -39,25 +40,6 @@ void clear_asset_table() {
     for (i = 0; i != sizeof(assetTable); ++i) {
         assetTable[i] = currentMapBorderAsset;
     }
-}
-
-// Loads the assets from assetTable (for the row *ending* with j) into mapScreenBuffer
-// at tempArrayIndex. 
-void load_palette_to_map_screen_buffer(int attributeTableAdr) {
-    mapScreenBuffer[tempArrayIndex++] = MSB(attributeTableAdr + j - 7) | NT_UPD_HORZ;
-    mapScreenBuffer[tempArrayIndex++] = LSB(attributeTableAdr + j - 7);
-    mapScreenBuffer[tempArrayIndex++] = 8;
-
-    // Using an unrolled loop to save a bit of RAM - not like we need it really.
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-7];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-6];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-5];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-4];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-3];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-2];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j-1];
-    mapScreenBuffer[tempArrayIndex++] = assetTable[j];
-    mapScreenBuffer[tempArrayIndex++] = NT_UPD_EOF;
 }
 
 // This is an ascii space

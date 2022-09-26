@@ -6,21 +6,21 @@
 
 ; Also note, if you want to patch in a game from the editor, check out "game.json" in the 
 
-.align 16
+.segment "USER_DATA"
 
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
-.asciiz "PATCH TARGET 1.00" ; 0x12
+.asciiz "PATCH TARGET 1.01" ; 0x12
 
 ; These are imported in map.h for the most part
-_gameName:
+_user_gameName:
     .asciiz "     Retro Puzzle Maker     " ; 1c
-.export _gameName: absolute
+.export _user_gameName: absolute
 
-_totalGameLevels: 
+_user_totalGameLevels: 
     .byte 1 ;1
-.export _totalGameLevels: absolute
+.export _user_totalGameLevels: absolute
 
-_gameLevelData:; 128 (4096 total, res for rest)
+_user_gameLevelData:; 128 (4096 total, res for rest)
     
     .byte $01, $99, $99, $99, $99, $99
     .byte $01, $22, $22, $22, $22, $28
@@ -75,19 +75,19 @@ _gameLevelData:; 128 (4096 total, res for rest)
 .res $f80
 
 
-.export _gameLevelData: absolute
+.export _user_gameLevelData: absolute
 
-_tileCollisionTypes:
+_user_tileCollisionTypes:
     .byte $00, $00, $01, $01, $04, $03, $05, $07
     .byte $00, $0a, $00, $08, $09, $00, $00, $00
-.export _tileCollisionTypes: absolute
+.export _user_tileCollisionTypes: absolute
 
-_tilePalettes:
+_user_tilePalettes:
     .byte $00, $01, $02, $03, $00, $01, $02, $03
     .byte $01, $01, $02, $03, $00, $01, $02, $03
-.export _tilePalettes: absolute
+.export _user_tilePalettes: absolute
 
-_titleScreenData:
+_user_titleScreenData:
     .byte $12, $12, $12, $12, $12, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -123,9 +123,9 @@ _titleScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 
-.export _titleScreenData: absolute
+.export _user_titleScreenData: absolute
 
-_introScreenData:
+_user_introScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -160,10 +160,10 @@ _introScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
-.export _introScreenData: absolute
+.export _user_introScreenData: absolute
 
 
-_creditsScreenData:
+_user_creditsScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -198,56 +198,56 @@ _creditsScreenData:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
-.export _creditsScreenData: absolute
+.export _user_creditsScreenData: absolute
 
-_gamePaletteData:
+_user_gamePaletteData:
     .byte $0f, $0a, $19, $2a, $0f, $11, $21, $31, $0f, $16, $28, $2a, $0f, $10, $20, $30
-.export _gamePaletteData: absolute
+.export _user_gamePaletteData: absolute
 
-_spritePalette: 
+_user_spritePalette: 
     .byte $0f, $01, $21, $31
-.export _spritePalette
+.export _user_spritePalette
 
-_introScreenEnabled:
+_user_introScreenEnabled:
     .byte $00
-.export _introScreenEnabled: absolute
+.export _user_introScreenEnabled: absolute
 
-_singleLevelOverride:
+_user_singleLevelOverride:
     .byte $ff
-.export _singleLevelOverride: absolute
+.export _user_singleLevelOverride: absolute
 
-_titleSong:
+_user_titleSong:
     .byte $00
-.export _titleSong :absolute
+.export _user_titleSong :absolute
 
-_gameplaySong:
+_user_gameplaySong:
     .byte $03
-.export _gameplaySong: absolute
+.export _user_gameplaySong: absolute
 
-_creditsSong:
+_user_creditsSong:
     .byte 1
-.export _creditsSong
+.export _user_creditsSong
 
-_movementSpeed:
+_user_movementSpeed:
     .byte 2
-.export _movementSpeed
+.export _user_movementSpeed
 
-_coinsCollectedText: 
+_user_coinsCollectedText: 
     .asciiz "Coins collected:   "
-.export _coinsCollectedText
+.export _user_coinsCollectedText
 
-_cratesRemovedText: 
+_user_cratesRemovedText: 
     .asciiz "Crates Removed:    "
-.export _cratesRemovedText
+.export _user_cratesRemovedText
 
-_enableUndo:
+_user_enableUndo:
     .byte 1
-.export _enableUndo
+.export _user_enableUndo
 
-_enableLevelShow:
+_user_enableLevelShow:
     .byte 1
-.export _enableLevelShow
+.export _user_enableLevelShow
 
-_enableKeyCount:
+_user_enableKeyCount:
     .byte 1
-.export _enableKeyCount
+.export _user_enableKeyCount

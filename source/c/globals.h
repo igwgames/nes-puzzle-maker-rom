@@ -67,18 +67,4 @@ extern const unsigned int bitToByte[8];
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderTile);
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderAsset);
 
-extern const unsigned char gamePaletteData[16];
-extern const unsigned char spritePalette[4];
-
-extern const unsigned char titleSong;
-extern const unsigned char gameplaySong;
-extern const unsigned char creditsSong;
-extern const unsigned char movementSpeed;
-extern const unsigned char coinsCollectedText[];
-extern const unsigned char cratesRemovedText[];
-
-extern const unsigned char enableUndo;
-extern const unsigned char enableLevelShow;
-extern const unsigned char enableKeyCount;
-
 ZEROPAGE_EXTERN(unsigned char, keyCount);

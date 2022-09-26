@@ -1,6 +1,7 @@
 #include "source/c/neslib.h"
 #include "source/c/sprites/player.h"
 #include "source/c/library/bank_helpers.h"
+#include "source/c/library/user_data.h"
 #include "source/c/globals.h"
 #include "source/c/map/map.h"
 #include "source/c/configuration/game_states.h"
@@ -8,6 +9,9 @@
 #include "source/c/graphics/hud.h"
 #include "source/c/map/load_map.h"
 #include "source/c/map/map.h"
+
+#pragma code-name ("PLAYER")
+#pragma rodata-name ("PLAYER")
 
 // Some useful global variables
 ZEROPAGE_DEF(unsigned char, playerGridPositionX);

@@ -32,14 +32,6 @@ void draw_current_map_to_a_inline();
 #define TILE_COLLISION_KEY 9
 #define TILE_COLLISION_ICE 0xa
 
-extern const unsigned char gameName[];
-extern const unsigned char tileCollisionTypes[];
-extern const unsigned char tilePalettes[];
-
-extern const unsigned char gameLevelData[];
-extern const unsigned char totalGameLevels;
-extern const unsigned char singleLevelOverride;
-
 // Simplest style - just get to the end of each level.
 #define GAME_STYLE_MAZE 0
 #define GAME_STYLE_CRATES 1

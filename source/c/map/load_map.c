@@ -1,12 +1,16 @@
 #include "source/c/configuration/system_constants.h"
 #include "source/c/neslib.h"
+#include "source/c/mapper.h"
 #include "source/c/library/bank_helpers.h"
+#include "source/c/library/user_data.h"
 #include "source/c/map/map.h"
 #include "source/c/globals.h"
 #include "source/c/map/map.h"
 #include "source/c/sprites/player.h"
 
 unsigned char palette[16];
+
+// NOTE: This is in the kernel since it loads from patchable_data
 
 // Replace any "sprite-ish" things, so that when we move them they don't duplicate
 void update_map_replace_spriteish(void) {
@@ -25,6 +29,8 @@ void update_map_replace_spriteish(void) {
 
 // Loads the map at the player's current position into the ram variable for the map. 
 void load_map() {
+    // WARNING: Does not clean up after itself
+    unrom_set_prg_bank(BANK_USER_DATA);
     totalCollectableCount = 0;
     totalCrateCount = 0;
 
@@ -32,7 +38,7 @@ void load_map() {
     tempInt1 = currentLevelId << 6;
 
     // Pull data out of the data we have available (see patchable_data.asm for where this comes from)
-    currentMapBorderTile = gameLevelData[60 + tempInt1];
+    currentMapBorderTile = user_gameLevelData[60 + tempInt1];
     currentMapBorderAsset = tilePalettes[currentMapBorderTile];
     currentMapBorderAsset += (currentMapBorderAsset << 2);
     currentMapBorderAsset += (currentMapBorderAsset << 4);
@@ -50,19 +56,19 @@ void load_map() {
     // in assembly, the left tile is 0xN_ and the right is 0x_N.
     for (i = 0, j = 0; i != 60; ++i) {
         j = i<<1;
-        currentMap[j] = (gameLevelData[i + tempInt1] & 0xf0) >> 4;
+        currentMap[j] = (user_gameLevelData[i + tempInt1] & 0xf0) >> 4;
 
         tempChar1 = tileCollisionTypes[currentMap[j]];
         update_map_replace_spriteish();
 
         ++j;
-        currentMap[j] = (gameLevelData[i + tempInt1] & 0x0f);
+        currentMap[j] = (user_gameLevelData[i + tempInt1] & 0x0f);
 
         tempChar1 = tileCollisionTypes[currentMap[j]];
         update_map_replace_spriteish();
     }
-    playerGridPositionX = gameLevelData[tempInt1 + 62] & 0x0f;
-    playerGridPositionY = gameLevelData[tempInt1 + 62] >> 4;
-    currentGameStyle = gameLevelData[tempInt1 + 61];
+    playerGridPositionX = user_gameLevelData[tempInt1 + 62] & 0x0f;
+    playerGridPositionY = user_gameLevelData[tempInt1 + 62] >> 4;
+    currentGameStyle = user_gameLevelData[tempInt1 + 61];
 
 }

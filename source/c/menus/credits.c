@@ -1,13 +1,17 @@
 #include "source/c/menus/credits.h"
+#include "source/c/mapper.h"
+#include "source/c/library/user_data.h"
 #include "source/c/configuration/system_constants.h"
 #include "source/c/globals.h"
 #include "source/c/neslib.h"
 #include "source/c/configuration/game_states.h"
 #include "source/c/menus/text_helpers.h"
 #include "source/c/map/map.h"
+#include "source/c/graphics/fade_animation.h"
+#include "source/c/menus/input_helpers.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
+#pragma code-name ("MENUS")
+#pragma rodata-name ("MENUS")
 
 void draw_win_screen() {
     ppu_off();
@@ -44,11 +48,13 @@ void draw_win_screen() {
             tempChar1 = 1;
             break;
         case GAME_STYLE_COIN:
-            put_str(NTADR_A(5, 22), coinsCollectedText);
+            load_coinsCollectedText_to_buffer(BANK_MENUS);
+            put_str(NTADR_A(5, 22), userDataBuffer);
             tempInt1 = gameCollectableCount;
             break;
         case GAME_STYLE_CRATES:
-            put_str(NTADR_A(5, 22), cratesRemovedText);
+            load_cratesRemovedText_to_buffer(BANK_MENUS);
+            put_str(NTADR_A(5, 22), userDataBuffer);
             tempInt1 = gameCrates;
             break;
     }
@@ -64,17 +70,37 @@ void draw_win_screen() {
     oam_clear();
     ppu_on_all();
 
+    fade_in();
+    // unrom_set_prg_bank(BANK_MENUS);
+    wait_for_start();
+    fade_out();
+
 }
 
+void load_credits_user_data();
 void draw_credits_screen() {
     ppu_off();
     scroll(0, 0);
 
 
     vram_adr(0x2000);
-    vram_write(&creditsScreenData[0], 0x400);
+    load_credits_user_data();
 
     // Hide all existing sprites
     oam_clear();
     ppu_on_all();
+
+    fade_in();
+    wait_for_start();
+    fade_out();
 }
+
+#pragma code-name ("CODE")
+#pragma rodata-name ("CODE")
+
+void load_credits_user_data() {
+    unrom_set_prg_bank(BANK_USER_DATA);
+    vram_write((unsigned char*)&(user_creditsScreenData[0]), 0x400);
+    unrom_set_prg_bank(BANK_MENUS);
+}
+

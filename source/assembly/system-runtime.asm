@@ -11,6 +11,7 @@
 
 ; System defines for various registers on the console
 .include "./system-defines.asm"
+.include "./mapper.asm"
 
 ;
 ; iNES header
@@ -20,13 +21,13 @@
 ;
 .segment "HEADER"
 
-    INES_MAPPER = 0 ; 0 = nrom
+    INES_MAPPER = 2 ; 2 = unrom
     INES_MIRROR = 1 ; 0 = horizontal mirroring, 1 = vertical mirroring
     INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
 
     .byte 'N', 'E', 'S', $1A ; ID
-    .byte 2 ; 16k PRG chunk count
-    .byte 1 ; 8k CHR chunk count
+    .byte 8 ; 16k PRG chunk count
+    .byte 0 ; 8k CHR chunk count
     .byte INES_MIRROR | (INES_SRAM << 1) | ((INES_MAPPER & $f) << 4)
     .byte (INES_MAPPER & %11110000)
     .byte $0, $0, $0, $0, $0, $0, $0, $0 ; padding
@@ -184,6 +185,9 @@
 
         jsr initlib
 
+        ; Do any initialization the mapper needs
+        jsr initialize_mapper
+
         ; Initialize our library
         jsr initialize_library
         ; The main() function in your C
@@ -301,6 +305,7 @@ sounds_data:
 
 .segment "DMC"
 
-.if(FT_DPCM_ENABLE)
-    .incbin "../../sound/samples.bin"
-.endif
+.byte 0
+;.if(FT_DPCM_ENABLE)
+;    .incbin "../../sound/samples.bin"
+;.endif

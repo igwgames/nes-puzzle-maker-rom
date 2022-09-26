@@ -2,6 +2,9 @@
 #include "source/c/menus/text_helpers.h"
 #include "source/c/globals.h"
 
+#pragma code-name ("MENUS")
+#pragma rodata-name ("MENUS")
+
 // Rather than have a full ASCII table, we skip the first 32 characters so we have a little room for extra 
 // data later in the bank. We have to subtract this constantly though, so we made a constant.
 #define TEXT_ASCII_SKIPPED_CHARACTERS 0x60

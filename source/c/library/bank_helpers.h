@@ -52,9 +52,3 @@
 #define SRAM_ARRAY_EXTERN(defa, defb, defArr) extern defa defb[defArr];
 #define WRAM_EXTERN(defa, defb) extern defa defb;
 #define WRAM_ARRAY_EXTERN(defa, defb, defArr) extern defa defb[defArr];
-
-// Set the PRG bank to put the code in the current file into.
-#define CODE_BANK(id) _Pragma("rodataseg (push, \"ROM_0" STR(id) "\")") _Pragma("codeseg (push, \"ROM_0" STR(id) "\")")
-
-// Reverse the actions of the CODE_BANK function, if you need to go back to the default bank.
-#define CODE_BANK_POP() _Pragma("rodataseg (pop)") _Pragma("codeseg (pop)")

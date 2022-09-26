@@ -1,11 +1,13 @@
 #include "source/c/neslib.h"
+#include "source/c/mapper.h"
+#include "source/c/library/user_data.h"
 #include "source/c/graphics/hud.h"
 #include "source/c/map/map.h"
 #include "source/c/menus/text_helpers.h"
 #include "source/c/globals.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
+#pragma code-name ("PLAYER")
+#pragma rodata-name ("PLAYER")
 
 ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
@@ -33,8 +35,9 @@ void draw_hud() {
     set_vram_update(NULL);
 
     vram_adr(NAMETABLE_A + HUD_POSITION_START + 0x22);
+    load_gamename_to_buffer(BANK_PLAYER);
     for (i = 0; i != 0x1c; ++i) {
-        vram_put(gameName[i] + 0x60);
+        vram_put(userDataBuffer[i] + 0x60);
     }
     if (enableLevelShow) {
         vram_adr(NAMETABLE_A + HUD_POSITION_START + 0x82);

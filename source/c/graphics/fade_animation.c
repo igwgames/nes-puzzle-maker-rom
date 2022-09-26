@@ -33,18 +33,6 @@ void fade_out_instant() {
     pal_bright(0);
 }
 
-void fade_in_slow() {
-    _fade_in(5);
-}
-
-void fade_out_slow() {
-    _fade_out(5);
-}
-
 void fade_in_fast() {
     _fade_in(1);
-}
-
-void fade_out_fast() {
-    _fade_out(1);
 }

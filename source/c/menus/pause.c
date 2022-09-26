@@ -6,8 +6,8 @@
 #include "source/c/menus/text_helpers.h"
 #include "source/c/menus/input_helpers.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("CODE")
+#pragma code-name ("MENUS")
+#pragma rodata-name ("MENUS")
 
 unsigned char editorSelectedPosition;
 

@@ -16,13 +16,29 @@
 ;
 ;
 
-.segment "CHR_00"
-    
+.segment "GRAPHICS" 
     _background_graphics:
+        .incbin "./tiles_mod.chr"
     _sprite_graphics:
+        ; NOTE: This is here to help romhackers who might like to have another one :)
+        ; Or some day I may add official support.
         .incbin "./tiles_mod.chr"
 ;
 ; Make sure to export all symbols created, too, so we can read them from our code!
 ;
 .export _background_graphics
 .export _sprite_graphics
+
+.import pushax
+    _load_graphics:
+        lda #$00
+        ldx #$00
+        jsr _vram_adr
+        lda #<(_background_graphics)
+        ldx #>(_background_graphics)
+        jsr pushax
+        lda #$00
+        ldx #$20
+        jsr _vram_write
+        rts
+.export _load_graphics

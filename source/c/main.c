@@ -4,6 +4,8 @@ This has the main loop for the game, which is then used to call out to other cod
 */
 
 #include "source/c/neslib.h"
+#include "source/c/mapper.h"
+#include "source/c/library/user_data.h"
 #include "source/c/library/bank_helpers.h"
 #include "source/c/configuration/game_states.h"
 #include "source/c/menus/title.h"
@@ -19,6 +21,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/c/menus/intro.h"
 #include "graphics/splash.h"
 
+extern void load_graphics(void);
 
 // Method to set a bunch of variables to default values when the system starts up.
 // Note that if variables aren't set in this method, they will start at 0 on NES startup.
@@ -42,10 +45,14 @@ void main() {
         everyOtherCycle = !everyOtherCycle;
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
+                unrom_set_prg_bank(BANK_USER_DATA);
                 initialize_variables();
+                load_user_data();
                 set_vram_update(NULL);
                 pal_bg(gamePaletteData);
                 pal_spr(spritePalette);
+                unrom_set_prg_bank(BANK_GRAPHICS);
+                load_graphics();
 
                 oam_clear();
 
@@ -71,6 +78,7 @@ void main() {
                 // If you're editing your own copy, please consider leaving this, since the tool helped you get here.
                 // Please? I can't stop you from deleting the splash, of course, it'd just make me happy to see it.
                 delay(30);
+                unrom_set_prg_bank(BANK_MENUS);
                 wait_for_start();
                 fade_out();
                 
@@ -79,6 +87,7 @@ void main() {
                 fade_in();
                 break;
             case GAME_STATE_TITLE_INPUT:
+                unrom_set_prg_bank(BANK_MENUS);
                 wait_for_start();
                 gameState = GAME_STATE_POST_TITLE;
                 break;
@@ -91,13 +100,14 @@ void main() {
 
                 if (singleLevelOverride != 255) {
                     currentLevelId = singleLevelOverride;
-                } else if (introScreenEnabled ) {
+                } else if (introScreenEnabled) {
                     fade_out();
                     load_map(); // Needed to get proper tile data loaded 
 
                     draw_intro_screen();
                     fade_in();
-                    handle_intro_input();
+                    unrom_set_prg_bank(BANK_MENUS);
+                    wait_for_start();
                 }
 
 
@@ -110,6 +120,7 @@ void main() {
                 playerCrateCount = 0;
                 undoPosition = 0;
                 keyCount = 0;
+                unrom_set_prg_bank(BANK_PLAYER);
                 clear_undo();
                 fade_out();
                 oam_clear();
@@ -117,8 +128,10 @@ void main() {
                 load_map();
 
                 ppu_off();
+                unrom_set_prg_bank(BANK_PLAYER);
                 draw_current_map_to_a_inline();
                 ppu_on_all();
+                //unrom_set_prg_bank(BANK_PLAYER);
                 init_map();
 
                 // Aim the player down to start
@@ -127,6 +140,7 @@ void main() {
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
+                unrom_set_prg_bank(BANK_PLAYER);
                 draw_hud();
                 ppu_on_all();
 
@@ -145,13 +159,16 @@ void main() {
                 break;
 
             case GAME_STATE_RUNNING:
+                unrom_set_prg_bank(BANK_PLAYER);
                 update_hud();
+                // unrom_set_prg_bank(BANK_PLAYER);
                 handle_player_movement();
                 update_player_sprite();
                 break;
             case GAME_STATE_PAUSED:
                 sfx_play(SFX_MENU_OPEN, SFX_CHANNEL_4);  
                 fade_out();
+                unrom_set_prg_bank(BANK_MENUS);
                 draw_pause_screen();
                 fade_in();
                 handle_pause_input();
@@ -163,31 +180,29 @@ void main() {
                 // Pause has its own mini main loop in handle_input to make logic easier.
                 sfx_play(SFX_MENU_CLOSE, SFX_CHANNEL_4);
                 fade_out();
+                unrom_set_prg_bank(BANK_PLAYER);
                 init_map();
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
                 ppu_off();
+                unrom_set_prg_bank(BANK_PLAYER);
                 draw_hud();
                 ppu_on_all();
                 fade_in();
 
                 break;
             case GAME_STATE_CREDITS:
+            
                 music_stop();
                 music_play(creditsSong);
 
                 fade_out();
                 // Draw the "you won" screen
+                unrom_set_prg_bank(BANK_MENUS);
                 draw_win_screen();
-                fade_in();
-                wait_for_start();
-                fade_out();
 
                 // Folow it up with the credits.
                 draw_credits_screen();
-                fade_in();
-                wait_for_start();
-                fade_out();
                 reset();
                 break;
                 

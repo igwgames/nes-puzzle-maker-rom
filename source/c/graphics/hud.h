@@ -1,8 +1,6 @@
 // Some defines for the elements in the HUD
 #include "source/c/library/bank_helpers.h"
 
-#define PRG_BANK_HUD 0
-
 #define HUD_POSITION_START 0x0300
 #define HUD_HEART_START 0x0356
 #define HUD_KEY_START 0x037d
