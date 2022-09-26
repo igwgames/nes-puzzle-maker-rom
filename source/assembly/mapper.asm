@@ -3,6 +3,12 @@
 ; 
 .define UNROM_BANK_SELECT $8000
 
+.segment "ZEROPAGE"
+    unrom_current_bank: 
+    _unrom_current_bank: 
+        .res 1
+    .export unrom_current_bank, _unrom_current_bank
+
 .segment "CODE"
 
     ; Bank table, used to 
@@ -12,8 +18,11 @@
 
 
     ; Set the prg bank to be used.
-    unrom_set_prg_bank:
+    unrom_set_prg_bank: 
     _unrom_set_prg_bank:
+    sta _unrom_current_bank
+    unrom_set_prg_bank_nosave:
+    _unrom_set_prg_bank_nosave:
         tax
         sta unrom_banktable, x
         rts
@@ -34,7 +43,7 @@
     jmp reset
 .segment "PLAYER" 
     jmp reset
-.segment "UNKNOWN02" 
+.segment "SOUND" 
     jmp reset
 .segment "UNKNOWN03" 
     jmp reset

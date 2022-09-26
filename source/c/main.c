@@ -83,6 +83,7 @@ void main() {
                 fade_out();
                 
                 draw_title_screen();
+                unrom_set_prg_bank(BANK_SOUND);
                 music_play(titleSong);
                 fade_in();
                 break;
@@ -111,6 +112,7 @@ void main() {
                 }
 
 
+                unrom_set_prg_bank(BANK_SOUND);
                 music_stop();
                 gameState = GAME_STATE_LOAD_LEVEL_1;
                 break;
@@ -148,6 +150,7 @@ void main() {
                 set_rand(frameCount);
 
                 if (gameState == GAME_STATE_LOAD_LEVEL_1) {
+                    unrom_set_prg_bank(BANK_SOUND);
                     music_play(gameplaySong);
                 }
                 
@@ -193,6 +196,7 @@ void main() {
                 break;
             case GAME_STATE_CREDITS:
             
+                unrom_set_prg_bank(BANK_SOUND);
                 music_stop();
                 music_play(creditsSong);
 

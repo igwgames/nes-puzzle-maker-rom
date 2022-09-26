@@ -2,7 +2,7 @@
 #define BANK_MENUS 1
 #define BANK_GRAPHICS 2
 #define BANK_PLAYER 3
-#define BANK_UNKNOWN02 4
+#define BANK_SOUND 4
 #define BANK_UNKNOWN03 5
 #define BANK_UNKNOWN04 6
 

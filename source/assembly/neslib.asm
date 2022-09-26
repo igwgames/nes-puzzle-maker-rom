@@ -116,6 +116,9 @@ neslib_nmi:
     sta PPU_MASK
 
     inc <FRAME_CNT1
+    bne @skip_second
+        inc <FRAME_CNT1B
+    @skip_second:
     inc <FRAME_CNT2
     lda <FRAME_CNT2
     cmp #6
@@ -126,6 +129,8 @@ neslib_nmi:
 @skipNtsc:
 
     ;play music, the code is modified to put data into output buffer instead of APU registers
+    lda #4
+    jsr _unrom_set_prg_bank_nosave
 
     lda <MUSIC_PLAY
     ror
@@ -217,6 +222,9 @@ neslib_nmi:
     ;tax
     ;pla
 
+    lda _unrom_current_bank
+    jsr _unrom_set_prg_bank_nosave
+
     ; rti
     rts
 
@@ -274,20 +282,24 @@ FT_SFX_CH3          = FT_SFX_STRUCT_SIZE*3
 
 FamiToneSfxInit:
 
+
     stx <TEMP+0
     sty <TEMP+1
     
     ldy #0
     
-    .if(FT_PITCH_FIX)
+; @cppchriscpp change:
+; Disable the famitracker PAL features... it has a weird bug where if I disable PAL, this var
+; is no longer defined, and ca65 does not like that.	
+;	.if(FT_PITCH_FIX)
 
-    lda FT_PAL_ADJUST       ;add 2 to the sound list pointer for PAL
-    bne @ntsc
-    iny
-    iny
+;	lda FT_PAL_ADJUST		;add 2 to the sound list pointer for PAL
+;	bne @ntsc
+;	iny
+;	iny
 @ntsc:
 
-    .endif
+;	.endif
     
     lda (TEMP),y        ;read and store pointer to the effects list
     sta FT_SFX_ADR_L
@@ -1142,13 +1154,22 @@ _music_pause:
 _sfx_play:
 
 .if(FT_SFX_ENABLE)
+    pha
+    lda _unrom_current_bank
+    sta TEMP_BANK
+    lda #4
+    jsr _unrom_set_prg_bank
+    pla
 
     and #$03
     tax
     lda @sfxPriority,x
     tax
     jsr popa
-    jmp FamiToneSfxPlay
+    jsr FamiToneSfxPlay
+    lda TEMP_BANK
+    jsr _unrom_set_prg_bank
+    rts
 
 @sfxPriority:
 

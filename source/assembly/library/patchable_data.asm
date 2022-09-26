@@ -17,7 +17,7 @@ _user_gameName:
 .export _user_gameName: absolute
 
 _user_totalGameLevels: 
-    .byte 1 ;1
+    .byte 2 ;1
 .export _user_totalGameLevels: absolute
 
 _user_gameLevelData:; 128 (4096 total, res for rest)

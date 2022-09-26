@@ -35,7 +35,9 @@ PAL_BUF     =$01c0
 .segment "ZEROPAGE"
 
 NTSC_MODE:          .res 1
+_frameCount:
 FRAME_CNT1:         .res 1
+FRAME_CNT1B:        .res 1
 FRAME_CNT2:         .res 1
 VRAM_UPDATE:        .res 1
 NAME_UPD_ADR:       .res 2
@@ -55,6 +57,7 @@ PPU_CTRL_VAR1:      .res 1
 PPU_MASK_VAR:       .res 1
 RAND_SEED:          .res 2
 FT_TEMP:            .res 3
+TEMP_BANK:          .res 1
 
 MUSIC_PLAY:         .res 1
 ft_music_addr:      .res 2
@@ -147,9 +150,13 @@ detectNTSC:
     jsr _music_stop
 
 .if(FT_SFX_ENABLE)
+    lda #4
+    jsr _unrom_set_prg_bank_nosave
     ldx #<sounds_data
     ldy #>sounds_data
     jsr FamiToneSfxInit
+    lda _unrom_current_bank
+    jsr _unrom_set_prg_bank_nosave
 .endif
 
     lda #$fd
@@ -164,4 +171,5 @@ detectNTSC:
     jmp _main           ;no parameters
 
     ; Famitracker driver uses .s for file extension, but is otherwise normal asm
+.segment "SOUND"
     .include "famitracker_driver/driver.s"
