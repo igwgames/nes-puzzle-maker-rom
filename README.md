@@ -10,6 +10,7 @@ It is loosely based off of [nes-starter-kit](https://cppchriscpp.github.io/nes-s
 however it makes many adjustments. 
 
 It uses the following tools: 
+* [create-nes-game](https://cppchriscpp.github.io/create-nes-game)
 * [neslib](https://shiru.untergrund.net/code.shtml)
 * [Famitracker](http://famitracker.com/)
 * [Early 80's Arcade Pixel Art](https://opengameart.org/content/early-80s-arcade-pixel-art-dungeonsslimes-walls-power-ups-etc)
@@ -17,37 +18,33 @@ It uses the following tools:
 
 ## Building
 
-The building instructions are basically identical to those of nes-starter-kit - follow those! 
+This game uses [create-nes-game](https://cppchriscpp.github.io/create-nes-game) for game building. Download and 
+optionally install that, then run the following command to set up the repository (you only have to do this once
+per pc): 
 
-[nes-starter-kit instructions](https://cppchriscpp.github.io/nes-starter-kit//guide/section_1/setting_up_your_tools.html)
+```
+create-nes-game download-dependencies
+```
 
-Now, there is one thing that is different. Delete the `cc65` folder in `tools`. Instead, download the latest version
-from [here](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip/download) and put that in `tools` instead.
+After that, you can build at any time with `create-nes-game build`. You can also use `create-nes-game run` to run
+the game in mesen.
 
 ## Using custom rom data
 
-So, you made a game with `puzzle.nes.science` and now you wanna tweak it. Awesome! The best way to do that right now is
-with an IPS patch. The tool gives you a (kinda secret) way to do this.
+So, you made a game with `puzzle.nes.science` and now you wanna tweak it. Awesome! The majority of game data is
+stored in `source/assembly/library/patchable_data.asm` You can generate a new version of this file from the tool.
 
-Go to [the tool](https://puzzle.nes.science) and load the game you want to export. Now, open the developer tools. The
-easiest way to do this is to right-click any element and choose "Inspect" or "Inspect Element". On the standalone app
-you can hit alt and find it in the menu above. Within the tools, find
-the "Console" tab, and paste the following in: 
+Go to [the tool](https://puzzle.nes.science) and load the game you want to export. 
 
-```javascript
-await getIpsData()
-```
+Now go to the root page of the tool. On the right side you'll see a section called "Developer tools". Under it
+there should be an option: `Download patachable_data.asm`. Click that, then replace the file in this repository.
+That's most of it!
 
-This will print out a url you can click and save. Rename this to `puzzle.ips` and drop it in the `rom` folder of this
-project, next to `puzzle.nes`, which you should have built. 
+If you're using custom music, put the `.bin` file you used in the tool in as `sound/music.bin`.
 
-Now if you open your rom, your emulator should hopefully automatically patch the rom with your data, just like in the
-tool! You can also use tools like [Lunar's IPS patcher](http://www.romhacking.net/utilities/240/) to build it into
-the rom, if you want to distribute it. 
+If you're using custom graphics, put the `.chr` file you used in the tool as `graphics/tiles_mod.chr`.
 
-Editor's note: Yes, this isn't super duper ideal, however forcing the data into an assembly or C file takes quite a bit
-of work and refactoring. If this is something you really want, open an issue asking for it. It's not impossible, just a
-lot of work. It may also slow down future releases of the tool, if I can't find a smart way to do it. 
+That's about it!
 
 ## License and copyright
 
