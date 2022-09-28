@@ -66,6 +66,20 @@ void update_hud() {
     i = 0;
     switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
+            for (j = 0; j != 16; ++j) {
+                if (tileCollisionTypes[j] == TILE_COLLISION_LEVEL_END) {
+                    tempTileIndex = j;
+                    break;
+                }
+            }
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 63) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 63);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = 'E' + 0x60;
+            screenBuffer[i++] = 'x' + 0x60;
+            screenBuffer[i++] = 'i' + 0x60;
+            screenBuffer[i++] = 't' + 0x60;
+
             break;
         case GAME_STYLE_COIN:
             for (j = 0; j != 16; ++j) {
@@ -74,21 +88,6 @@ void update_hud() {
                     break;
                 }
             }
-            tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
-            i = 0;
-            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
-            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
-            screenBuffer[i++] = 2;
-            screenBuffer[i++] = tempTileId;
-            screenBuffer[i++] = tempTileId+1;
-            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 32) | NT_UPD_HORZ;
-            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 32);
-            screenBuffer[i++] = 2;
-            screenBuffer[i++] = tempTileId+16;
-            screenBuffer[i++] = tempTileId+17;
-            screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = (tilePalettes[tempTileIndex] << 6) | 0x3f;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
@@ -106,19 +105,6 @@ void update_hud() {
             }
             tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
             i = 0;
-            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
-            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
-            screenBuffer[i++] = 2;
-            screenBuffer[i++] = tempTileId;
-            screenBuffer[i++] = tempTileId+1;
-            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 32) | NT_UPD_HORZ;
-            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 32);
-            screenBuffer[i++] = 2;
-            screenBuffer[i++] = tempTileId+16;
-            screenBuffer[i++] = tempTileId+17;
-            screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
-            screenBuffer[i++] = (tilePalettes[tempTileIndex] << 6) | 0x3f;
             screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
             screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
             screenBuffer[i++] = 5;
@@ -128,6 +114,23 @@ void update_hud() {
 
             break;
     }
+
+    tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
+    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
+    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
+    screenBuffer[i++] = 2;
+    screenBuffer[i++] = tempTileId;
+    screenBuffer[i++] = tempTileId+1;
+    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 32) | NT_UPD_HORZ;
+    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 32);
+    screenBuffer[i++] = 2;
+    screenBuffer[i++] = tempTileId+16;
+    screenBuffer[i++] = tempTileId+17;
+    screenBuffer[i++] = MSB(NAMETABLE_A + 0x03f5);
+    screenBuffer[i++] = LSB(NAMETABLE_A + 0x03f5);
+    screenBuffer[i++] = (tilePalettes[tempTileIndex] << 6) | 0x3f;
+
+
 
     if (enableLevelShow) {
         screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x89) | NT_UPD_HORZ;

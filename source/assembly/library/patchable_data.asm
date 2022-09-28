@@ -72,7 +72,7 @@ _user_gameLevelData:; 128 (4096 total, res for rest)
     ; Unused
     .byte $67
 ; rest of the levels
-.res $f80
+.res $f80, $ff
 
 
 .export _user_gameLevelData: absolute
