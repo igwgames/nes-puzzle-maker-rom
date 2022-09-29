@@ -19,7 +19,7 @@ void update_map_replace_spriteish(void) {
         ++totalCollectableCount;
     } else if (tempChar1 == TILE_COLLISION_CRATE || tempChar1 == TILE_COLLISION_LOCK || tempChar1 == TILE_COLLISION_KEY) {
         currentMapOrig[j] = 0;
-    } else if (tempChar1 == TILE_COLLISION_GAP) {
+    } else if (tempChar1 == TILE_COLLISION_GAP || tempChar1 == TILE_COLLISION_GAP_PASSABLE) {
         currentMapOrig[j] = 0;
         ++totalCrateCount;
     } else {

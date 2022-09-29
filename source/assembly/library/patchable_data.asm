@@ -78,7 +78,7 @@ _user_gameLevelData:; 128 (4096 total, res for rest)
 .export _user_gameLevelData: absolute
 
 _user_tileCollisionTypes:
-    .byte $00, $00, $01, $01, $04, $03, $05, $07
+    .byte $00, $00, $01, $01, $04, $06, $05, $07
     .byte $00, $0a, $00, $08, $09, $00, $00, $00
 .export _user_tileCollisionTypes: absolute
 
