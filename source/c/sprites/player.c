@@ -188,6 +188,7 @@ void handle_player_movement() {
     // This is impossible with a normal controller. Used in the ide for the tool to skip levels.
     if ((controllerState & (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) == (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) {
         do_next_level();
+        return;
     }
     
     // tempoarily track the position we'd undo, if the user were to ask
