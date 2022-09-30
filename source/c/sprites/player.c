@@ -164,6 +164,16 @@ void set_undos_from_params(void) {
     undoActionType[undoPosition] = TILE_COLLISION_WALKABLE;
 }
 
+void do_next_level(void) {
+    ++currentLevelId;
+    if (currentLevelId == totalGameLevels) {
+        gameState = GAME_STATE_CREDITS;
+    } else {
+        gameState = GAME_STATE_LOAD_LEVEL;
+        sfx_play(SFX_WIN, SFX_CHANNEL_1);
+    }
+}
+
 // Handle the player hitting buttons, and move em around!
 void handle_player_movement() {
     lastControllerState = controllerState;
@@ -173,6 +183,11 @@ void handle_player_movement() {
     if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
         gameState = GAME_STATE_PAUSED;
         return;
+    }
+
+    // This is impossible with a normal controller. Used in the ide for the tool to skip levels.
+    if ((controllerState & (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) == (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) {
+        do_next_level();
     }
     
     // tempoarily track the position we'd undo, if the user were to ask
@@ -597,13 +612,7 @@ void handle_player_movement() {
                     break;
             }
             if (!collisionTempTileId) {
-                ++currentLevelId;
-                if (currentLevelId == totalGameLevels) {
-                    gameState = GAME_STATE_CREDITS;
-                } else {
-                    gameState = GAME_STATE_LOAD_LEVEL;
-                    sfx_play(SFX_WIN, SFX_CHANNEL_1);
-                }
+                do_next_level();
                 return;
             }
             break;
