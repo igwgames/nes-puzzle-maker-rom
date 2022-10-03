@@ -45,7 +45,7 @@
     jmp reset
 .segment "SOUND" 
     jmp reset
-.segment "UNKNOWN03" 
+.segment "STATIC_SC" 
     jmp reset
 .segment "UNKNOWN04" 
     jmp reset

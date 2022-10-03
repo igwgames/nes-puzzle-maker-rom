@@ -15,10 +15,10 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/c/map/map.h"
 #include "source/c/graphics/hud.h"
 #include "source/c/graphics/fade_animation.h"
+#include "source/c/graphics/static_screens.h"
 #include "source/c/sprites/player.h"
 #include "source/c/menus/pause.h"
 #include "source/c/menus/input_helpers.h"
-#include "source/c/menus/intro.h"
 #include "graphics/splash.h"
 
 extern void load_graphics(void);
@@ -81,6 +81,9 @@ void main() {
                 unrom_set_prg_bank(BANK_MENUS);
                 wait_for_start();
                 fade_out();
+
+                // Start showing any screens we need
+                show_relevant_screen(STATIC_SCREEN_AFTER_SPLASH);
                 
                 draw_title_screen();
                 unrom_set_prg_bank(BANK_SOUND);
@@ -101,15 +104,9 @@ void main() {
 
                 if (singleLevelOverride != 255) {
                     currentLevelId = singleLevelOverride;
-                } else if (introScreenEnabled) {
-                    fade_out();
-                    load_map(); // Needed to get proper tile data loaded 
-
-                    draw_intro_screen();
-                    fade_in();
-                    unrom_set_prg_bank(BANK_MENUS);
-                    wait_for_start();
                 }
+
+                show_relevant_screen(STATIC_SCREEN_AFTER_TITLE);
 
 
                 unrom_set_prg_bank(BANK_SOUND);
@@ -126,6 +123,10 @@ void main() {
                 clear_undo();
                 fade_out();
                 oam_clear();
+
+                if (currentLevelId > 0) {
+                    show_relevant_screen(STATIC_SCREEN_AFTER_LEVEL + (currentLevelId - 1));
+                }
 
                 load_map();
 
@@ -204,9 +205,12 @@ void main() {
                 // Draw the "you won" screen
                 unrom_set_prg_bank(BANK_MENUS);
                 draw_win_screen();
+                show_relevant_screen(STATIC_SCREEN_AFTER_ENDING);
 
                 // Folow it up with the credits.
+                unrom_set_prg_bank(BANK_MENUS);
                 draw_credits_screen();
+                show_relevant_screen(STATIC_SCREEN_AFTER_CREDITS);
                 reset();
                 break;
                 
