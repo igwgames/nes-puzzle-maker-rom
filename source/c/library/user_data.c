@@ -10,7 +10,6 @@ unsigned char tileCollisionTypes[16];
 unsigned char tilePalettes[16];
 unsigned char gamePaletteData[16];
 unsigned char spritePalette[4];
-unsigned char introScreenEnabled;
 unsigned char singleLevelOverride;
 unsigned char titleSong;
 unsigned char gameplaySong;
@@ -42,11 +41,9 @@ extern const unsigned char user_tilePalettes[];
 
 extern const unsigned char user_gameLevelData[];
 extern const unsigned char user_totalGameLevels;
+extern const unsigned char user_unusedByte1;
 extern const unsigned char user_singleLevelOverride;
 extern const unsigned char user_titleScreenData[];
-extern const unsigned char user_introScreenEnabled;
-
-
 
 
 
@@ -57,7 +54,6 @@ void load_user_data(void) {
     totalGameLevels = user_totalGameLevels;
     movementSpeed = user_movementSpeed;
     enableUndo = user_enableUndo;
-    introScreenEnabled = user_introScreenEnabled;
     singleLevelOverride = user_singleLevelOverride;
     titleSong = user_titleSong;
     gameplaySong = user_gameplaySong;
@@ -68,7 +64,7 @@ void load_user_data(void) {
     memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 16);
     memcpy(&tilePalettes[0], &user_tilePalettes[0], 16);
     memcpy(&gamePaletteData[0], &user_gamePaletteData[0], 16);
-    memcpy(&spritePalette[0], &user_spritePalette[0], 16);
+    memcpy(&spritePalette[0], &user_spritePalette[0], 4);
 }
 
 #pragma code-name ("CODE")

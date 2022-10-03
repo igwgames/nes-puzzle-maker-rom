@@ -8,7 +8,7 @@ extern unsigned char tileCollisionTypes[16];
 extern unsigned char tilePalettes[16];
 extern unsigned char gamePaletteData[16];
 extern unsigned char spritePalette[4];
-extern unsigned char introScreenEnabled;
+extern unsigned char unusedByte1;
 extern unsigned char singleLevelOverride;
 extern unsigned char titleSong;
 extern unsigned char gameplaySong;
@@ -20,7 +20,6 @@ extern unsigned char userDataBuffer[16];
 
 // These ones are only in the bank, not copied. Make sure to swap to the USER_DATA bank!
 extern const unsigned char user_gameLevelData[4096];
-extern const unsigned char user_introScreenData[1024];
 extern const unsigned char user_titleScreenData[1024];
 extern const unsigned char user_creditsScreenData[1024];
 

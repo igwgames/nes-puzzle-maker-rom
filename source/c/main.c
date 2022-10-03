@@ -45,8 +45,8 @@ void main() {
         everyOtherCycle = !everyOtherCycle;
         switch (gameState) {
             case GAME_STATE_SYSTEM_INIT:
-                unrom_set_prg_bank(BANK_USER_DATA);
                 initialize_variables();
+                unrom_set_prg_bank(BANK_USER_DATA);
                 load_user_data();
                 set_vram_update(NULL);
                 pal_bg(gamePaletteData);
