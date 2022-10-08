@@ -15,6 +15,8 @@ extern unsigned char gameplaySong;
 extern unsigned char creditsSong;
 extern unsigned char enableLevelShow;
 extern unsigned char enableKeyCount;
+extern unsigned char showGoal;
+extern unsigned char showGameTitle;
 
 extern unsigned char userDataBuffer[16];
 
@@ -30,3 +32,5 @@ void load_user_data(void);
 void load_gamename_to_buffer(unsigned char bankToReturnTo);
 void load_coinsCollectedText_to_buffer(unsigned char bankToReturnTo);
 void load_cratesRemovedText_to_buffer(unsigned char bankToReturnTo);
+void load_hud_vram(unsigned char bankToReturnTo);
+unsigned char user_get_hud_palette_for_goal(unsigned char bankToReturnTo);
