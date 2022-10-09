@@ -17,11 +17,14 @@ void update_map_replace_spriteish(void) {
     if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
         currentMapOrig[j] = 0;
         ++totalCollectableCount;
-    } else if (tempChar1 == TILE_COLLISION_CRATE || tempChar1 == TILE_COLLISION_LOCK || tempChar1 == TILE_COLLISION_KEY) {
+    } else if (tempChar1 == TILE_COLLISION_CRATE) {
+        currentMapOrig[j] = 0;
+        ++tempChar3;
+    } else if (tempChar1 == TILE_COLLISION_LOCK || tempChar1 == TILE_COLLISION_KEY) {
         currentMapOrig[j] = 0;
     } else if (tempChar1 == TILE_COLLISION_GAP || tempChar1 == TILE_COLLISION_GAP_PASSABLE || tempChar1 == TILE_COLLISION_COLLAPSIBLE) {
         currentMapOrig[j] = 0;
-        ++totalCrateCount;
+        ++tempChar2;
     } else {
         currentMapOrig[j] = currentMap[j];
     }
@@ -54,6 +57,11 @@ void load_map() {
     // Iterate over the map data and expand it into a full map. Each byte in the data we store actually holds
     // 2 tiles - each nybble (half-byte) is a tile id, left then right. Thus each row is 6 bytes. If you're editing
     // in assembly, the left tile is 0xN_ and the right is 0x_N.
+
+    // Track whether we have more crates, or more holes. Use this to determine how to finish level.
+    tempChar2 = 0;
+    tempChar3 = 0;
+
     for (i = 0, j = 0; i != 60; ++i) {
         j = i<<1;
         currentMap[j] = (user_gameLevelData[i + tempInt1] & 0xf0) >> 4;
@@ -66,6 +74,11 @@ void load_map() {
 
         tempChar1 = tileCollisionTypes[currentMap[j]];
         update_map_replace_spriteish();
+    }
+    if (tempChar2 < tempChar3) {
+        totalCrateCount = tempChar2;
+    } else {
+        totalCrateCount = tempChar3;
     }
     playerGridPositionX = user_gameLevelData[tempInt1 + 62] & 0x0f;
     playerGridPositionY = user_gameLevelData[tempInt1 + 62] >> 4;
