@@ -579,6 +579,7 @@ void handle_player_movement() {
             for (i = 0; i < 16; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_GAP || tileCollisionTypes[i] == TILE_COLLISION_GAP_PASSABLE) {
                     newBlock = i;
+                    break;
                 }
             }
 
