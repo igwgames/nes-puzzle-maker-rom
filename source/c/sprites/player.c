@@ -54,6 +54,8 @@ ZEROPAGE_DEF(unsigned char, playerDidMove);
 #define collisionTempX tempChar4
 #define collisionTempY tempChar5
 
+#define newBlock tempChar6
+
 #define collisionTempTileId tempChar8
 
 
@@ -347,7 +349,7 @@ void handle_player_movement() {
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
-                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE) {
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         ++playerCrateCount;
                         ++gameCrates;
                         set_undos_from_params();
@@ -404,7 +406,7 @@ void handle_player_movement() {
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
-                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE) {
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
@@ -460,7 +462,7 @@ void handle_player_movement() {
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
-                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE) {
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
@@ -516,7 +518,7 @@ void handle_player_movement() {
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
-                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE) {
+                    } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
@@ -570,6 +572,26 @@ void handle_player_movement() {
             update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
             update_hud();
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
+            break;
+        case TILE_COLLISION_COLLAPSIBLE:
+            // Figure out where a hole is
+            newBlock = 0; // If there isn't one, do something half sane
+            for (i = 0; i < 16; ++i) {
+                if (tileCollisionTypes[i] == TILE_COLLISION_GAP || tileCollisionTypes[i] == TILE_COLLISION_GAP_PASSABLE) {
+                    newBlock = i;
+                }
+            }
+
+            set_undos_from_params();
+            undoBlockFromId[undoPosition] = currentMap[rawTileId];
+            currentMap[rawTileId] = newBlock;
+            undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
+            undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
+            undoActionType[undoPosition] = currentCollision;
+
+            update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
+            update_hud();
+            sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
             break;
         case TILE_COLLISION_LOCK:
             if (keyCount == 0) {

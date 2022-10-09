@@ -22,7 +22,7 @@ void draw_current_map_to_a_inline();
 // Handles collisions of all sorts in this engine.
 #define TILE_COLLISION_WALKABLE 0
 #define TILE_COLLISION_SOLID 1
-#define TILE_COLLISION_UNUSED 2
+#define TILE_COLLISION_COLLAPSIBLE 2
 #define TILE_COLLISION_GAP 3
 #define TILE_COLLISION_CRATE 4
 #define TILE_COLLISION_COLLECTABLE 5

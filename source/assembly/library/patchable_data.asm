@@ -23,9 +23,9 @@ _user_totalGameLevels:
 _user_gameLevelData:; 128 (4096 total, res for rest)
     
     .byte $01, $99, $99, $99, $99, $99
-    .byte $01, $22, $22, $22, $22, $28
-    .byte $01, $21, $06, $00, $12, $28
-    .byte $01, $21, $45, $00, $12, $21
+    .byte $01, $22, $22, $22, $22, $29
+    .byte $01, $21, $06, $00, $12, $29
+    .byte $01, $21, $48, $00, $12, $21
     .byte $01, $21, $00, $00, $12, $21
 
     .byte $00, $00, $00, $00, $cb, $00
@@ -79,7 +79,7 @@ _user_gameLevelData:; 128 (4096 total, res for rest)
 
 _user_tileCollisionTypes:
     .byte $00, $00, $01, $01, $04, $06, $05, $07
-    .byte $00, $0a, $00, $08, $09, $00, $00, $00
+    .byte $02, $0a, $00, $08, $09, $00, $00, $00
 .export _user_tileCollisionTypes: absolute
 
 _user_tilePalettes:
