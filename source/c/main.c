@@ -20,6 +20,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/c/menus/pause.h"
 #include "source/c/menus/input_helpers.h"
 #include "graphics/splash.h"
+#include "source/c/library/music.h"
 
 extern void load_graphics(void);
 
@@ -87,7 +88,7 @@ void main() {
                 
                 draw_title_screen();
                 unrom_set_prg_bank(BANK_SOUND);
-                music_play(titleSong);
+                playSongForEvent(MUSIC_TIME_ON_TITLE);
                 fade_in();
                 break;
             case GAME_STATE_TITLE_INPUT:
@@ -150,10 +151,8 @@ void main() {
                 // Seed the random number generator here, using the time since console power on as a seed
                 set_rand(frameCount);
 
-                if (gameState == GAME_STATE_LOAD_LEVEL_1) {
-                    unrom_set_prg_bank(BANK_SOUND);
-                    music_play(gameplaySong);
-                }
+                unrom_set_prg_bank(BANK_SOUND);
+                playSongForEvent(MUSIC_TIME_ON_LEVEL + currentLevelId);
                 
                 // Map drawing is complete; let the player play the game!
                 
@@ -199,7 +198,7 @@ void main() {
             
                 unrom_set_prg_bank(BANK_SOUND);
                 music_stop();
-                music_play(creditsSong);
+                playSongForEvent(MUSIC_TIME_ON_END_SCREEN);
 
                 fade_out();
                 // Draw the "you won" screen
@@ -208,6 +207,8 @@ void main() {
                 show_relevant_screen(STATIC_SCREEN_AFTER_ENDING);
 
                 // Folow it up with the credits.
+                unrom_set_prg_bank(BANK_SOUND);
+                playSongForEvent(MUSIC_TIME_ON_CREDITS_SCREEN);
                 unrom_set_prg_bank(BANK_MENUS);
                 draw_credits_screen();
                 show_relevant_screen(STATIC_SCREEN_AFTER_CREDITS);

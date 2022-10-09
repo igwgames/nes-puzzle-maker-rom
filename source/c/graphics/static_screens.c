@@ -4,6 +4,7 @@
 #include "source/c/graphics/fade_animation.h"
 #include "source/c/menus/input_helpers.h"
 #include "source/c/globals.h"
+#include "source/c/library/music.h"
 
 // Purposely left in main bank
 void do_show_screen(unsigned char screen) {
@@ -37,6 +38,9 @@ void show_relevant_screen(unsigned char position) {
         }
     }
     if (tempChar1 != 255) {
+        unrom_set_prg_bank(BANK_SOUND);
+        playSongForEvent(MUSIC_TIME_ON_SCREEN + tempChar1);
+        unrom_set_prg_bank(BANK_STATIC_SC);
         do_show_screen(tempChar1);
     }
 }

@@ -242,6 +242,10 @@ _user_hudDataAttrs:
     .byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
 .export _user_hudDataAttrs
 
+_user_customSongShowTimes:
+    .byte 101, 0, 102, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
+.export _user_customSongShowTimes
+
 .segment "STATIC_SC"
 
 _staticScreenTypes:
