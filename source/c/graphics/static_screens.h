@@ -6,7 +6,7 @@
 #define STATIC_SCREEN_AFTER_CREDITS 103
 #define STATIC_SCREEN_UNUSED 255
 
-extern const unsigned char staticScreenTypes[14];
-extern const unsigned char staticScreens[/* a lot */];
+extern const unsigned char user_staticScreenTypes[14];
+extern const unsigned char user_staticScreens[/* a lot */];
 
 extern void show_relevant_screen(unsigned char position);

@@ -5,6 +5,7 @@
 #include "source/c/menus/input_helpers.h"
 #include "source/c/globals.h"
 #include "source/c/library/music.h"
+#include "source/c/graphics/static_screens.h"
 
 // Purposely left in main bank
 void do_show_screen(unsigned char screen) {
@@ -15,7 +16,7 @@ void do_show_screen(unsigned char screen) {
     
     scroll(0, 0);
     vram_adr(0x2000);
-    vram_write((unsigned char*)&(staticScreens[screen << 10]), 1024);
+    vram_write((unsigned char*)&(user_staticScreens[screen << 10]), 1024);
     ppu_on_all();
     fade_in();
 
@@ -32,7 +33,7 @@ void show_relevant_screen(unsigned char position) {
 
     tempChar1 = 255;
     for (i = 0; i < 16; ++i) {
-        if (staticScreenTypes[i] == position) {
+        if (user_staticScreenTypes[i] == position) {
             tempChar1 = i;
             break;
         }
