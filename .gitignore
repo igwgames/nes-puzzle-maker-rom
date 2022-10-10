@@ -26,3 +26,5 @@ _site/
 _pdf
 .DS_Store
 .idea
+*.rle.chr
+*.rle.nam

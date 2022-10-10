@@ -7,7 +7,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "/usr/bin/make build run",
+            "command": "create-nes-game build && create-nes-game run",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

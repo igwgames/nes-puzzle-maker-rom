@@ -1,0 +1,19 @@
+{
+    "configVersion": 10000,
+    "configVersionString": "1.0.0",
+    "name": "puzzle",
+    "mapper": "unrom",
+    "mirroring": "vertical",
+    "useChrRam": false,
+    "useSram": false,
+    "sramSize": 0,
+    "chrBanks": 0,
+    "prgBanks": 8,
+    "includeC": true,
+    "ciProvider": "circleci",
+    "testProvider": "none",
+    "installEmulator": "mesen",
+    "includeCLibrary": "neslib with famitracker",
+    "neslibNtscPal": "both",
+    "console": "nes"
+}
