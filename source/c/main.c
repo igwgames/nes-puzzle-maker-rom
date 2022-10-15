@@ -105,9 +105,9 @@ void main() {
 
                 if (singleLevelOverride != 255) {
                     currentLevelId = singleLevelOverride;
+                } else {
+                    show_relevant_screen(STATIC_SCREEN_AFTER_TITLE);
                 }
-
-                show_relevant_screen(STATIC_SCREEN_AFTER_TITLE);
 
 
                 unrom_set_prg_bank(BANK_SOUND);
