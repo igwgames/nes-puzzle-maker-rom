@@ -20,6 +20,8 @@
     .export _set_vram_update,_flush_vram_update
     .export _memcpy,_memfill,_delay
 
+; Modified to change to the music bank in nmi
+.import BANK_SOUND
 
 
 ;NMI handler
@@ -129,7 +131,7 @@ neslib_nmi:
 @skipNtsc:
 
     ;play music, the code is modified to put data into output buffer instead of APU registers
-    lda #4
+    lda #<BANK_SOUND
     jsr _unrom_set_prg_bank_nosave
 
     lda <MUSIC_PLAY
