@@ -1159,7 +1159,7 @@ _sfx_play:
     pha
     lda _unrom_current_bank
     sta TEMP_BANK
-    lda #4
+    lda #<BANK_SOUND
     jsr _unrom_set_prg_bank
     pla
 

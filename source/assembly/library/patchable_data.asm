@@ -74,8 +74,6 @@ _user_gameLevelData:; 128 (4096 total, res for rest)
 ; rest of the levels
 .res $f80, $ef
 
-.segment "USER_DATA"
-
 .export _user_gameLevelData: absolute
 
 _user_tileCollisionTypes:
