@@ -74,6 +74,7 @@ _user_gameLevelData:; 128 (4096 total, res for rest)
 ; rest of the levels
 .res $f80, $ef
 
+.segment "USER_DATA"
 
 .export _user_gameLevelData: absolute
 
@@ -577,12 +578,11 @@ _user_staticScreens:
     .byte $44, $55, $55, $55, $55, $55, $55, $11
     .byte $44, $55, $55, $55, $55, $55, $55, $11
     .byte $04, $05, $05, $05, $05, $05, $05, $01
-.if .defined(USE_COMPRESSION) 
-    ; hopefully enough space for your data with rle...
-    ; 8 * 1024
-    .res (8192), $ef
+.if .defined(SMALL_ROM) 
+    ; 7 * 1024 - 8 total screens
+    .res 7168, $ef
 .else
-    ; 13 * 10 1024 screens
+    ; 13 * 10 1024 screens (14 total)
     .res 13312, $ef
 .endif
 

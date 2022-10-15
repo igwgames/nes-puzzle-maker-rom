@@ -22,8 +22,8 @@ extern void* BANK_STATIC_SC_PTR;
 extern void* BANK_UNKOWN04_PTR;
 #define BANK_UNKNOWN04 ((unsigned char)&BANK_UNKNOWN04_PTR)
 
-extern void* USE_COMPRESSION;
-#define USE_COMPRESSION ((unsigned char)&USE_COMPRESSION_PTR)
+extern void* SMALL_ROM;
+#define SMALL_ROM ((unsigned char)&SMALL_ROM)
 
 
 // Set the prg bank currently used in the first slot.

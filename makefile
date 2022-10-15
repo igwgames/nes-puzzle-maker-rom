@@ -6,13 +6,17 @@
 # `create-nes-game build` without even thinking about this.
 VERSION=v5-2
 
+build: build-full build-compressed
+
 build-full: 
 	create-nes-game build
 
 build-compressed:
-	create-nes-game --linker-config-file config/ca65-compressed.cfg --assembler-options "-D USE_COMPRESSION" --output-file "rom/puzzle-compressed.nes" build
+	create-nes-game --linker-config-file config/ca65-compressed.cfg --assembler-options "-D SMALL_ROM" --output-file "rom/puzzle-compressed.nes" build
 
-build: build-full build-compressed
+
+clean: 
+	create-nes-game clean
 
 s3_upload:
 	make build
