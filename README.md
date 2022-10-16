@@ -59,6 +59,10 @@ You can make it work though - in the `config` folder, there are two files: `ca65
 Rename `ca65.cfg` to something else, then rename `ca65-compressed.cfg` to `ca65.cfg`. Now you can run 
 `create-nes-game` again and it should build the 64kb version. Have fun!
 
+Note: If you haven't replaced `patchable_data.asm` with one downloaded from the site, you will get errors about
+something called `SMALL_ROM` not being defined. I suggest downloading a version from the site, however you can
+also run it as-is using the command directly under `build-compressed:` in the [makefile](https://github.com/cppchriscpp/nes-puzzle-maker-rom/blob/main/makefile#L14).
+
 ## License and copyright
 
 The tool is copyrighted to Christopher Parker, as of 2022. The rom sources are available under an MIT license, however
