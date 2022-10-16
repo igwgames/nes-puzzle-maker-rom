@@ -9,7 +9,7 @@
 .segment "USER_DATA"
 
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
-.asciiz "PATCH TARGET 1.01" ; 0x12
+.asciiz "PATCH TARGET 1.02" ; 0x12
 
 ; These are imported in map.h for the most part
 _user_gameName:
