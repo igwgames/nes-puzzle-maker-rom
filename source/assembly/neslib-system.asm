@@ -150,7 +150,7 @@ detectNTSC:
     jsr _music_stop
 
 .if(FT_SFX_ENABLE)
-    lda #4
+    lda #<BANK_SOUND
     jsr _unrom_set_prg_bank_nosave
     ldx #<sounds_data
     ldy #>sounds_data

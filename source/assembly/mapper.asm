@@ -50,4 +50,18 @@
 .segment "UNKNOWN04" 
     jmp reset
 
+; This ugly little mess of assembly pulls in a linker symbol, then exports it as if it were a pointer
+; This allows us to read it from C without storing it to a memory location.
+.macro make_ptr var_name
+    .import var_name
+    .ident(.concat("_", .string(var_name), "_PTR")) = var_name
+    .export .ident(.concat("_", .string(var_name), "_PTR"))
+.endmacro
 
+make_ptr BANK_USER_DATA
+make_ptr BANK_MENUS
+make_ptr BANK_GRAPHICS
+make_ptr BANK_PLAYER
+make_ptr BANK_SOUND
+make_ptr BANK_STATIC_SC
+make_ptr BANK_UNKNOWN04

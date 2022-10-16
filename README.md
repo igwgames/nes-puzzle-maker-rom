@@ -46,6 +46,19 @@ If you're using custom graphics, put the `.chr` file you used in the tool as `gr
 
 That's about it!
 
+## Smaller rom version
+
+A version of the rom that should be compatible with the nesdev compo is now available as well. It reduces the rom
+size from 128kb down to 64kb. Some features in the UI will also be restricted or disabled. Enable this feature in 
+the UI on the "Other Settings" page. This will make the editor work with the smaller rom.
+
+If you want to compile it yourself, you won't be able to do this as simply as you can above. When you run 
+`create-nes-game build` it will work, but build a 128kb rom. That's not quite what you want! 
+
+You can make it work though - in the `config` folder, there are two files: `ca65.cfg` and `ca65-compressed.cfg`.
+Rename `ca65.cfg` to something else, then rename `ca65-compressed.cfg` to `ca65.cfg`. Now you can run 
+`create-nes-game` again and it should build the 64kb version. Have fun!
+
 ## License and copyright
 
 The tool is copyrighted to Christopher Parker, as of 2022. The rom sources are available under an MIT license, however

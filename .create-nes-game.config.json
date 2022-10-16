@@ -6,7 +6,7 @@
     "mirroring": "vertical",
     "useChrRam": false,
     "useSram": false,
-    "sramSize": 0,
+    "sramSize": 8,
     "chrBanks": 0,
     "prgBanks": 8,
     "includeC": true,
