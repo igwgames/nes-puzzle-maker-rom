@@ -611,6 +611,7 @@ void handle_player_movement() {
             }
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
+            set_undos_from_params();
             collisionTempTileId = 0;
             switch (currentGameStyle) {
                 case GAME_STYLE_MAZE:
@@ -642,6 +643,7 @@ void handle_player_movement() {
             break;
         default:
             // Stop you when you hit an unknown tile... idk seems better than walking?
+            set_undos_from_params();
             nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
     }
