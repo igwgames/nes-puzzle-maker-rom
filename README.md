@@ -19,8 +19,11 @@ It uses the following tools:
 ## Building
 
 This game uses [create-nes-game](https://cppchriscpp.github.io/create-nes-game) for game building. Download and 
-optionally install that, then run the following command to set up the repository (you only have to do this once
-per pc): 
+optionally install that.
+
+Next, copy the code for this repository to your pc somehow, either using git or the "Download Zip" feature under
+the code button at the top-right of the github ui. From that directory, run the following command to set up the 
+repository (you only have to do this once per pc): 
 
 ```
 create-nes-game download-dependencies
@@ -36,7 +39,7 @@ stored in `source/assembly/library/patchable_data.asm` You can generate a new ve
 
 Go to [the tool](https://puzzle.nes.science) and load the game you want to export. 
 
-Now go to the root page of the tool. On the right side you'll see a section called "Developer tools". Under it
+Now go to the homepage of the tool. On the right side you'll see a section called "Developer tools". Under it
 there should be an option: `Download patachable_data.asm`. Click that, then replace the file in this repository.
 That's most of it!
 
