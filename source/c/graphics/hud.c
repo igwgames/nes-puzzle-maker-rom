@@ -29,6 +29,14 @@ void draw_hud() {
             vram_put(userDataBuffer[i] + 0x60);
         }
     }
+
+    if (!enableLevelShow) {
+        // Have to override the section that says "level:" in this case.
+        vram_adr(NAMETABLE_A + HUD_LEVEL_TEXT_START);
+        for (i = 0; i < 6; ++i) {
+            vram_put(' ' + 0x60);
+        }
+    }
 }
 
 // Draw a number to "screenBuffer". Isolated so we do the /10 and %10 in one spot
