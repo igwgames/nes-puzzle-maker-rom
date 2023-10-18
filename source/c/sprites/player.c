@@ -361,7 +361,7 @@ void handle_player_movement() {
 
 
                         collisionTempTileId = currentMap[rawTileId+1];
-                        undoActionType[undoPosition] = collisionTempTileId;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX + 1;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
 
@@ -416,7 +416,7 @@ void handle_player_movement() {
                         ++gameCrates;
 
                         collisionTempTileId = currentMap[rawTileId-1];
-                        undoActionType[undoPosition] = collisionTempTileId;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX - 1;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
 
@@ -472,7 +472,7 @@ void handle_player_movement() {
                         ++gameCrates;
 
                         collisionTempTileId = currentMap[rawTileId-12];
-                        undoActionType[undoPosition] = collisionTempTileId;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY - 1;
 
@@ -528,7 +528,7 @@ void handle_player_movement() {
                         ++gameCrates;
 
                         collisionTempTileId = currentMap[rawTileId+12];
-                        undoActionType[undoPosition] = collisionTempTileId;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY + 1;
 
