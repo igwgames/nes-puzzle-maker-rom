@@ -4,7 +4,7 @@
 
 # If you just want to build a game and don't care about the smaller rom, uncheck the option in the ui and use
 # `create-nes-game build` without even thinking about this.
-VERSION=v5-2
+VERSION=v5-3
 
 build: build-full build-compressed
 
