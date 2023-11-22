@@ -5,6 +5,7 @@
 #include "source/c/menus/input_helpers.h"
 #include "source/c/globals.h"
 #include "source/c/library/music.h"
+#include "source/c/library/user_data.h"
 #include "source/c/graphics/static_screens.h"
 
 // Purposely left in main bank
@@ -24,11 +25,10 @@ void do_show_screen(unsigned char screen) {
     unrom_set_prg_bank(BANK_MENUS);
     wait_for_start();
     fade_out();
-
-    show_relevant_screen(STATIC_SCREEN_AFTER_SCREEN + screen);
 }
 
 void show_relevant_screen(unsigned char position) {
+    recur:
     unrom_set_prg_bank(BANK_STATIC_SC);
 
     tempChar1 = 255;
@@ -43,5 +43,9 @@ void show_relevant_screen(unsigned char position) {
         playSongForEvent(MUSIC_TIME_ON_SCREEN + tempChar1);
         unrom_set_prg_bank(BANK_STATIC_SC);
         do_show_screen(tempChar1);
+        
+        // Recur without adding to stack, since we're tripping over the max
+        position = STATIC_SCREEN_AFTER_SCREEN + tempChar1;
+        goto recur;
     }
 }

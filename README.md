@@ -68,7 +68,7 @@ also run it as-is using the command directly under `build-compressed:` in the [m
 
 ## License and copyright
 
-The tool is copyrighted to Christopher Parker, as of 2022. The rom sources are available under an MIT license, however
+The tool is copyrighted to Indie GameWeb, as of 2022. The rom sources are available under an MIT license, however
 art from the online tool may have other licenses that need to be followed. The source code cannot help you with that, so
 please be aware of required licenses for any art and music you may use! (The sound effects were created by me, and are
 available under the same MIT license.)
