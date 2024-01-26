@@ -6,11 +6,11 @@ The main site is: https://puzzle.nes.science
 
 You can do most things with the game there, without ever touching this source code!
 
-It is loosely based off of [nes-starter-kit](https://cppchriscpp.github.io/nes-starter-kit), 
+It is loosely based off of [nes-starter-kit](https://nes-starter-kit.nes.science), 
 however it makes many adjustments. 
 
 It uses the following tools: 
-* [create-nes-game](https://cppchriscpp.github.io/create-nes-game)
+* [create-nes-game](https://create-nes-game.nes.science)
 * [neslib](https://shiru.untergrund.net/code.shtml)
 * [Famitracker](http://famitracker.com/)
 * [Early 80's Arcade Pixel Art](https://opengameart.org/content/early-80s-arcade-pixel-art-dungeonsslimes-walls-power-ups-etc)
@@ -18,7 +18,7 @@ It uses the following tools:
 
 ## Building
 
-This game uses [create-nes-game](https://cppchriscpp.github.io/create-nes-game) for game building. Download and 
+This game uses [create-nes-game](https://create-nes-game.nes.science) for game building. Download and 
 optionally install that.
 
 Next, copy the code for this repository to your pc somehow, either using git or the "Download Zip" feature under
@@ -64,7 +64,7 @@ Rename `ca65.cfg` to something else, then rename `ca65-compressed.cfg` to `ca65.
 
 Note: If you haven't replaced `patchable_data.asm` with one downloaded from the site, you will get errors about
 something called `SMALL_ROM` not being defined. I suggest downloading a version from the site, however you can
-also run it as-is using the command directly under `build-compressed:` in the [makefile](https://github.com/cppchriscpp/nes-puzzle-maker-rom/blob/main/makefile#L14).
+also run it as-is using the command directly under `build-compressed:` in the [makefile](https://gh.nes.science/nes-puzzle-maker-rom/blob/main/makefile#L14).
 
 ## License and copyright
 

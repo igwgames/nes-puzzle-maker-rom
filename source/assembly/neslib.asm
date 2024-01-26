@@ -290,7 +290,7 @@ FamiToneSfxInit:
     
     ldy #0
     
-; @cppchriscpp change:
+; @igwgames change:
 ; Disable the famitracker PAL features... it has a weird bug where if I disable PAL, this var
 ; is no longer defined, and ca65 does not like that.	
 ;	.if(FT_PITCH_FIX)
