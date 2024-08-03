@@ -51,24 +51,13 @@ That's about it!
 
 ## Smaller rom version
 
-A version of the rom that should be compatible with the nesdev compo is now available as well. It reduces the rom
-size from 128kb down to 64kb. Some features in the UI will also be restricted or disabled. Enable this feature in 
-the UI on the "Other Settings" page. This will make the editor work with the smaller rom.
-
-If you want to compile it yourself, you won't be able to do this as simply as you can above. When you run 
-`create-nes-game build` it will work, but build a 128kb rom. That's not quite what you want! 
-
-You can make it work though - in the `config` folder, there are two files: `ca65.cfg` and `ca65-compressed.cfg`.
-Rename `ca65.cfg` to something else, then rename `ca65-compressed.cfg` to `ca65.cfg`. Now you can run 
-`create-nes-game` again and it should build the 64kb version. Have fun!
-
-Note: If you haven't replaced `patchable_data.asm` with one downloaded from the site, you will get errors about
-something called `SMALL_ROM` not being defined. I suggest downloading a version from the site, however you can
-also run it as-is using the command directly under `build-compressed:` in the [makefile](https://gh.nes.science/nes-puzzle-maker-rom/blob/main/makefile#L14).
+A version of the rom that should be compatible with the nesdev compo was available through rom version 5-3, and
+editor version 1.4.4. It was removed to allow adding more features, though you can certainly make a smaller rom
+with some careful hacking at the rom's content.
 
 ## License and copyright
 
-The tool is copyrighted to Indie GameWeb, as of 2022. The rom sources are available under an MIT license, however
+The tool is copyrighted to Indie GameWeb, as of 2024. The rom sources are available under an MIT license, however
 art from the online tool may have other licenses that need to be followed. The source code cannot help you with that, so
 please be aware of required licenses for any art and music you may use! (The sound effects were created by me, and are
 available under the same MIT license.)

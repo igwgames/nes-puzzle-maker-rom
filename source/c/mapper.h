@@ -22,9 +22,6 @@ extern void* BANK_STATIC_SC_PTR;
 extern void* BANK_UNKOWN04_PTR;
 #define BANK_UNKNOWN04 ((unsigned char)&BANK_UNKNOWN04_PTR)
 
-extern void* SMALL_ROM;
-#define SMALL_ROM ((unsigned char)&SMALL_ROM)
-
 
 // Set the prg bank currently used in the first slot.
 extern void __fastcall__ unrom_set_prg_bank(unsigned char bank);

@@ -576,12 +576,7 @@ _user_staticScreens:
     .byte $44, $55, $55, $55, $55, $55, $55, $11
     .byte $44, $55, $55, $55, $55, $55, $55, $11
     .byte $04, $05, $05, $05, $05, $05, $05, $01
-.if .defined(SMALL_ROM) 
-    ; 7 * 1024 - 8 total screens
-    .res 7168, $ef
-.else
     ; 13 * 10 1024 screens (14 total)
     .res 13312, $ef
-.endif
 
 .export _user_staticScreens: absolute
