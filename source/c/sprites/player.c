@@ -111,6 +111,7 @@ unsigned char convert_to_graphical_tileId(unsigned char newTile) {
 
 void animate_sprite_to_position() {
     ppu_wait_nmi();
+    if (!animateBlockMovement){ return; }
     blockAnimateTile = convert_to_graphical_tileId(collisionTempTileId);
     rawXPosition = (PLAY_AREA_LEFT + (playerGridPositionX << 4));
     rawYPosition = (PLAY_AREA_TOP + (playerGridPositionY << 4)) + 2; // grid is about 2px off for some reason

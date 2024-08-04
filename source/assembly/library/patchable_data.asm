@@ -414,6 +414,10 @@ _user_showGoal:
     .byte 1
 .export _user_showGoal
 
+_user_animateBlockMovement:
+    .byte 1
+.export _user_animateBlockMovement
+
 _user_hudData:
     .byte $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80
     .byte $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80 

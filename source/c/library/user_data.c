@@ -16,6 +16,7 @@ unsigned char enableLevelShow;
 unsigned char enableKeyCount;
 unsigned char showGameTitle;
 unsigned char showGoal;
+unsigned char animateBlockMovement;
 unsigned char customSongShowTimes[16];
 
 unsigned char userDataBuffer[16];
@@ -45,6 +46,7 @@ extern const unsigned char user_titleScreenData[];
 
 extern const unsigned char user_showGameTitle;
 extern const unsigned char user_showGoal;
+extern const unsigned char user_animateBlockMovement;
 extern const unsigned char user_hudData[];
 extern const unsigned char user_hudDataAttrs[];
 extern const unsigned char user_customSongShowTimes[];
@@ -63,6 +65,7 @@ void load_user_data(void) {
     enableKeyCount = user_enableKeyCount;
     showGameTitle = user_showGameTitle;
     showGoal = user_showGoal;
+    animateBlockMovement = user_animateBlockMovement;
 
     memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 16);
     memcpy(&tilePalettes[0], &user_tilePalettes[0], 16);

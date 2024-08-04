@@ -13,6 +13,7 @@ extern unsigned char singleLevelOverride;
 extern unsigned char enableLevelShow;
 extern unsigned char enableKeyCount;
 extern unsigned char showGoal;
+extern unsigned char animateBlockMovement;
 extern unsigned char showGameTitle;
 extern unsigned char customSongShowTimes[16];
 
