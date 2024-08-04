@@ -45,6 +45,7 @@ ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
 ZEROPAGE_DEF(unsigned char, currentUndoAction);
 ZEROPAGE_DEF(unsigned char, playerDidMove);
 
+#define HW_SPRITE_BOX_PUSH_ANI 0xd0
 
 // Huge pile of temporary variables
 #define rawXPosition tempChar1
@@ -58,6 +59,9 @@ ZEROPAGE_DEF(unsigned char, playerDidMove);
 
 #define collisionTempTileId tempChar8
 
+#define blockAnimateTile tempChar9
+#define blockAnimateX tempChara
+#define blockAnimateY tempCharb
 
 #define collisionTempValue tempInt1
 
@@ -93,9 +97,7 @@ void update_player_sprite() {
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
 }
 
-// Updates a single tile on the map visually
-void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
-
+unsigned char convert_to_graphical_tileId(unsigned char newTile) {
     if (newTile > 7) {
         newTile -= 8;
         newTile <<= 1;
@@ -103,6 +105,84 @@ void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile,
     } else {
         newTile <<= 1;
     }
+    return newTile;
+}
+
+
+void animate_sprite_to_position() {
+    ppu_wait_nmi();
+    blockAnimateTile = convert_to_graphical_tileId(collisionTempTileId);
+    rawXPosition = (PLAY_AREA_LEFT + (playerGridPositionX << 4));
+    rawYPosition = (PLAY_AREA_TOP + (playerGridPositionY << 4)) + 2; // grid is about 2px off for some reason
+    blockAnimateX = 0;
+    blockAnimateY = 0;
+    switch (playerDirection) {
+        case SPRITE_DIRECTION_RIGHT:
+            rawXPosition += 16;
+            blockAnimateX = 3;
+            break;
+        case SPRITE_DIRECTION_LEFT:
+            rawXPosition -= 16;
+            // Use overflow to subtract 3
+            blockAnimateX = 253;
+            break;
+        case SPRITE_DIRECTION_DOWN:
+            rawYPosition += 16;
+            blockAnimateY = 3;
+            break;
+        case SPRITE_DIRECTION_UP:
+            rawYPosition -= 16;
+            // Use overflow to subtract 3
+            blockAnimateY = 253;
+            break;
+
+    }
+    // Rewrite palette #3 with the color of this tile, copied from original palette
+
+    // Slightly dirty code, using i as the index to gamePaletteData
+    i = tilePalettes[collisionTempTileId]<<2;
+    pal_col(28, gamePaletteData[i]);
+    ++i;
+    pal_col(29, gamePaletteData[i]);
+    ++i;
+    pal_col(30, gamePaletteData[i]);
+    ++i;
+    pal_col(31, gamePaletteData[i]);
+    oam_spr(rawXPosition, rawYPosition, blockAnimateTile, 0x03, HW_SPRITE_BOX_PUSH_ANI);
+    rawXPosition += NES_SPRITE_WIDTH;
+    ++blockAnimateTile;
+    oam_spr(rawXPosition, rawYPosition, blockAnimateTile, 0x03, HW_SPRITE_BOX_PUSH_ANI+4);
+    rawXPosition -= NES_SPRITE_WIDTH;
+    rawYPosition += NES_SPRITE_HEIGHT;
+    blockAnimateTile += 15;
+    oam_spr(rawXPosition, rawYPosition, blockAnimateTile, 0x03, HW_SPRITE_BOX_PUSH_ANI+8);
+    rawXPosition += NES_SPRITE_WIDTH;
+    ++blockAnimateTile;
+    oam_spr(rawXPosition, rawYPosition, blockAnimateTile, 0x03, HW_SPRITE_BOX_PUSH_ANI+12);
+    for (i = 0; i < 5; i++) {
+        // Use raw sprite address manipulation to move the sprites on the x or y axis
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+3)) += blockAnimateX;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+7)) += blockAnimateX;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+11)) += blockAnimateX;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+15)) += blockAnimateX;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI)) += blockAnimateY;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+4)) += blockAnimateY;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+8)) += blockAnimateY;
+        (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+12)) += blockAnimateY;
+
+        ppu_wait_nmi();
+    }
+    // Hide using raw sprite address manipulation
+    (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+0)) = SPRITE_OFFSCREEN;
+    (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+4)) = SPRITE_OFFSCREEN;
+    (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+8)) = SPRITE_OFFSCREEN;
+    (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+12)) = SPRITE_OFFSCREEN;
+}
+
+// Updates a single tile on the map visually
+void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
+
+    newTile = convert_to_graphical_tileId(newTile);
 
     collisionTempValue = 0x2000 + ((x + 2)<<1) + ((y + 1)<<6);
     screenBuffer[0] = MSB(collisionTempValue);
@@ -205,6 +285,17 @@ void handle_player_movement() {
         undoPosition = tempChar1;
         currentUndoAction = undoActionType[undoPosition];
         
+        // Try to guess player direction before we change grid positions
+        if (undoPlayerFromPositionsX[undoPosition] > playerGridPositionX) {
+            playerDirection = SPRITE_DIRECTION_LEFT;
+        } else if (undoPlayerFromPositionsX[undoPosition] < playerGridPositionX) {
+            playerDirection = SPRITE_DIRECTION_RIGHT;
+        } else if (undoPlayerFromPositionsY[undoPosition] > playerGridPositionY) {
+            playerDirection = SPRITE_DIRECTION_UP;
+        } else if (undoPlayerFromPositionsY[undoPosition] < playerGridPositionX) {
+            playerDirection = SPRITE_DIRECTION_DOWN;
+        }
+
         playerGridPositionX = undoPlayerFromPositionsX[undoPosition];
         playerGridPositionY = undoPlayerFromPositionsY[undoPosition];
 
@@ -294,6 +385,9 @@ void handle_player_movement() {
         // Ya didn't move...
         return; 
     }
+    // Update the sprite immediately, so it's not locked in the wrong direction for later animations.
+    // (And so we don't knock rawTileID out from under ourselves later on.)
+    update_player_sprite();
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
     currentCollision = tileCollisionTypes[currentMap[rawTileId]];
 
@@ -333,20 +427,21 @@ void handle_player_movement() {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
-                        currentMap[rawTileId+1] = currentMap[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId+1];
-                        
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX + 1;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
-                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId+1]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
-
                         undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        currentMap[rawTileId+1] = undoBlockToId[undoPosition];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
+                        collisionTempTileId = currentMap[rawTileId];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
@@ -355,24 +450,23 @@ void handle_player_movement() {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
-
-                        currentMap[rawTileId+1] = currentMapOrig[rawTileId+1];
-                        
-
-
-                        collisionTempTileId = currentMap[rawTileId+1];
-                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX + 1;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
-
-                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId+1]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
                         undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        currentMap[rawTileId+1] = currentMapOrig[rawTileId+1];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
+                        collisionTempTileId = currentMap[rawTileId];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+                        collisionTempTileId = currentMap[rawTileId+1];
+                        update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
@@ -391,43 +485,52 @@ void handle_player_movement() {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
-
-                        currentMap[rawTileId-1] = currentMap[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId-1];
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX - 1;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
-
-                        update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
                         undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+
+
+                        currentMap[rawTileId-1] = undoBlockToId[undoPosition];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
+                        collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId-1];
+                        update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
+
+                        
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
+                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX - 1;
+                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
+                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
 
                         currentMap[rawTileId-1] = currentMapOrig[rawTileId-1];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMap[rawTileId-1];
-                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
-                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX - 1;
-                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        collisionTempTileId = currentMap[rawTileId];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
 
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId-1];
                         update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
 
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
-                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
-                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
-
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -446,44 +549,51 @@ void handle_player_movement() {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
-
-                        currentMap[rawTileId-12] = currentMap[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId-12];
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY - 1;
-
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[currentMap[rawTileId-12]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
                         undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+
+                        currentMap[rawTileId-12] = currentMap[rawTileId];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
+                        collisionTempTileId = currentMap[rawTileId];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId-12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
+                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
+                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY - 1;
+                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
+                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
 
-                        currentMap[rawTileId-12] = 0;
+                        currentMap[rawTileId-12] = currentMapOrig[rawTileId - 12];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMap[rawTileId-12];
-                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
-                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
-                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY - 1;
-
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[currentMap[rawTileId-12]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
                         collisionTempTileId = currentMap[rawTileId];
-                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
-                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId-12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -502,44 +612,50 @@ void handle_player_movement() {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
-
-                        currentMap[rawTileId+12] = currentMap[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId+12];
                         undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY + 1;
-
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[currentMap[rawTileId+12]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
-                        collisionTempTileId = currentMap[rawTileId];
                         undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
                         undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        currentMap[rawTileId+12] = currentMap[rawTileId];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
+                        collisionTempTileId = currentMap[rawTileId];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId+12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_MOVE, SFX_CHANNEL_1);
                     } else if (collisionTempTileId == TILE_COLLISION_GAP || collisionTempTileId == TILE_COLLISION_GAP_PASSABLE || collisionTempTileId == TILE_COLLISION_COLLAPSIBLE) {
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];
                         undoBlockToId[undoPosition] = currentMap[rawTileId];
+                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
+                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY + 1;
+                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
+                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
 
                         currentMap[rawTileId+12] = currentMapOrig[rawTileId + 12];
+                        currentMap[rawTileId] = currentMapOrig[rawTileId];
+
                         ++playerCrateCount;
                         ++gameCrates;
 
-                        collisionTempTileId = currentMap[rawTileId+12];
-                        undoActionType[undoPosition] = TILE_COLLISION_GAP;
-                        undoBlockFromPositionsX[undoPosition] = nextPlayerGridPositionX;
-                        undoBlockFromPositionsY[undoPosition] = nextPlayerGridPositionY + 1;
-
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[currentMap[rawTileId+12]]);
-
-                        currentMap[rawTileId] = currentMapOrig[rawTileId];
                         collisionTempTileId = currentMap[rawTileId];
-                        undoBlockToPositionsX[undoPosition] = nextPlayerGridPositionX;
-                        undoBlockToPositionsY[undoPosition] = nextPlayerGridPositionY;
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
-                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
+                        collisionTempTileId = undoBlockToId[undoPosition];
+                        animate_sprite_to_position();
+
+                        collisionTempTileId = currentMap[rawTileId+12];
+                        update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[collisionTempTileId]);
+
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
