@@ -47,11 +47,13 @@ If you're using custom music, put the `.bin` file you used in the tool in as `so
 
 If you're using custom graphics, put the `.chr` file you used in the tool as `graphics/tiles_mod.chr`.
 
+If you're using custom sound effects, put the `.ftm` file you used in the tool as `sound/sfx.nsf`
+
 That's about it!
 
 ## Smaller rom version
 
-A version of the rom that should be compatible with the nesdev compo was available through rom version 5-3, and
+A version of the rom that was compatible with the nesdev compo was available through rom version 5-3, and
 editor version 1.4.4. It was removed to allow adding more features, though you can certainly make a smaller rom
 with some careful hacking at the rom's content.
 
