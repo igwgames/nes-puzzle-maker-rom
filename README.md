@@ -47,7 +47,7 @@ If you're using custom music, put the `.bin` file you used in the tool in as `so
 
 If you're using custom graphics, put the `.chr` file you used in the tool as `graphics/tiles_mod.chr`.
 
-If you're using custom sound effects, put the `.ftm` file you used in the tool as `sound/sfx.nsf`
+If you're using custom sound effects, put the `.ftm` file you used in the tool as `sound/sfx.ftm`
 
 That's about it!
 
