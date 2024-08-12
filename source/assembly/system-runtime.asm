@@ -304,6 +304,7 @@ music_dummy_data:
 .if(FT_SFX_ENABLE)
 sounds_data:
     .include "../../sound/sfx.asm"
+    .res (1024 - 582)
 .endif
 
 .segment "DMC"
