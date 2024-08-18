@@ -19,10 +19,11 @@
 .segment "GRAPHICS" 
     _background_graphics:
         .incbin "./tiles_mod.chr"
+        .incbin "./ascii_mod.chr"
     _sprite_graphics:
-        ; NOTE: This is here to help romhackers who might like to have another one :)
-        ; Or some day I may add official support.
+        ; Allow animation effects for tiles
         .incbin "./tiles_mod.chr"
+        .incbin "./sprites_mod.chr"
 ;
 ; Make sure to export all symbols created, too, so we can read them from our code!
 ;

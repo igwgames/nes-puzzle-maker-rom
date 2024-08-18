@@ -35,7 +35,7 @@ void initialize_variables() {
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
-    bank_spr(0);
+    bank_spr(1);
 }   
 
 void main() {
@@ -139,7 +139,7 @@ void main() {
                 init_map();
 
                 // Aim the player down to start
-                playerSpriteTileId = 0x40;
+                playerSpriteTileId = 0x80;
 
                 
                 // The draw map methods handle turning the ppu on/off, but we weren't quite done yet. Turn it back off.
