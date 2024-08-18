@@ -10,6 +10,8 @@
 
 unsigned char palette[16];
 
+unsigned char bitplaneBytes[3];
+
 // NOTE: This is in the kernel since it loads from patchable_data
 
 // Replace any "sprite-ish" things, so that when we move them they don't duplicate
@@ -37,11 +39,11 @@ void load_map() {
     totalCollectableCount = 0;
     totalCrateCount = 0;
 
-    // Each map is 64 bytes in total, so find the index to start looking at
-    tempInt1 = currentLevelId << 6;
+    // Each map is 78 bytes in total, so find the index to start looking at
+    tempInt1 = currentLevelId * 78;
 
     // Pull data out of the data we have available (see patchable_data.asm for where this comes from)
-    currentMapBorderTile = user_gameLevelData[60 + tempInt1];
+    currentMapBorderTile = user_gameLevelData[75 + tempInt1];
     currentMapBorderAsset = tilePalettes[currentMapBorderTile];
     currentMapBorderAsset += (currentMapBorderAsset << 2);
     currentMapBorderAsset += (currentMapBorderAsset << 4);
@@ -55,33 +57,59 @@ void load_map() {
 
 
     // Iterate over the map data and expand it into a full map. Each byte in the data we store actually holds
-    // 2 tiles - each nybble (half-byte) is a tile id, left then right. Thus each row is 6 bytes. If you're editing
-    // in assembly, the left tile is 0xN_ and the right is 0x_N.
+    // data for 2 tiles - one in the lower 5 bits, then a bitplane of the last 3 bytes, 6=<<5, 7=<<6, 8=<<7
 
     // Track whether we have more crates, or more holes. Use this to determine how to finish level.
     tempChar2 = 0;
     tempChar3 = 0;
 
-    for (i = 0, j = 0; i != 60; ++i) {
-        j = i<<1;
-        currentMap[j] = (user_gameLevelData[i + tempInt1] & 0xf0) >> 4;
+    // i = index on gameLevelData, j = index on currentMap
+    for (i = 0, j = 0; i != 75; ++i) {
+        
+        tempChar4 = user_gameLevelData[i + tempInt1];
+        tempChar5 = tempChar4 & 0x1f;
+        currentMap[j] = tempChar5;
 
-        tempChar1 = tileCollisionTypes[currentMap[j]];
+        tempChar1 = tileCollisionTypes[tempChar5];
         update_map_replace_spriteish();
+
+        tempChar6 = i % 5; // bit within bitlaneBytes
+        bitplaneBytes[0] += (!!(tempChar4 & 0x20)) << tempChar6;
+        bitplaneBytes[1] += (!!(tempChar4 & 0x40)) << tempChar6;
+        bitplaneBytes[2] += (!!(tempChar4 & 0x80)) << tempChar6;
+        if (tempChar6 == 4) {
+            // End of a chunk, use bitplane values
+            ++j;
+            tempChar7 = bitplaneBytes[0];
+            currentMap[j] = tempChar7;
+            tempChar1 = tileCollisionTypes[tempChar7];
+            update_map_replace_spriteish();
+            ++j;
+            tempChar7 = bitplaneBytes[1];
+            currentMap[j] = tempChar7;
+            tempChar1 = tileCollisionTypes[tempChar7];
+            update_map_replace_spriteish();
+            ++j;
+            tempChar7 = bitplaneBytes[2];
+            currentMap[j] = tempChar7;
+            tempChar1 = tileCollisionTypes[tempChar7];
+            update_map_replace_spriteish();
+
+            bitplaneBytes[0] = 0;
+            bitplaneBytes[1] = 0;
+            bitplaneBytes[2] = 0;
+        }
 
         ++j;
-        currentMap[j] = (user_gameLevelData[i + tempInt1] & 0x0f);
 
-        tempChar1 = tileCollisionTypes[currentMap[j]];
-        update_map_replace_spriteish();
     }
     if (tempChar2 < tempChar3) {
         totalCrateCount = tempChar2;
     } else {
         totalCrateCount = tempChar3;
     }
-    playerGridPositionX = user_gameLevelData[tempInt1 + 62] & 0x0f;
-    playerGridPositionY = user_gameLevelData[tempInt1 + 62] >> 4;
-    currentGameStyle = user_gameLevelData[tempInt1 + 61];
+    playerGridPositionX = user_gameLevelData[tempInt1 + 77] & 0x0f;
+    playerGridPositionY = user_gameLevelData[tempInt1 + 77] >> 4;
+    currentGameStyle = user_gameLevelData[tempInt1 + 76];
 
 }

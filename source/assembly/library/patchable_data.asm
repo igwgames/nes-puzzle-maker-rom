@@ -9,7 +9,7 @@
 .segment "USER_DATA"
 
 ; DO NOT REMOVE/EDIT! Used by engine to identify game and align patching
-.asciiz "PATCH TARGET 1.02" ; 0x12
+.asciiz "PATCH TARGET 1.03" ; 0x12
 
 ; These are imported in map.h for the most part
 _user_gameName:
@@ -20,59 +20,25 @@ _user_totalGameLevels:
     .byte 2 ;1
 .export _user_totalGameLevels: absolute
 
-_user_gameLevelData:; 128 (4096 total, res for rest)
+_user_gameLevelData:; 78 (4992 total, res for rest)
     
-    .byte $01, $99, $99, $99, $99, $99
-    .byte $01, $22, $22, $22, $22, $29
-    .byte $01, $21, $06, $00, $12, $29
-    .byte $01, $21, $48, $00, $12, $21
-    .byte $01, $21, $00, $00, $12, $21
-
-    .byte $00, $00, $00, $00, $cb, $00
-    .byte $01, $21, $50, $45, $12, $21
-    .byte $01, $21, $45, $40, $12, $21
-    .byte $01, $99, $99, $11, $99, $11
-    .byte $01, $11, $11, $11, $91, $17
-
-
+    ; 75 bytes of level data
+    .byte $00, $00, $02, $00, $00, $00, $40, $00, $0f, $00, $80, $80, $80, $80, $07 
+    .byte $00, $20, $20, $00, $00, $00, $00, $00, $0f, $0c, $80, $86, $80, $80, $00 
+    .byte $00, $00, $04, $00, $00, $00, $00, $40, $0f, $00, $80, $80, $80, $80, $00 
+    .byte $02, $0b, $02, $00, $09, $00, $40, $00, $0f, $00, $89, $00, $c8, $08, $00 
+    .byte $00, $00, $02, $00, $09, $00, $40, $04, $05, $00, $80, $00, $c0, $00, $00
     ; Extra data...
     ; Tile id for border
     .byte $02
     ; Gameplay mode
-    .byte $1
+    .byte 1
     
     ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
-    .byte $44
-    ; Unused
-    .byte $67
+    .byte $11
 
-    ; ---
-
-    .byte $01, $11, $11, $11, $11, $11
-    .byte $01, $22, $22, $22, $22, $21
-    .byte $01, $21, $06, $00, $12, $21
-    .byte $01, $21, $50, $00, $12, $21
-    .byte $01, $21, $00, $00, $12, $21
-
-    .byte $00, $00, $00, $00, $00, $00
-    .byte $01, $21, $50, $45, $12, $21
-    .byte $01, $21, $00, $40, $12, $21
-    .byte $01, $22, $17, $11, $22, $21
-    .byte $01, $11, $11, $11, $11, $11
-
-
-    ; Extra data...
-    ; Tile id for border
-    .byte $02
-    ; Gameplay mode
-    .byte $00 
-    
-    ; start position (top nybble is y, bottom nybble is x - starts at first playable space, no border)
-    .byte $44
-    ; Unused
-    .byte $67
 ; rest of the levels
-.res $f80, $ef
+.res 4914, $ef
 
 .export _user_gameLevelData: absolute
 
