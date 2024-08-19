@@ -7,8 +7,8 @@ ZEROPAGE_DEF(unsigned char, totalGameLevels);
 ZEROPAGE_DEF(unsigned char, movementSpeed);
 ZEROPAGE_DEF(unsigned char, enableUndo);
 
-unsigned char tileCollisionTypes[16];
-unsigned char tilePalettes[16];
+unsigned char tileCollisionTypes[32];
+unsigned char tilePalettes[32];
 unsigned char gamePaletteData[16];
 unsigned char spritePalette[4];
 unsigned char singleLevelOverride;
@@ -67,8 +67,8 @@ void load_user_data(void) {
     showGoal = user_showGoal;
     animateBlockMovement = user_animateBlockMovement;
 
-    memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 16);
-    memcpy(&tilePalettes[0], &user_tilePalettes[0], 16);
+    memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 32);
+    memcpy(&tilePalettes[0], &user_tilePalettes[0], 32);
     memcpy(&gamePaletteData[0], &user_gamePaletteData[0], 16);
     memcpy(&spritePalette[0], &user_spritePalette[0], 4);
     memcpy(&customSongShowTimes[0], &user_customSongShowTimes[0], 16);

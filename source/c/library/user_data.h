@@ -4,8 +4,8 @@ ZEROPAGE_EXTERN(unsigned char, totalGameLevels);
 ZEROPAGE_EXTERN(unsigned char, movementSpeed);
 ZEROPAGE_EXTERN(unsigned char, enableUndo);
 
-extern unsigned char tileCollisionTypes[16];
-extern unsigned char tilePalettes[16];
+extern unsigned char tileCollisionTypes[32];
+extern unsigned char tilePalettes[32];
 extern unsigned char gamePaletteData[16];
 extern unsigned char spritePalette[4];
 extern unsigned char unusedByte1;

@@ -126,14 +126,13 @@ void draw_current_map_to_a_inline() {
             tempChar2 = tempChar4 + j;
             // value from the grid, expanded up to a "real" tile id
             tempChar3 = currentMap[tempChar2];
+            tempChara = tempChar3;
             update_asset_table_based_on_i_j();
-            if (tempChar3 < 8) {
-                tempChar3 <<= 1;
-            } else {
-                tempChar3 -= 8;
-                tempChar3 <<= 1;
-                tempChar3 += 32;
-            }
+            tempChar3 &= 0x07;
+            tempChara >>= 3;
+            tempChar3 <<= 1;
+            tempChara <<= 5;
+            tempChar3 += tempChara;
             mapScreenBuffer[0x04 + (j<<1)] = tempChar3;
             mapScreenBuffer[0x04 + (j<<1) + 1] = tempChar3 + 1;
             mapScreenBuffer[0x24 + (j<<1)] = tempChar3 + 16;
