@@ -98,13 +98,12 @@ void update_player_sprite() {
 }
 
 unsigned char convert_to_graphical_tileId(unsigned char newTile) {
-    if (newTile > 7) {
-        newTile -= 8;
-        newTile <<= 1;
-        newTile += 32;
-    } else {
-        newTile <<= 1;
-    }
+    tempChara = newTile;
+    newTile &= 0x07;
+    tempChara >>= 3;
+    newTile <<= 1;
+    tempChara <<= 5;
+    newTile += tempChara;
     return newTile;
 }
 
