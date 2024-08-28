@@ -9,6 +9,7 @@
 #include "source/c/map/map.h"
 #include "source/c/graphics/fade_animation.h"
 #include "source/c/menus/input_helpers.h"
+#include "source/c/library/user_data.h"
 
 #pragma code-name ("MENUS")
 #pragma rodata-name ("MENUS")
@@ -17,6 +18,12 @@ void draw_win_screen() {
     ppu_off();
     clear_screen_with_border();
     scroll(0, 0);
+
+    if (disableStatsScreen) {
+        ppu_on_all();
+        return;
+    }
+
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(8, 5), "Congratulations!");
@@ -71,7 +78,6 @@ void draw_win_screen() {
     ppu_on_all();
 
     fade_in();
-    // unrom_set_prg_bank(BANK_MENUS);
     wait_for_start();
     fade_out();
 

@@ -13,6 +13,7 @@ ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
 
 #define tempTileId tempChar1
 #define tempTileIndex tempChar2
+#define tempTileId2 tempChar3
 
 // Draw the "hud" at the top of the screen, with its border and attributes. Also the level if the user turned
 // that feature on.
@@ -52,7 +53,7 @@ void update_hud() {
     if (showGoal) {
         switch (currentGameStyle) {
             case GAME_STYLE_MAZE:
-                for (j = 0; j != 16; ++j) {
+                for (j = 0; j !=32; ++j) {
                     if (tileCollisionTypes[j] == TILE_COLLISION_LEVEL_END) {
                         tempTileIndex = j;
                         break;
@@ -68,7 +69,7 @@ void update_hud() {
 
                 break;
             case GAME_STYLE_COIN:
-                for (j = 0; j != 16; ++j) {
+                for (j = 0; j != 32; ++j) {
                     if (tileCollisionTypes[j] == TILE_COLLISION_COLLECTABLE) {
                         tempTileIndex = j;
                         break;
@@ -83,13 +84,12 @@ void update_hud() {
 
                 break;
             case GAME_STYLE_CRATES:
-                for (j = 0; j != 16; ++j) {
+                for (j = 0; j != 32; ++j) {
                     if (tileCollisionTypes[j] == TILE_COLLISION_CRATE) {
                         tempTileIndex = j;
                         break;
                     }
                 }
-                tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
                 i = 0;
                 screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START + 62) | NT_UPD_HORZ;
                 screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START + 62);
@@ -101,7 +101,15 @@ void update_hud() {
                 break;
         }
 
-        tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
+        // tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
+        tempTileId = tempTileIndex;
+        tempTileId2 = tempTileId;
+        tempTileId &= 0x07;
+        tempTileId2 >>= 3;
+        tempTileId <<= 1;
+        tempTileId2 <<= 5;
+        tempTileId += tempTileId2;
+
         screenBuffer[i++] = MSB(NAMETABLE_A + HUD_HEART_START) | NT_UPD_HORZ;
         screenBuffer[i++] = LSB(NAMETABLE_A + HUD_HEART_START);
         screenBuffer[i++] = 2;

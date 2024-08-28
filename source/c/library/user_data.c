@@ -16,6 +16,7 @@ unsigned char enableLevelShow;
 unsigned char enableKeyCount;
 unsigned char showGameTitle;
 unsigned char showGoal;
+unsigned char disableStatsScreen;
 unsigned char animateBlockMovement;
 unsigned char customSongShowTimes[16];
 
@@ -41,6 +42,7 @@ extern const unsigned char user_tilePalettes[];
 extern const unsigned char user_gameLevelData[];
 extern const unsigned char user_totalGameLevels;
 extern const unsigned char user_unusedByte1;
+extern const unsigned char user_disableStatsScreen;
 extern const unsigned char user_singleLevelOverride;
 extern const unsigned char user_titleScreenData[];
 
@@ -66,6 +68,7 @@ void load_user_data(void) {
     showGameTitle = user_showGameTitle;
     showGoal = user_showGoal;
     animateBlockMovement = user_animateBlockMovement;
+    disableStatsScreen = user_disableStatsScreen;
 
     memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 32);
     memcpy(&tilePalettes[0], &user_tilePalettes[0], 32);

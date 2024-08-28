@@ -692,7 +692,7 @@ void handle_player_movement() {
         case TILE_COLLISION_COLLAPSIBLE:
             // Figure out where a hole is
             newBlock = 0; // If there isn't one, do something half sane
-            for (i = 0; i < 16; ++i) {
+            for (i = 0; i < 32; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_GAP || tileCollisionTypes[i] == TILE_COLLISION_GAP_PASSABLE) {
                     newBlock = i;
                     break;

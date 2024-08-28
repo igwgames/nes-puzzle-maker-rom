@@ -17,7 +17,7 @@ _user_gameName:
 .export _user_gameName: absolute
 
 _user_totalGameLevels: 
-    .byte 2 ;1
+    .byte 1 ;1
 .export _user_totalGameLevels: absolute
 
 _user_gameLevelData:; 78 (4992 total, res for rest)
@@ -348,9 +348,9 @@ _user_unusedByte3:
     .byte $03
 .export _user_unusedByte3: absolute
 
-_user_unusedByte4:
-    .byte 1
-.export _user_unusedByte4
+_user_disableStatsScreen:
+    .byte 0
+.export _user_disableStatsScreen
 
 _user_movementSpeed:
     .byte 2

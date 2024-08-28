@@ -15,6 +15,7 @@ extern unsigned char enableKeyCount;
 extern unsigned char showGoal;
 extern unsigned char animateBlockMovement;
 extern unsigned char showGameTitle;
+extern unsigned char disableStatsScreen;
 extern unsigned char customSongShowTimes[16];
 
 extern unsigned char userDataBuffer[16];
