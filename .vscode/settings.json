@@ -1,9 +1,0 @@
-{
-    "terminal.integrated.profiles.windows": {
-      "Cygwin": {
-        "path": "C:\\cygwin64\\bin\\bash.exe",
-      }
-    },
-    "terminal.integrated.defaultProfile.windows": "Cygwin"
-  }
-  
