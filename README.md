@@ -51,7 +51,7 @@ If you're using custom sprites, put the `.chr` file you used in the tool as `gra
 
 If you're using a custom font, put the `.chr` file you used in the tool as `graphics/ascii_mod.chr`.
 
-If you're using custom sound effects, put the `.ftm` file you used in the tool as `sound/sfx.ftm`
+If you're using custom sound effects, put the `.nsf` file you used in the tool as `sound/sfx.nsf`
 
 That's about it!
 
