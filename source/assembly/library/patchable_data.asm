@@ -4,7 +4,6 @@
 ; NOTE: If you're editing the raw code of your own game you can ignore the warnings in this file, and move it wherever
 ; you want! These warnings only apply if your rom will continue to be used with the  web-based editor.
 
-; Also note, if you want to patch in a game from the editor, check out "game.json" in the 
 
 .segment "USER_DATA"
 
