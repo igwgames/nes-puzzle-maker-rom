@@ -32,6 +32,7 @@ void initialize_variables() {
 
     playerGridPositionX = 0;
     playerGridPositionY = 0;
+    switchState = 0;
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
