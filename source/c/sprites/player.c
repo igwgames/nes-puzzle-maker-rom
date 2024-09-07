@@ -481,6 +481,7 @@ void handle_player_movement() {
         rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
         if (tileCollisionTypes[currentMap[rawTileId]] == TILE_COLLISION_SWITCH) {
             switchState = !switchState;
+            sfx_play(SFX_SWITCH_HIT, SFX_CHANNEL_1);
             updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
             update_based_on_tile_trigger();
 

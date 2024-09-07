@@ -27,6 +27,7 @@
 #define SFX_MENU_CLOSE 5
 #define SFX_CRATE_SMASH 6
 #define SFX_CRATE_MOVE 7
+#define SFX_SWITCH_HIT 8
 
 // Constants for sfx channels. Completely unnecessary but it's easier to read
 #define SFX_CHANNEL_1 0
