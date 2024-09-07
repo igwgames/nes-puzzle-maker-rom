@@ -114,7 +114,7 @@ unsigned char win_condition_met(void) {
             // Do nothing; you're just allowed to pass.
             break;
         case GAME_STYLE_COIN:
-            for (i = 0; i != 120; ++i) {
+            for (i = 0; i != MAP_DATA_TILE_LENGTH; ++i) {
                 if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_COLLECTABLE) {
                     // Sorry, you didn't get em all. Plz try again.
                     return 0;
@@ -122,7 +122,7 @@ unsigned char win_condition_met(void) {
             }
             break;
         case GAME_STYLE_CRATES: 
-            for (i = 0; i != 120; ++i) {
+            for (i = 0; i != MAP_DATA_TILE_LENGTH; ++i) {
                 if (totalCrateCount != playerCrateCount) {
                     // Sorry, you didn't get em all. Plz try again.
                     return 0;
@@ -138,13 +138,13 @@ unsigned char win_condition_met(void) {
 void update_based_on_tile_trigger(void) {
     if (updateTileTrigger == UPDATE_TILE_TRIGGER_END) {
         // First, make sure both an open and closed tile are present, else do nothing.
-        tempChar1 = 0;
-        tempChar2 = 0;
+        tempChar1 = 255;
+        tempChar2 = 255;
         for (i = 0; i < NUMBER_OF_TILES; i++) {
             if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END) { tempChar1 = i; }
             if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END_OPEN) { tempChar2 = i; }
         }
-        if (!tempChar1 || !tempChar2) {
+        if (tempChar1 == 255 || tempChar2 == 255) {
             return;
         }
 
@@ -165,8 +165,40 @@ void update_based_on_tile_trigger(void) {
             } 
         }
     } else if (updateTileTrigger == UPDATE_TILE_TRIGGER_SWITCH) {
+        // First, find the default walkable and default solid tiles, and keep them handy
+        tempChar1 = 255;
+        tempChar2 = 255;
+        for (i = 0; i < NUMBER_OF_TILES; i++) {
+            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_SOLID) { tempChar1 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_WALKABLE) { tempChar2 = i; }
+        }
+        if (tempChar1 == 255 || tempChar2 == 255) {
+            return;
+        }
+
         // Iterate over every tile in the map, updating all switch-affected tiles to be open or
         // closed based on the state of the switch
+        for (i = 0; i < MAP_DATA_TILE_LENGTH; ++i) {
+            // Ignore crates entirely. Just let them be.
+            if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_CRATE) { continue; }
+
+            collisionTempTileId = tileCollisionTypes[currentMapOrig[i]];
+            if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_SOLID) {
+                // Take over this variable so we can avoid reading currentMap[i] multiple times
+                collisionTempTileId = switchState ? tempChar2 : tempChar1;
+            } else if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
+                // Take over this variable so we can avoid reading currentMap[i] multiple times
+                collisionTempTileId = switchState ? tempChar1 : tempChar2;
+            } else {
+                continue; // Nothing to do here, skip the step below.
+            }
+            if (currentMap[i] != collisionTempTileId) {
+                currentMap[i] = collisionTempTileId;
+                update_single_tile(i % 12, i / 12, collisionTempTileId, tilePalettes[collisionTempTileId]);
+            }
+
+        }
+
     }
     updateTileTrigger = UPDATE_TILE_TRIGGER_NONE;
 }
@@ -371,7 +403,7 @@ void handle_player_movement() {
             playerDirection = SPRITE_DIRECTION_RIGHT;
         } else if (undoPlayerFromPositionsY[undoPosition] > playerGridPositionY) {
             playerDirection = SPRITE_DIRECTION_UP;
-        } else if (undoPlayerFromPositionsY[undoPosition] < playerGridPositionX) {
+        } else if (undoPlayerFromPositionsY[undoPosition] < playerGridPositionY) {
             playerDirection = SPRITE_DIRECTION_DOWN;
         }
 
@@ -388,6 +420,8 @@ void handle_player_movement() {
             --keyCount;
         } else if (currentUndoAction == TILE_COLLISION_LOCK) {
             ++keyCount;
+        } else if (currentUndoAction == TILE_COLLISION_SWITCH) {
+            switchState = !switchState;
         }
 
         sfx_play(SFX_HURT, SFX_CHANNEL_1);
@@ -418,13 +452,48 @@ void handle_player_movement() {
         }
         
         // Just re-trigger all tile updates.
-        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
-        update_based_on_tile_trigger();
         updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
+        update_based_on_tile_trigger();
+        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
         update_based_on_tile_trigger();
         update_hud();
         return;
+    } else if (controllerState & PAD_A && !(lastControllerState & PAD_A) && tempChar1 != (NUMBER_OF_UNDOS - 1)) {
+        tempChar1 = 255;
+        // Borrow nextPlayerGridPositionX/Y to figure out where you'll land
+        nextPlayerGridPositionX = playerGridPositionX;
+        nextPlayerGridPositionY = playerGridPositionY;
+        switch (playerDirection) {
+            case SPRITE_DIRECTION_DOWN:
+            case SPRITE_DIRECTION_STATIONARY:
+                ++nextPlayerGridPositionY;
+                break;
+            case SPRITE_DIRECTION_UP:
+                --nextPlayerGridPositionY;
+                break;
+            case SPRITE_DIRECTION_LEFT:
+                --nextPlayerGridPositionX;
+                break;
+            case SPRITE_DIRECTION_RIGHT:
+                ++nextPlayerGridPositionX;
+                break;
+        }
+        rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
+        if (tileCollisionTypes[currentMap[rawTileId]] == TILE_COLLISION_SWITCH) {
+            switchState = !switchState;
+            updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
+            update_based_on_tile_trigger();
+
+            // Add the undo action
+            set_undos_from_params();
+            undoActionType[undoPosition] = TILE_COLLISION_SWITCH;
+            ++undoPosition;
+            if (undoPosition == (NUMBER_OF_UNDOS)) { undoPosition = 0; }
+
+            return;
+        }
     }
+
     
     shouldKeepMoving = 0;
     go_again:
@@ -485,6 +554,7 @@ void handle_player_movement() {
         // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_GAP_PASSABLE:
+        case TILE_COLLISION_SW_BLOCK_WALKABLE:
             // Walkable.. Go !
             set_undos_from_params();
             break;
@@ -506,7 +576,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+1]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE || collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+1];
@@ -565,7 +635,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-1]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE || collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-1];
@@ -630,7 +700,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId-12]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE || collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId-12];
@@ -694,7 +764,7 @@ void handle_player_movement() {
                         break;
                     }
                     collisionTempTileId = tileCollisionTypes[currentMap[rawTileId+12]];
-                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE) {
+                    if (collisionTempTileId == TILE_COLLISION_WALKABLE || collisionTempTileId == TILE_COLLISION_ICE || collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                         // Do it
                         set_undos_from_params();
                         undoBlockFromId[undoPosition] = currentMap[rawTileId+12];

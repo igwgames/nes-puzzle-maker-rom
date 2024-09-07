@@ -126,8 +126,6 @@ void update_hud() {
         screenBuffer[i++] = tempTileId;
     }
 
-
-
     if (enableLevelShow) {
         screenBuffer[i++] = MSB(NAMETABLE_A + HUD_POSITION_START + 0x89) | NT_UPD_HORZ;
         screenBuffer[i++] = LSB(NAMETABLE_A + HUD_POSITION_START + 0x89);

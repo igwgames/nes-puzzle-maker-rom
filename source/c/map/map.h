@@ -1,11 +1,11 @@
 #include "source/c/library/bank_helpers.h"
 
 // How many tiles are in the map before we start getting into sprite data.
-#define MAP_DATA_TILE_LENGTH 192
+#define MAP_DATA_TILE_LENGTH 120
 
 // The current map; usable for collisions/etc
-extern unsigned char currentMap[120];
-extern unsigned char currentMapOrig[120];
+extern unsigned char currentMap[MAP_DATA_TILE_LENGTH];
+extern unsigned char currentMapOrig[MAP_DATA_TILE_LENGTH];
 
 extern unsigned char assetTable[64];
 
