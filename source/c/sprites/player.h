@@ -28,3 +28,10 @@ void update_player_sprite();
 
 // Wipe the undo list
 void clear_undo(void);
+
+#define UPDATE_TILE_TRIGGER_NONE 0
+#define UPDATE_TILE_TRIGGER_END 1
+#define UPDATE_TILE_TRIGGER_SWITCH 2
+void set_update_tile_trigger(unsigned char val);
+
+extern unsigned char switchState;

@@ -30,7 +30,11 @@ void draw_current_map_to_a_inline();
 #define TILE_COLLISION_LEVEL_END 7
 #define TILE_COLLISION_LOCK 8
 #define TILE_COLLISION_KEY 9
-#define TILE_COLLISION_ICE 0xa
+#define TILE_COLLISION_ICE 10
+#define TILE_COLLISION_LEVEL_END_OPEN 11
+#define TILE_COLLISION_SWITCH 12
+#define TILE_COLLISION_SW_BLOCK_SOLID 13
+#define TILE_COLLISION_SW_BLOCK_WALKABLE 14
 
 // Simplest style - just get to the end of each level.
 #define GAME_STYLE_MAZE 0

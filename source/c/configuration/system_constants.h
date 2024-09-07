@@ -33,3 +33,5 @@
 #define SFX_CHANNEL_2 1
 #define SFX_CHANNEL_3 2
 #define SFX_CHANNEL_4 3
+
+#define NUMBER_OF_TILES 32

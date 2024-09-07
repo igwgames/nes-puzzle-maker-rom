@@ -147,6 +147,8 @@ void main() {
                 unrom_set_prg_bank(BANK_PLAYER);
                 draw_hud();
                 ppu_on_all();
+                // If any tiles need to be updated, start that process
+                set_update_tile_trigger(UPDATE_TILE_TRIGGER_END);
 
                 // Seed the random number generator here, using the time since console power on as a seed
                 set_rand(frameCount);

@@ -9,6 +9,7 @@
 #include "source/c/graphics/hud.h"
 #include "source/c/map/load_map.h"
 #include "source/c/map/map.h"
+#include "source/c/sprites/player.h"
 
 #pragma code-name ("PLAYER")
 #pragma rodata-name ("PLAYER")
@@ -40,6 +41,9 @@ unsigned char undoBlockFromId[NUMBER_OF_UNDOS];
 unsigned char undoBlockToId[NUMBER_OF_UNDOS];
 unsigned char undoActionType[NUMBER_OF_UNDOS];
 
+unsigned char updateTileTrigger;
+unsigned char switchState;
+
 ZEROPAGE_DEF(unsigned char, currentCollision);
 ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
 ZEROPAGE_DEF(unsigned char, currentUndoAction);
@@ -65,6 +69,9 @@ ZEROPAGE_DEF(unsigned char, playerDidMove);
 
 #define collisionTempValue tempInt1
 
+// Forward defs, since this file is a little bit messy
+void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette);
+
 void clear_undo(void) {
     for (i = 0; i != NUMBER_OF_UNDOS; ++i) {
         undoActionType[i] = 255;
@@ -73,7 +80,7 @@ void clear_undo(void) {
 
 // Code here goes in PRG instead. because space is hard
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
-void update_player_sprite() {
+void update_player_sprite(void) {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
 
     rawXPosition = (PLAY_AREA_LEFT + (playerGridPositionX << 4));
@@ -99,6 +106,74 @@ void update_player_sprite() {
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition, rawTileId + 1, 0x00, PLAYER_SPRITE_INDEX+4);
     oam_spr(rawXPosition, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 16, 0x00, PLAYER_SPRITE_INDEX+8);
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
+}
+
+unsigned char win_condition_met(void) {
+    switch (currentGameStyle) {
+        case GAME_STYLE_MAZE:
+            // Do nothing; you're just allowed to pass.
+            break;
+        case GAME_STYLE_COIN:
+            for (i = 0; i != 120; ++i) {
+                if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_COLLECTABLE) {
+                    // Sorry, you didn't get em all. Plz try again.
+                    return 0;
+                }
+            }
+            break;
+        case GAME_STYLE_CRATES: 
+            for (i = 0; i != 120; ++i) {
+                if (totalCrateCount != playerCrateCount) {
+                    // Sorry, you didn't get em all. Plz try again.
+                    return 0;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    return 1;
+}
+
+void update_based_on_tile_trigger(void) {
+    if (updateTileTrigger == UPDATE_TILE_TRIGGER_END) {
+        // First, make sure both an open and closed tile are present, else do nothing.
+        tempChar1 = 0;
+        tempChar2 = 0;
+        for (i = 0; i < NUMBER_OF_TILES; i++) {
+            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END) { tempChar1 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END_OPEN) { tempChar2 = i; }
+        }
+        if (!tempChar1 || !tempChar2) {
+            return;
+        }
+
+        // Figure out which tile should be shown on the screen, collisionTempTileId is the index on collision types
+        collisionTempTileId = win_condition_met() ? tempChar2 : tempChar1;
+
+        // Iterate over every tile in the map, updating all end tiles not matching the goal to 
+        // match it.
+        for (i = 0; i < MAP_DATA_TILE_LENGTH; ++i) {
+            tempChar1 = currentMap[i];
+            tempChar2 = tileCollisionTypes[tempChar1];
+            if (tempChar2 == TILE_COLLISION_LEVEL_END || tempChar2 == TILE_COLLISION_LEVEL_END_OPEN) {
+                if (tempChar1 != collisionTempTileId) {
+                    currentMap[i] = collisionTempTileId;
+                    // NOTE: Be careful, this method eats a number of variables
+                    update_single_tile(i % 12, i / 12, collisionTempTileId, tilePalettes[collisionTempTileId]);
+                }
+            } 
+        }
+    } else if (updateTileTrigger == UPDATE_TILE_TRIGGER_SWITCH) {
+        // Iterate over every tile in the map, updating all switch-affected tiles to be open or
+        // closed based on the state of the switch
+    }
+    updateTileTrigger = UPDATE_TILE_TRIGGER_NONE;
+}
+
+void set_update_tile_trigger(unsigned char val) {
+    updateTileTrigger = val;
+    update_based_on_tile_trigger();
 }
 
 unsigned char convert_to_graphical_tileId(unsigned char newTile) {
@@ -342,6 +417,11 @@ void handle_player_movement() {
             goto undo_again;
         }
         
+        // Just re-trigger all tile updates.
+        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+        update_based_on_tile_trigger();
+        updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
+        update_based_on_tile_trigger();
         update_hud();
         return;
     }
@@ -415,7 +495,7 @@ void handle_player_movement() {
         case TILE_COLLISION_GAP:
         case TILE_COLLISION_SOLID: // Solid 1
             // Nope, go back. These are solid.
-                nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
+            nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
         case TILE_COLLISION_CRATE:
             // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
@@ -471,6 +551,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId+1];
                         update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
+                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
@@ -535,6 +616,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId-1];
                         update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
 
+                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -598,6 +680,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId-12];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
+                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -660,6 +743,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId+12];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
+                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -690,13 +774,14 @@ void handle_player_movement() {
             undoActionType[undoPosition] = currentCollision;
 
             update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
+            updateTileTrigger = UPDATE_TILE_TRIGGER_END;
             update_hud();
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
             break;
         case TILE_COLLISION_COLLAPSIBLE:
             // Figure out where a hole is
             newBlock = 0; // If there isn't one, do something half sane
-            for (i = 0; i < 32; ++i) {
+            for (i = 0; i < NUMBER_OF_TILES; ++i) {
                 if (tileCollisionTypes[i] == TILE_COLLISION_GAP || tileCollisionTypes[i] == TILE_COLLISION_GAP_PASSABLE) {
                     newBlock = i;
                     break;
@@ -731,32 +816,9 @@ void handle_player_movement() {
             }
             break;
         case TILE_COLLISION_LEVEL_END: // Level end!
+        case TILE_COLLISION_LEVEL_END_OPEN:
             set_undos_from_params();
-            collisionTempTileId = 0;
-            switch (currentGameStyle) {
-                case GAME_STYLE_MAZE:
-                    // Do nothing; you're just allowed to pass.
-                    break;
-                case GAME_STYLE_COIN:
-                    for (i = 0; i != 120; ++i) {
-                        if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_COLLECTABLE) {
-                            // Sorry, you didn't get em all. Plz try again.
-                            collisionTempTileId = 1;
-                        }
-                    }
-                    break;
-                case GAME_STYLE_CRATES: 
-                    for (i = 0; i != 120; ++i) {
-                        if (totalCrateCount != playerCrateCount) {
-                            // Sorry, you didn't get em all. Plz try again.
-                            collisionTempTileId = 1;
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-            if (!collisionTempTileId) {
+            if (win_condition_met()) {
                 do_next_level();
                 return;
             }
@@ -803,6 +865,7 @@ void handle_player_movement() {
         playerDidMove = 1;
     }
 
+    update_based_on_tile_trigger();
     update_player_sprite();
     animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;

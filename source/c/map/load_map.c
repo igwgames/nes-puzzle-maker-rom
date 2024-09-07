@@ -111,5 +111,4 @@ void load_map() {
     playerGridPositionX = user_gameLevelData[tempInt1 + 77] & 0x0f;
     playerGridPositionY = user_gameLevelData[tempInt1 + 77] >> 4;
     currentGameStyle = user_gameLevelData[tempInt1 + 76];
-
 }

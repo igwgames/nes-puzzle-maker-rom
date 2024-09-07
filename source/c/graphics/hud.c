@@ -54,7 +54,7 @@ void update_hud() {
         switch (currentGameStyle) {
             case GAME_STYLE_MAZE:
                 for (j = 0; j !=32; ++j) {
-                    if (tileCollisionTypes[j] == TILE_COLLISION_LEVEL_END) {
+                    if (tileCollisionTypes[j] == TILE_COLLISION_LEVEL_END || tileCollisionTypes[j] == TILE_COLLISION_LEVEL_END_OPEN) {
                         tempTileIndex = j;
                         break;
                     }

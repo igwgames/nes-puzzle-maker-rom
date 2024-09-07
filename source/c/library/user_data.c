@@ -2,13 +2,14 @@
 #include "source/c/mapper.h"
 #include "source/c/neslib.h"
 #include "source/c/globals.h"
+#include "source/c/configuration/system_constants.h"
 
 ZEROPAGE_DEF(unsigned char, totalGameLevels);
 ZEROPAGE_DEF(unsigned char, movementSpeed);
 ZEROPAGE_DEF(unsigned char, enableUndo);
 
-unsigned char tileCollisionTypes[32];
-unsigned char tilePalettes[32];
+unsigned char tileCollisionTypes[NUMBER_OF_TILES];
+unsigned char tilePalettes[NUMBER_OF_TILES];
 unsigned char gamePaletteData[16];
 unsigned char spritePalette[4];
 unsigned char singleLevelOverride;
@@ -70,8 +71,8 @@ void load_user_data(void) {
     animateBlockMovement = user_animateBlockMovement;
     disableStatsScreen = user_disableStatsScreen;
 
-    memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], 32);
-    memcpy(&tilePalettes[0], &user_tilePalettes[0], 32);
+    memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], NUMBER_OF_TILES);
+    memcpy(&tilePalettes[0], &user_tilePalettes[0], NUMBER_OF_TILES);
     memcpy(&gamePaletteData[0], &user_gamePaletteData[0], 16);
     memcpy(&spritePalette[0], &user_spritePalette[0], 4);
     memcpy(&customSongShowTimes[0], &user_customSongShowTimes[0], 16);
