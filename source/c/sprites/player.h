@@ -32,6 +32,6 @@ void clear_undo(void);
 #define UPDATE_TILE_TRIGGER_NONE 0
 #define UPDATE_TILE_TRIGGER_END 1
 #define UPDATE_TILE_TRIGGER_SWITCH 2
-void set_update_tile_trigger(unsigned char val);
+void run_dynamic_tile_update(unsigned char updateTileTrigger);
 
 extern unsigned char switchState;

@@ -41,8 +41,10 @@ unsigned char undoBlockFromId[NUMBER_OF_UNDOS];
 unsigned char undoBlockToId[NUMBER_OF_UNDOS];
 unsigned char undoActionType[NUMBER_OF_UNDOS];
 
-unsigned char updateTileTrigger;
 unsigned char switchState;
+
+unsigned char tempDynamicTile1, tempDynamicTile2, tempDynamicTile3;
+unsigned char tempDynamicResultTile;
 
 ZEROPAGE_DEF(unsigned char, currentCollision);
 ZEROPAGE_DEF(unsigned char, shouldKeepMoving);
@@ -135,54 +137,54 @@ unsigned char win_condition_met(void) {
     return 1;
 }
 
-void update_based_on_tile_trigger(void) {
+void run_dynamic_tile_update(unsigned char updateTileTrigger) {
     if (updateTileTrigger == UPDATE_TILE_TRIGGER_END) {
         // First, make sure both an open and closed tile are present, else do nothing.
-        tempChar1 = 255;
-        tempChar2 = 255;
+        tempDynamicTile1 = 255;
+        tempDynamicTile2 = 255;
         for (i = 0; i < NUMBER_OF_TILES; i++) {
-            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END) { tempChar1 = i; }
-            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END_OPEN) { tempChar2 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END) { tempDynamicTile1 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_LEVEL_END_OPEN) { tempDynamicTile2 = i; }
         }
-        if (tempChar1 == 255 || tempChar2 == 255) {
+        if (tempDynamicTile1 == 255 || tempDynamicTile2 == 255) {
             return;
         }
 
-        // Figure out which tile should be shown on the screen, collisionTempTileId is the index on collision types
-        collisionTempTileId = win_condition_met() ? tempChar2 : tempChar1;
+        // Figure out which tile should be shown on the screen, tempDynamicResultTile is the index on collision types
+        tempDynamicResultTile = win_condition_met() ? tempDynamicTile2 : tempDynamicTile1;
 
         // Iterate over every tile in the map, updating all end tiles not matching the goal to 
         // match it.
         for (i = 0; i < MAP_DATA_TILE_LENGTH; ++i) {
-            tempChar1 = currentMap[i];
-            tempChar2 = tileCollisionTypes[tempChar1];
-            if (tempChar2 == TILE_COLLISION_LEVEL_END || tempChar2 == TILE_COLLISION_LEVEL_END_OPEN) {
-                if (tempChar1 != collisionTempTileId) {
-                    currentMap[i] = collisionTempTileId;
+            tempDynamicTile1 = currentMap[i];
+            tempDynamicTile2 = tileCollisionTypes[tempDynamicTile1];
+            if (tempDynamicTile2 == TILE_COLLISION_LEVEL_END || tempDynamicTile2 == TILE_COLLISION_LEVEL_END_OPEN) {
+                if (tempDynamicTile1 != tempDynamicResultTile) {
+                    currentMap[i] = tempDynamicResultTile;
                     // NOTE: Be careful, this method eats a number of variables
-                    update_single_tile(i % 12, i / 12, collisionTempTileId, tilePalettes[collisionTempTileId]);
+                    update_single_tile(i % 12, i / 12, tempDynamicResultTile, tilePalettes[tempDynamicResultTile]);
                 }
             } 
         }
     } else if (updateTileTrigger == UPDATE_TILE_TRIGGER_SWITCH) {
         // First, find the default walkable and default solid tiles, and keep them handy
-        tempChar1 = 255;
-        tempChar2 = 255;
+        tempDynamicTile1 = 255;
+        tempDynamicTile2 = 255;
         // Also track the first/last switch, so we can swap them depending on state
-        tempChar7 = 255;
+        tempDynamicTile3 = 255;
         for (i = 0; i < NUMBER_OF_TILES; i++) {
-            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_SOLID) { tempChar1 = i; }
-            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_WALKABLE) { tempChar2 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_SOLID) { tempDynamicTile1 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_WALKABLE) { tempDynamicTile2 = i; }
             if (tileCollisionTypes[i] == TILE_COLLISION_SWITCH) {
                 // If switch is off, we want the first instance, else we want the last.
-                if (!switchState && tempChar7 != 255) {
+                if (!switchState && tempDynamicTile3 != 255) {
                     continue;
                 }
-                tempChar7 = i;
+                tempDynamicTile3 = i;
                 
             }
         }
-        if (tempChar1 == 255 || tempChar2 == 255) {
+        if (tempDynamicTile1 == 255 || tempDynamicTile2 == 255) {
             return;
         }
 
@@ -190,37 +192,28 @@ void update_based_on_tile_trigger(void) {
         // closed based on the state of the switch
         for (i = 0; i < MAP_DATA_TILE_LENGTH; ++i) {
             // Ignore crates entirely. Just let them be.
+            if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_CRATE) { continue; }
 
-            collisionTempTileId = tileCollisionTypes[currentMapOrig[i]];
-            if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_SOLID) {
+            tempDynamicResultTile = tileCollisionTypes[currentMapOrig[i]];
+            if (tempDynamicResultTile == TILE_COLLISION_SW_BLOCK_SOLID) {
                 // Take over this variable so we can avoid reading currentMap[i] multiple times
-                collisionTempTileId = tempChar2;
-            } else if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
+                tempDynamicResultTile = switchState ? tempDynamicTile2 : tempDynamicTile1;
+            } else if (tempDynamicResultTile == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                 // Take over this variable so we can avoid reading currentMap[i] multiple times
-                collisionTempTileId = tempChar1;
-            } else if (collisionTempTileId == TILE_COLLISION_SWITCH) {
-                collisionTempTileId = tempChar7;
+                tempDynamicResultTile = switchState ? tempDynamicTile1 : tempDynamicTile2;
+            } else if (tempDynamicResultTile == TILE_COLLISION_SWITCH) {
+                tempDynamicResultTile = tempDynamicTile3;
             } else {
                 continue; // Nothing to do here, skip the step below.
             }
-
-            // Always overwrite the original map, since the only thing the current map handles otherwise is crates.
-            currentMapOrig[i] = collisionTempTileId;
-            // If the current has a different map (non-crate), we need to update the tiles on screen
-            if (currentMap[i] != collisionTempTileId && tileCollisionTypes[currentMap[i]] != TILE_COLLISION_CRATE) {
-                currentMap[i] = collisionTempTileId;
-                update_single_tile(i % 12, i / 12, collisionTempTileId, tilePalettes[collisionTempTileId]);
+            if (currentMap[i] != tempDynamicResultTile) {
+                currentMap[i] = tempDynamicResultTile;
+                update_single_tile(i % 12, i / 12, tempDynamicResultTile, tilePalettes[tempDynamicResultTile]);
             }
 
         }
 
     }
-    updateTileTrigger = UPDATE_TILE_TRIGGER_NONE;
-}
-
-void set_update_tile_trigger(unsigned char val) {
-    updateTileTrigger = val;
-    update_based_on_tile_trigger();
 }
 
 unsigned char convert_to_graphical_tileId(unsigned char newTile) {
@@ -467,10 +460,8 @@ void handle_player_movement() {
         }
         
         // Just re-trigger all tile updates.
-        updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
-        update_based_on_tile_trigger();
-        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
-        update_based_on_tile_trigger();
+        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
+        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
         update_hud();
         return;
     } else if (controllerState & PAD_A && !(lastControllerState & PAD_A) && tempChar1 != (NUMBER_OF_UNDOS - 1)) {
@@ -497,8 +488,7 @@ void handle_player_movement() {
         if (tileCollisionTypes[currentMap[rawTileId]] == TILE_COLLISION_SWITCH) {
             switchState = !switchState;
             sfx_play(SFX_SWITCH_HIT, SFX_CHANNEL_1);
-            updateTileTrigger = UPDATE_TILE_TRIGGER_SWITCH;
-            update_based_on_tile_trigger();
+            run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
 
             // Add the undo action
             set_undos_from_params();
@@ -584,6 +574,21 @@ void handle_player_movement() {
             nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
             break;
         case TILE_COLLISION_CRATE:
+            // First, make sure we're not actually on top of a solid tile. If we are, bail early.
+            collisionTempTileId = tileCollisionTypes[currentMapOrig[rawTileId]];
+            // Since a crate is on top of this, currentMap doesn't contain state for it. So, look at currentMapOrig and switchState to find it
+            if (switchState) {
+                // Switch on means the roles of the tiles are reversed. Walkable is actually solid. Bail!
+                if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
+                    nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
+                    break;
+                }
+            } else {
+                if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_SOLID) {
+                    nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
+                    break;
+                }
+            }
             // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
             switch (collisionTempDirection) {
                 case PAD_RIGHT:
@@ -605,6 +610,7 @@ void handle_player_movement() {
                         currentMap[rawTileId+1] = undoBlockToId[undoPosition];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -629,6 +635,7 @@ void handle_player_movement() {
                         currentMap[rawTileId+1] = currentMapOrig[rawTileId+1];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -637,7 +644,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId+1];
                         update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
-                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
                     } else {
@@ -665,6 +672,7 @@ void handle_player_movement() {
                         currentMap[rawTileId-1] = undoBlockToId[undoPosition];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
 
@@ -693,6 +701,7 @@ void handle_player_movement() {
                         ++playerCrateCount;
                         ++gameCrates;
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId]]);
 
@@ -702,7 +711,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId-1];
                         update_single_tile(nextPlayerGridPositionX - 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[currentMap[rawTileId-1]]);
 
-                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -730,6 +739,7 @@ void handle_player_movement() {
                         currentMap[rawTileId-12] = currentMap[rawTileId];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -757,6 +767,7 @@ void handle_player_movement() {
                         ++playerCrateCount;
                         ++gameCrates;
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -766,7 +777,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId-12];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY-1, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
-                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -793,6 +804,7 @@ void handle_player_movement() {
                         currentMap[rawTileId+12] = currentMap[rawTileId];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -820,6 +832,7 @@ void handle_player_movement() {
                         ++playerCrateCount;
                         ++gameCrates;
 
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
@@ -829,7 +842,7 @@ void handle_player_movement() {
                         collisionTempTileId = currentMap[rawTileId+12];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY+1, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
-                        updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+                        run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
                         update_hud();
                         sfx_play(SFX_CRATE_SMASH, SFX_CHANNEL_1);
 
@@ -860,7 +873,7 @@ void handle_player_movement() {
             undoActionType[undoPosition] = currentCollision;
 
             update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
-            updateTileTrigger = UPDATE_TILE_TRIGGER_END;
+            run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
             update_hud();
             sfx_play(SFX_HEART, SFX_CHANNEL_1);
             break;
@@ -951,7 +964,6 @@ void handle_player_movement() {
         playerDidMove = 1;
     }
 
-    update_based_on_tile_trigger();
     update_player_sprite();
     animationPositionX = 0; animationPositionY = 0;
     playerGridPositionX = nextPlayerGridPositionX; playerGridPositionY = nextPlayerGridPositionY;
