@@ -190,21 +190,24 @@ void update_based_on_tile_trigger(void) {
         // closed based on the state of the switch
         for (i = 0; i < MAP_DATA_TILE_LENGTH; ++i) {
             // Ignore crates entirely. Just let them be.
-            if (tileCollisionTypes[currentMap[i]] == TILE_COLLISION_CRATE) { continue; }
 
             collisionTempTileId = tileCollisionTypes[currentMapOrig[i]];
             if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_SOLID) {
                 // Take over this variable so we can avoid reading currentMap[i] multiple times
-                collisionTempTileId = switchState ? tempChar2 : tempChar1;
+                collisionTempTileId = tempChar2;
             } else if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                 // Take over this variable so we can avoid reading currentMap[i] multiple times
-                collisionTempTileId = switchState ? tempChar1 : tempChar2;
+                collisionTempTileId = tempChar1;
             } else if (collisionTempTileId == TILE_COLLISION_SWITCH) {
                 collisionTempTileId = tempChar7;
             } else {
                 continue; // Nothing to do here, skip the step below.
             }
-            if (currentMap[i] != collisionTempTileId) {
+
+            // Always overwrite the original map, since the only thing the current map handles otherwise is crates.
+            currentMapOrig[i] = collisionTempTileId;
+            // If the current has a different map (non-crate), we need to update the tiles on screen
+            if (currentMap[i] != collisionTempTileId && tileCollisionTypes[currentMap[i]] != TILE_COLLISION_CRATE) {
                 currentMap[i] = collisionTempTileId;
                 update_single_tile(i % 12, i / 12, collisionTempTileId, tilePalettes[collisionTempTileId]);
             }
