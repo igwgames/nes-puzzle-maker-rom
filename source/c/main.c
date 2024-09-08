@@ -32,7 +32,6 @@ void initialize_variables() {
 
     playerGridPositionX = 0;
     playerGridPositionY = 0;
-    switchState = 0;
     
     // Little bit of generic initialization below this point - we need to set
     // The system up to use a different hardware bank for sprites vs backgrounds.
@@ -121,6 +120,7 @@ void main() {
                 playerCrateCount = 0;
                 undoPosition = 0;
                 keyCount = 0;
+                switchState = 0;
                 unrom_set_prg_bank(BANK_PLAYER);
                 clear_undo();
                 fade_out();

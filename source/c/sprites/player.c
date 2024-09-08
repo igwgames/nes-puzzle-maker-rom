@@ -168,9 +168,19 @@ void update_based_on_tile_trigger(void) {
         // First, find the default walkable and default solid tiles, and keep them handy
         tempChar1 = 255;
         tempChar2 = 255;
+        // Also track the first/last switch, so we can swap them depending on state
+        tempChar7 = 255;
         for (i = 0; i < NUMBER_OF_TILES; i++) {
             if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_SOLID) { tempChar1 = i; }
             if (tileCollisionTypes[i] == TILE_COLLISION_SW_BLOCK_WALKABLE) { tempChar2 = i; }
+            if (tileCollisionTypes[i] == TILE_COLLISION_SWITCH) {
+                // If switch is off, we want the first instance, else we want the last.
+                if (!switchState && tempChar7 != 255) {
+                    continue;
+                }
+                tempChar7 = i;
+                
+            }
         }
         if (tempChar1 == 255 || tempChar2 == 255) {
             return;
@@ -189,6 +199,8 @@ void update_based_on_tile_trigger(void) {
             } else if (collisionTempTileId == TILE_COLLISION_SW_BLOCK_WALKABLE) {
                 // Take over this variable so we can avoid reading currentMap[i] multiple times
                 collisionTempTileId = switchState ? tempChar1 : tempChar2;
+            } else if (collisionTempTileId == TILE_COLLISION_SWITCH) {
+                collisionTempTileId = tempChar7;
             } else {
                 continue; // Nothing to do here, skip the step below.
             }
