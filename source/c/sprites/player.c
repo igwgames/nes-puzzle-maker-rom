@@ -80,7 +80,7 @@ void clear_undo(void) {
     }
 }
 
-// Code here goes in PRG instead. because space is hard
+// Draw the player sprite in its current animation state. 
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
 void update_player_sprite(void) {
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
@@ -110,6 +110,7 @@ void update_player_sprite(void) {
     oam_spr(rawXPosition + NES_SPRITE_WIDTH, rawYPosition + NES_SPRITE_HEIGHT, rawTileId + 17, 0x00, PLAYER_SPRITE_INDEX+12);
 }
 
+// Returns 1 if the win condition for the current level is met, 0 otherwise. 
 unsigned char win_condition_met(void) {
     switch (currentGameStyle) {
         case GAME_STYLE_MAZE:
@@ -137,6 +138,10 @@ unsigned char win_condition_met(void) {
     return 1;
 }
 
+// Used for any tiles that we update on the fly - including the level end tiles, as well as switches
+// and the blocks the control. 
+// This is called more often than things change, and needs to be (relatively) fast. Avoid redrawing 
+// anything unless you have to!
 void run_dynamic_tile_update(unsigned char updateTileTrigger) {
     if (updateTileTrigger == UPDATE_TILE_TRIGGER_END) {
         // First, make sure both an open and closed tile are present, else do nothing.
@@ -161,7 +166,7 @@ void run_dynamic_tile_update(unsigned char updateTileTrigger) {
             if (tempDynamicTile2 == TILE_COLLISION_LEVEL_END || tempDynamicTile2 == TILE_COLLISION_LEVEL_END_OPEN) {
                 if (tempDynamicTile1 != tempDynamicResultTile) {
                     currentMap[i] = tempDynamicResultTile;
-                    // NOTE: Be careful, this method eats a number of variables
+                    // NOTE: Be careful, this method uses many of the shared temporary variables
                     update_single_tile(i % 12, i / 12, tempDynamicResultTile, tilePalettes[tempDynamicResultTile]);
                 }
             } 
@@ -216,6 +221,7 @@ void run_dynamic_tile_update(unsigned char updateTileTrigger) {
     }
 }
 
+// Convert a numberic tileId we use on a map to the address of its top-left chr tile.
 unsigned char convert_to_graphical_tileId(unsigned char newTile) {
     tempChara = newTile;
     newTile &= 0x07;
@@ -227,6 +233,8 @@ unsigned char convert_to_graphical_tileId(unsigned char newTile) {
 }
 
 
+// This takes collisionTempTileId, converts it to a sprite, and animates it from its original position to
+// the new one, using the direction the player is facing as a guide for where the block goes from/to.
 void animate_sprite_to_position() {
     ppu_wait_nmi();
     if (!animateBlockMovement){ return; }
@@ -280,6 +288,7 @@ void animate_sprite_to_position() {
     oam_spr(rawXPosition, rawYPosition, blockAnimateTile, 0x03, HW_SPRITE_BOX_PUSH_ANI+12);
     for (i = 0; i < 5; i++) {
         // Use raw sprite address manipulation to move the sprites on the x or y axis
+        // Normal calls are a bit more expensive and slow.
         (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+3)) += blockAnimateX;
         (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+7)) += blockAnimateX;
         (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+11)) += blockAnimateX;
@@ -298,7 +307,8 @@ void animate_sprite_to_position() {
     (*(unsigned char*)(0x200 + HW_SPRITE_BOX_PUSH_ANI+12)) = SPRITE_OFFSCREEN;
 }
 
-// Updates a single tile on the map visually
+// Updates a single tile on the map visually - note this DOES NOT update the map variable - that has 
+// to be done separately.
 void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile, unsigned char palette) {
 
     newTile = convert_to_graphical_tileId(newTile);
@@ -324,7 +334,7 @@ void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile,
     collisionTempX = x + 2;
     collisionTempY = y + 1;
 
-    // Calculate raw attr table address
+    // Calculate raw attribute table address
     collisionTempValue = ((collisionTempY >> 1) << 3) + (collisionTempX >> 1);
 
     if (collisionTempX & 0x01) {
@@ -356,7 +366,8 @@ void update_single_tile(unsigned char x, unsigned char y, unsigned char newTile,
     set_vram_update(NULL);
 }
 
-// Set up the undo array from the current parameters. Some things will have to be overridden.
+// Set up the undo array from the current parameters, defaulting to the player just moving. Many of these
+// parameters will need to be overridden.
 void set_undos_from_params(void) {
     undoPlayerFromPositionsX[undoPosition] = playerGridPositionX;
     undoPlayerFromPositionsY[undoPosition] = playerGridPositionY;
@@ -365,6 +376,8 @@ void set_undos_from_params(void) {
     undoActionType[undoPosition] = TILE_COLLISION_WALKABLE;
 }
 
+// This is done when a level is beaten (or skipped) - increase the level and show the win screen if
+// you're over the limit.
 void do_next_level(void) {
     ++currentLevelId;
     if (currentLevelId == totalGameLevels) {
@@ -380,13 +393,13 @@ void handle_player_movement() {
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
 
-    // If Start is pressed now, and was not pressed before...
+    // If Start is pressed now, and was not pressed before, pause.
     if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
         gameState = GAME_STATE_PAUSED;
         return;
     }
 
-    // This is impossible with a normal controller. Used in the ide for the tool to skip levels.
+    // Level skip! This is impossible with a normal controller. Used in the ide for the tool to skip levels.
     if ((controllerState & (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) == (PAD_LEFT | PAD_RIGHT | PAD_SELECT)) {
         do_next_level();
         return;
@@ -398,6 +411,7 @@ void handle_player_movement() {
         tempChar1 = (NUMBER_OF_UNDOS - 1);
     }
 
+    // If the user requested an undo and there are undos available, roll things back.
     if (enableUndo && controllerState & PAD_B && !(lastControllerState & PAD_B) && tempChar1 != (NUMBER_OF_UNDOS - 1) && undoActionType[tempChar1] != 255) {
         undo_again:
         // UNDO!!
@@ -465,8 +479,9 @@ void handle_player_movement() {
         update_hud();
         return;
     } else if (controllerState & PAD_A && !(lastControllerState & PAD_A) && tempChar1 != (NUMBER_OF_UNDOS - 1)) {
+        // A button means a switch hit - test if there's a switch around, and react if so.
         tempChar1 = 255;
-        // Borrow nextPlayerGridPositionX/Y to figure out where you'll land
+        // Borrow nextPlayerGridPositionX/Y to figure out where the potential switch is
         nextPlayerGridPositionX = playerGridPositionX;
         nextPlayerGridPositionY = playerGridPositionY;
         switch (playerDirection) {
@@ -486,6 +501,7 @@ void handle_player_movement() {
         }
         rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
         if (tileCollisionTypes[currentMap[rawTileId]] == TILE_COLLISION_SWITCH) {
+            // It's a switch! Update our state, play a sound, and update all of the impacted tiles
             switchState = !switchState;
             sfx_play(SFX_SWITCH_HIT, SFX_CHANNEL_1);
             run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
@@ -502,23 +518,23 @@ void handle_player_movement() {
 
     
     shouldKeepMoving = 0;
-    go_again:
+    go_again: // Used when you're sliding on ice
     nextPlayerGridPositionX = playerGridPositionX;
     nextPlayerGridPositionY = playerGridPositionY;
 
+    // Figure out what direction you're facing, and move your prospective position. Also update playerDirection
+    // so you'll turn even if you can't move.
     if (controllerState & PAD_LEFT) {
         if (playerGridPositionX > 0) {
             --nextPlayerGridPositionX;
             collisionTempDirection = PAD_LEFT;
         }
-        // Graphical only
         playerDirection = SPRITE_DIRECTION_LEFT;
     } else if (controllerState & PAD_RIGHT) {
         if (playerGridPositionX < 11) {
             ++nextPlayerGridPositionX;
             collisionTempDirection = PAD_RIGHT;
         }
-        // Graphical only
         playerDirection = SPRITE_DIRECTION_RIGHT;
 
     } else if (controllerState & PAD_UP) {
@@ -526,7 +542,6 @@ void handle_player_movement() {
             --nextPlayerGridPositionY;
             collisionTempDirection = PAD_UP;
         }
-        // Graphical only
         playerDirection = SPRITE_DIRECTION_UP;
 
     } else if (controllerState & PAD_DOWN) {
@@ -534,7 +549,6 @@ void handle_player_movement() {
             ++nextPlayerGridPositionY;
             collisionTempDirection = PAD_DOWN;
         }
-        // Graphical only
         playerDirection = SPRITE_DIRECTION_DOWN;
 
     }
@@ -545,7 +559,7 @@ void handle_player_movement() {
         return; 
     }
     // Update the sprite immediately, so it's not locked in the wrong direction for later animations.
-    // (And so we don't knock rawTileID out from under ourselves later on.)
+    // (And so we don't overwrite rawTileID then try to use it with this later on...)
     update_player_sprite();
     rawTileId = nextPlayerGridPositionX + (nextPlayerGridPositionY * 12);
     currentCollision = tileCollisionTypes[currentMap[rawTileId]];
@@ -557,11 +571,10 @@ void handle_player_movement() {
     }
 
     switch (currentCollision) {
-        // Ids are multiplied by 4, which is their index 
         case TILE_COLLISION_WALKABLE:
         case TILE_COLLISION_GAP_PASSABLE:
         case TILE_COLLISION_SW_BLOCK_WALKABLE:
-            // Walkable.. Go !
+            // Walkable tile. You're free to move! Continue with the rest of the method.
             set_undos_from_params();
             break;
         case TILE_COLLISION_ICE:
@@ -589,9 +602,10 @@ void handle_player_movement() {
                     break;
                 }
             }
-            // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, bunt it. If not... stop.
+            // So, we know that rawTileId is the crate we intend to move. Test if it can move anywhere, and if so, move it. If not... uh, don't.
             switch (collisionTempDirection) {
                 case PAD_RIGHT:
+                    // Keep player within the grid
                     if (nextPlayerGridPositionX == 11) {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
@@ -610,12 +624,16 @@ void handle_player_movement() {
                         currentMap[rawTileId+1] = undoBlockToId[undoPosition];
                         currentMap[rawTileId] = currentMapOrig[rawTileId];
 
+                        // Update any tiles necessary from switch flips, now that we have exposed some new tiles
                         run_dynamic_tile_update(UPDATE_TILE_TRIGGER_SWITCH);
+                        // Next update the tile currently containing the crate
                         collisionTempTileId = currentMap[rawTileId];
                         update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
+                        // Now animate the crate, while it's not visible on the map
                         collisionTempTileId = undoBlockToId[undoPosition];
                         animate_sprite_to_position();
+                        // Finally, put the crate back on the map.
                         update_single_tile(nextPlayerGridPositionX + 1, nextPlayerGridPositionY, collisionTempTileId, tilePalettes[collisionTempTileId]);
 
                         update_hud();
@@ -653,6 +671,7 @@ void handle_player_movement() {
                     }
                     break;
                 case PAD_LEFT:
+                    // Keep player within the grid
                     if (nextPlayerGridPositionX == 0) {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
@@ -720,6 +739,7 @@ void handle_player_movement() {
                     }
                     break;
                 case PAD_UP:
+                    // Keep player within the grid
                     if (nextPlayerGridPositionY == 0) {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
@@ -786,6 +806,7 @@ void handle_player_movement() {
                     }
                     break;
                 case PAD_DOWN:
+                    // Keep player within the grid
                     if (nextPlayerGridPositionY == 9) {
                         nextPlayerGridPositionX = playerGridPositionX; nextPlayerGridPositionY = playerGridPositionY;
                         break;
@@ -929,7 +950,7 @@ void handle_player_movement() {
             break;
     }
 
-    // Track whether we should actually try to move
+    // Track whether we should actually try to move, then animate the sprite to its new position.
     playerDidMove = 0;
     if (playerGridPositionX > nextPlayerGridPositionX) {
         for (i = 0; i < 8; ++i) {
@@ -971,6 +992,7 @@ void handle_player_movement() {
     if (playerDidMove) { 
         ++undoPosition;
         if (undoPosition == (NUMBER_OF_UNDOS)) { undoPosition = 0; }
+        // This is used for ice, so you keep going until you're off it
         if (shouldKeepMoving) {
             goto go_again;
         }
