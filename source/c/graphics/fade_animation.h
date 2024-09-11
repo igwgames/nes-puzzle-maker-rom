@@ -5,9 +5,8 @@
 void fade_in();
 void fade_out();
 
-// Does the fastest fade animation possible, with one frame per color.
+// Does the fastest fade animation possible, with one frame per shade.
 void fade_in_fast();
-// void fade_out_fast(); - Pointless with instant being used
 
 // This can be used to instantly turn the screen black - such as when you're starting the game.
 // Not really a true "fade", but a nice shortcut method.

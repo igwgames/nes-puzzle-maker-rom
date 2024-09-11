@@ -38,6 +38,9 @@ void initialize_variables() {
     bank_spr(1);
 }   
 
+// This  is the first method that runs when your game starts up, and also the loop that will continue
+// as long as the game is running. It operates largely off setting the gameState variable to different states,
+// which control which sections of logic run.
 void main() {
     fade_out_instant();
     gameState = GAME_STATE_SYSTEM_INIT;

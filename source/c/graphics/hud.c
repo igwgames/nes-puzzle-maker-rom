@@ -9,8 +9,6 @@
 #pragma code-name ("PLAYER")
 #pragma rodata-name ("PLAYER")
 
-ZEROPAGE_DEF(unsigned char, editorSelectedTileId);
-
 #define tempTileId tempChar1
 #define tempTileIndex tempChar2
 #define tempTileId2 tempChar3
@@ -32,7 +30,7 @@ void draw_hud() {
     }
 
     if (!enableLevelShow) {
-        // Have to override the section that says "level:" in this case.
+        // This ends up overwriting the "Level:" part of the hud.
         vram_adr(NAMETABLE_A + HUD_LEVEL_TEXT_START);
         for (i = 0; i < 6; ++i) {
             vram_put(' ' + 0x60);
@@ -40,7 +38,8 @@ void draw_hud() {
     }
 }
 
-// Draw a number to "screenBuffer". Isolated so we do the /10 and %10 in one spot
+// Draw a number to "screenBuffer". Isolated so we do the /10 and %10 in one spot.
+// Those are both costly operations on the 6502. (Both in time and rom space)
 void draw_num_to_sb(unsigned char num) {
     screenBuffer[i++] = (num / 10) + '0' + 0x60;
     screenBuffer[i++] = (num % 10) + '0' + 0x60;

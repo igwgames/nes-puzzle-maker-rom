@@ -62,6 +62,7 @@ TEMP_BANK:          .res 1
 MUSIC_PLAY:         .res 1
 ft_music_addr:      .res 2
 
+; This is all music-related
 BUF_4000:           .res 1
 BUF_4001:           .res 1
 BUF_4002:           .res 1
@@ -170,6 +171,6 @@ detectNTSC:
 
     jmp _main           ;no parameters
 
-    ; Famitracker driver uses .s for file extension, but is otherwise normal asm
+    ; Famitracker driver uses .s for file extension, but is otherwise the same assembly language
 .segment "SOUND"
     .include "famitracker_driver/driver.s"

@@ -9,7 +9,7 @@
 #pragma code-name ("MENUS")
 #pragma rodata-name ("MENUS")
 
-unsigned char editorSelectedPosition;
+unsigned char pauseMenuPosition;
 
 void draw_pause_screen() {
     ppu_off();
@@ -31,7 +31,7 @@ void draw_pause_screen() {
 
 void handle_pause_input() {
     // Show a few options, and regularly update the tiles to show where the user has selected
-    editorSelectedPosition = 0;
+    pauseMenuPosition = 0;
     screenBuffer[0] = MSB(NTADR_B(10, 16));
     screenBuffer[1] = LSB(NTADR_B(10, 16));
     screenBuffer[2] = 0xe2;
@@ -44,21 +44,21 @@ void handle_pause_input() {
         lastControllerState = controllerState;
         controllerState = pad_poll(0);
 
-        // If Start is pressed now, and was not pressed before...
+        // If Start is pressed now, and was not pressed before, close the menu.
         if ((controllerState & PAD_START && !(lastControllerState & PAD_START)) || (controllerState & PAD_A && !(lastControllerState & PAD_A))) {
             break;
         }
 
         if (controllerState & PAD_UP && !(lastControllerState & PAD_UP)) {
             sfx_play(SFX_MENU_BOP, SFX_CHANNEL_2);
-            editorSelectedPosition = 0;
+            pauseMenuPosition = 0;
             screenBuffer[2] = 0xe2;
             screenBuffer[5] = ' ' + 0x60;
         }
 
         if (controllerState & PAD_DOWN && !(lastControllerState & PAD_DOWN)) {
             sfx_play(SFX_MENU_BOP, SFX_CHANNEL_2);
-            editorSelectedPosition = 1;
+            pauseMenuPosition = 1;
             screenBuffer[5] = 0xe2;
             screenBuffer[2] = ' ' + 0x60;
         }
@@ -68,7 +68,7 @@ void handle_pause_input() {
 
     }
     set_vram_update(NULL);
-    if (editorSelectedPosition == 0) {
+    if (pauseMenuPosition == 0) {
         gameState = GAME_STATE_RUNNING;
     } else {
         gameState = GAME_STATE_LOAD_LEVEL;

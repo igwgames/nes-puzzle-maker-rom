@@ -2,7 +2,8 @@
 #include "source/c/globals.h"
 #include "source/c/neslib.h"
 
-// Use this to fade the screen in/out with various timeouts
+// Use these methods to fade the screen in/out with various timeouts
+
 // Tracking the current state since the optional screens put us into an unknown state
 // with fades. Prevents double-fade animations.
 unsigned char currentBright;
@@ -28,18 +29,22 @@ void _fade_in(unsigned char speed) {
 
 }
 
+// Fade the screen from black to normal colors at a normal pace.
 void fade_in() {
     _fade_in(2);
 }
 
+// Fade the screen from normal colors down to black at a normal pace.
 void fade_out() {
     _fade_out(2);
 }
 
+// Instantly "fade" the screen to black. 
 void fade_out_instant() {
     pal_bright(0);
 }
 
+// Fade the screen in from black to normal colors faster.
 void fade_in_fast() {
     _fade_in(1);
 }

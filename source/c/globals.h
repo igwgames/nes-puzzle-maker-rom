@@ -58,12 +58,6 @@ ZEROPAGE_EXTERN(int, tempInt5);
 
 extern const unsigned int bitToByte[8];
 
-// Get the absolute value of a number, the lazy person's way.
-#define ABS(x) ((x) > 0 ? x : 0-(x))
-
-// Set a memory address to a value. Very, very raw.
-#define SET_ADDR_VALUE(addr, value) *(unsigned char*)(addr) = value
-
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderTile);
 ZEROPAGE_EXTERN(unsigned char, currentMapBorderAsset);
 

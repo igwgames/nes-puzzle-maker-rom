@@ -25,16 +25,17 @@ void draw_win_screen() {
     }
 
 
-    // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
+    // Add whatever you want here; NTADR_A picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(8, 5), "Congratulations!");
 
     put_str(NTADR_A(9, 12), "You have won! ");
 
     put_str(NTADR_A(5, 24), "Your time:       ");
 
+    // Figure out how long the player was playing.
     // 60 frames/second, so get down to seconds
     tempInt1 = (frameCount - gameTime) / 60;
-    // Build it up in reverse...
+    // Build the string version up in reverse...
     screenBuffer[4] = (tempInt1 % 60) % 10;
     screenBuffer[3] = (tempInt1 % 60) / 10;
     // Down to minutes
@@ -65,8 +66,8 @@ void draw_win_screen() {
             tempInt1 = gameCrates;
             break;
     }
-    // NOTE: If there are space issues, we might benefit from incrementing these 
-    // "smartly" and replacing this with & 0x0f, &0xf0, (>>8)& 0x0f, etc
+
+    // NOTE: If you need space back, all of the % 10 and /10 likely takes up a bit of space and cpu time.
     if (tempChar1 == 0) {
         vram_put('0' + ((tempInt1 / 100) % 10) + 0x60);
         vram_put('0' +((tempInt1 / 10) % 10) + 0x60);
@@ -83,7 +84,10 @@ void draw_win_screen() {
 
 }
 
+// Forward-definition of this method, so we can call it to load data. 
 void load_credits_user_data();
+
+// Draw the credits screen from user data.
 void draw_credits_screen() {
     ppu_off();
     scroll(0, 0);
@@ -101,9 +105,9 @@ void draw_credits_screen() {
     fade_out();
 }
 
+// Switch back to the main prg bank for this load method, to fetch things from user_data in another bank.
 #pragma code-name ("CODE")
 #pragma rodata-name ("CODE")
-
 void load_credits_user_data() {
     unrom_set_prg_bank(BANK_USER_DATA);
     vram_write((unsigned char*)&(user_creditsScreenData[0]), 0x400);

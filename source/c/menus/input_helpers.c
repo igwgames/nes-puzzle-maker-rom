@@ -7,6 +7,7 @@
 #pragma code-name ("MENUS")
 #pragma rodata-name ("MENUS")
 
+// Wait for the user to push the start button, as it says.
 void wait_for_start() {
     while (1) {
         lastControllerState = controllerState;

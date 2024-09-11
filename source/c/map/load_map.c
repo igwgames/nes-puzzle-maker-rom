@@ -12,9 +12,9 @@ unsigned char palette[16];
 
 unsigned char bitplaneBytes[3];
 
-// NOTE: This is in the kernel since it loads from patchable_data
+// NOTE: This file is in the primary prg since it loads from patchable_data, which lives in a bank.
 
-// Replace any "sprite-ish" things, so that when we move them they don't duplicate
+// Replace any "sprite-ish" things from the "orig" copy of the map, so that when we move them they don't duplicate
 void update_map_replace_spriteish(void) {
     if (tempChar1 == TILE_COLLISION_COLLECTABLE) {
         currentMapOrig[j] = 0;
@@ -34,7 +34,7 @@ void update_map_replace_spriteish(void) {
 
 // Loads the map at the player's current position into the ram variable for the map. 
 void load_map() {
-    // WARNING: Does not clean up after itself
+    // WARNING: Changes prg bank and does not change it back
     unrom_set_prg_bank(BANK_USER_DATA);
     totalCollectableCount = 0;
     totalCrateCount = 0;
@@ -56,7 +56,7 @@ void load_map() {
     }
 
 
-    // Iterate over the map data and expand it into a full map. Each byte in the data we store actually holds
+    // Iterate over the map data and expand it into a full array. Each byte in the data we store actually holds
     // data for 2 tiles - one in the lower 5 bits, then a bitplane of the last 3 bytes, 6=<<5, 7=<<6, 8=<<7
 
     // Track whether we have more crates, or more holes. Use this to determine how to finish level.

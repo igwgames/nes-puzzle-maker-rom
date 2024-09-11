@@ -34,7 +34,7 @@
         jsr unrom_set_prg_bank
         rts
 
-; Make sure to put something in every bank, so the library doesn't get confused. Let's just jump to reset.
+; Make sure to put something in every bank, so the library/mapper doesn't get confused. Let's just jump to reset.
 .segment "USER_DATA" 
     jmp reset
 .segment "MENUS"
