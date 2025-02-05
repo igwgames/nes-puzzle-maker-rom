@@ -47,13 +47,14 @@ void load_map() {
     currentMapBorderAsset = tilePalettes[currentMapBorderTile];
     currentMapBorderAsset += (currentMapBorderAsset << 2);
     currentMapBorderAsset += (currentMapBorderAsset << 4);
-    if (currentMapBorderTile < 8) {
-        currentMapBorderTile <<= 1;
-    } else {
-        currentMapBorderTile -= 8;
-        currentMapBorderTile <<= 1;
-        currentMapBorderTile += 32;
-    }
+    // Expand to a full map tile
+    tempChar2 = currentMapBorderTile;
+    tempChar3 = tempChar2;
+    tempChar2 &= 0x07;
+    tempChar3 >>= 3;
+    tempChar2 <<= 1;
+    tempChar3 <<= 5;
+    currentMapBorderTile = tempChar2 + tempChar3;
 
 
     // Iterate over the map data and expand it into a full array. Each byte in the data we store actually holds
