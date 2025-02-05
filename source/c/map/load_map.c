@@ -56,7 +56,6 @@ void load_map() {
     tempChar3 <<= 5;
     currentMapBorderTile = tempChar2 + tempChar3;
 
-
     // Iterate over the map data and expand it into a full array. Each byte in the data we store actually holds
     // data for 2 tiles - one in the lower 5 bits, then a bitplane of the last 3 bytes, 6=<<5, 7=<<6, 8=<<7
 
