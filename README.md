@@ -1,4 +1,4 @@
-# NES Puzzle Maker rom sources
+# Retro Puzzle Maker rom sources
 
 This is the source for a puzzle NES game you can customize to make your own games! 
 
