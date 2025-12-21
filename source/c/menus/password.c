@@ -156,8 +156,6 @@ void do_password_input(void) {
                 sfx_play(SFX_MENU_BOP, SFX_CHANNEL_2);
                 if (passwordPosition > 0) { 
                     --passwordPosition; 
-                } else {
-                    timeToExit = 1;
                 }
             } else if (cursorPos == 34) {
                 test_password();
@@ -170,7 +168,11 @@ void do_password_input(void) {
 
         if (controllerState & PAD_B && !(lastControllerState & PAD_B)) {
             sfx_play(SFX_MENU_BOP, SFX_CHANNEL_2);
-            if (passwordPosition > 0) { --passwordPosition; }
+            if (passwordPosition > 0) { 
+                --passwordPosition; 
+            } else {
+                timeToExit = 1;
+            }
         }
 
         if (cursorPos == lastCursorPos) {
