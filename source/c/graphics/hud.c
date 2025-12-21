@@ -5,6 +5,7 @@
 #include "source/c/map/map.h"
 #include "source/c/menus/text_helpers.h"
 #include "source/c/globals.h"
+#include "source/c/menus/password.h"
 
 #pragma code-name ("PLAYER")
 #pragma rodata-name ("PLAYER")
@@ -35,7 +36,7 @@ void draw_hud() {
         for (i = 0; i < 6; ++i) {
             vram_put(' ' + 0x60);
         }
-    }
+    }    
 }
 
 // Draw a number to "screenBuffer". Isolated so we do the /10 and %10 in one spot.
@@ -100,7 +101,6 @@ void update_hud() {
                 break;
         }
 
-        // tempTileId = (tempTileIndex < 8) ? (tempTileIndex << 1) : (((tempTileIndex - 8) << 1) + 32);
         tempTileId = tempTileIndex;
         tempTileId2 = tempTileId;
         tempTileId &= 0x07;

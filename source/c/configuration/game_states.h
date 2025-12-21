@@ -8,4 +8,5 @@
 #define GAME_STATE_LOAD_LEVEL_1     26 // Secondary; available to do some trickery in main.c around music playing
 #define GAME_STATE_RUNNING          50
 #define GAME_STATE_PAUSED           100
+#define GAME_STATE_PASSWORD_INPUT   150
 #define GAME_STATE_CREDITS          250

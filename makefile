@@ -1,6 +1,6 @@
 # This wraps create-nes-game for purposes of releasing to s3. 
 # You can probably ignore it
-VERSION=v6-1
+VERSION=v7-0
 
 build: build-full
 

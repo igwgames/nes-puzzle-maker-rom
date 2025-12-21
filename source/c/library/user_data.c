@@ -21,7 +21,8 @@ unsigned char disableStatsScreen;
 unsigned char animateBlockMovement;
 unsigned char customSongShowTimes[16];
 
-unsigned char userDataBuffer[16];
+unsigned char userDataBuffer[28];
+unsigned char enablePassword;
 
 
 // Stuff from patchable_data.asm
@@ -53,6 +54,7 @@ extern const unsigned char user_animateBlockMovement;
 extern const unsigned char user_hudData[];
 extern const unsigned char user_hudDataAttrs[];
 extern const unsigned char user_customSongShowTimes[];
+extern const unsigned char user_enablePassword;
 
 
 
@@ -70,6 +72,7 @@ void load_user_data(void) {
     showGoal = user_showGoal;
     animateBlockMovement = user_animateBlockMovement;
     disableStatsScreen = user_disableStatsScreen;
+    enablePassword = user_enablePassword;
 
     memcpy(&tileCollisionTypes[0], &user_tileCollisionTypes[0], NUMBER_OF_TILES);
     memcpy(&tilePalettes[0], &user_tilePalettes[0], NUMBER_OF_TILES);

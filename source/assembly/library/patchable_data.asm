@@ -387,6 +387,11 @@ _user_animateBlockMovement:
     .byte 1
 .export _user_animateBlockMovement
 
+_user_enablePassword:
+    .byte 1
+.export _user_enablePassword
+
+
 _user_hudData:
     .byte $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80
     .byte $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80, $80 

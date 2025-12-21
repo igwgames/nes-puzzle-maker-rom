@@ -5,6 +5,8 @@
 #include "source/c/configuration/game_states.h"
 #include "source/c/menus/text_helpers.h"
 #include "source/c/menus/input_helpers.h"
+#include "source/c/menus/password.h"
+#include "source/c/library/user_data.h"
 
 #pragma code-name ("MENUS")
 #pragma rodata-name ("MENUS")
@@ -22,6 +24,13 @@ void draw_pause_screen() {
 
     put_str(NTADR_B(12, 16), "Continue");
     put_str(NTADR_B(12, 18), "Restart");
+
+    if (enablePassword) {
+        put_str(NTADR_B(8, 24), "Password: ");
+        for (i = 0; i != 5; ++i) {
+            vram_put(currentPassword[i] + 0x60);
+        }
+    }
 
     // We purposely leave sprites off, so they do not clutter the view. 
     // This means all menu drawing must be done with background tiles - if you want to use sprites (eg for a menu item),

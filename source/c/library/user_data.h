@@ -19,7 +19,8 @@ extern unsigned char showGameTitle;
 extern unsigned char disableStatsScreen;
 extern unsigned char customSongShowTimes[16];
 
-extern unsigned char userDataBuffer[16];
+extern unsigned char userDataBuffer[28];
+extern unsigned char enablePassword;
 
 // These ones are only in the bank, not copied. Make sure to swap to the USER_DATA bank!
 extern const unsigned char user_gameLevelData[4096];

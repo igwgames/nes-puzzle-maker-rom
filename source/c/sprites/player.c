@@ -28,8 +28,8 @@ ZEROPAGE_DEF(signed char, animationPositionY);
 
 
 // Lots of data to handle tracking player movements, so we can let them undo them
-// NOTE: Each undo requires 9 bytes, so 50 = 450 bytes. It's kind of a lot...
-#define NUMBER_OF_UNDOS 50u
+// NOTE: Each undo requires 9 bytes, so 45 = 405 bytes. It's kind of a lot...
+#define NUMBER_OF_UNDOS 45u
 ZEROPAGE_DEF(unsigned char, undoPosition);
 unsigned char undoPlayerFromPositionsX[NUMBER_OF_UNDOS];
 unsigned char undoPlayerFromPositionsY[NUMBER_OF_UNDOS];

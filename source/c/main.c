@@ -21,6 +21,7 @@ This has the main loop for the game, which is then used to call out to other cod
 #include "source/c/menus/input_helpers.h"
 #include "graphics/splash.h"
 #include "source/c/library/music.h"
+#include "source/c/menus/password.h"
 
 extern void load_graphics(void);
 
@@ -96,7 +97,23 @@ void main() {
                 break;
             case GAME_STATE_TITLE_INPUT:
                 unrom_set_prg_bank(BANK_MENUS);
-                wait_for_start();
+                while (1) {
+                    lastControllerState = controllerState;
+                    controllerState = pad_poll(0);
+
+                    // If Start is pressed now, and was not pressed before...
+                    if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+                        break;
+                    }
+                    if (enablePassword && controllerState & PAD_SELECT && !(lastControllerState & PAD_SELECT)) {
+                        gameState = GAME_STATE_PASSWORD_INPUT;
+                        goto endcycle;
+                    }
+
+                    ppu_wait_nmi();
+
+                }
+
                 gameState = GAME_STATE_POST_TITLE;
                 break;
             case GAME_STATE_POST_TITLE:
@@ -134,12 +151,12 @@ void main() {
                 }
 
                 load_map();
+                write_state_to_password();
 
                 ppu_off();
                 unrom_set_prg_bank(BANK_PLAYER);
                 draw_current_map_to_a_inline();
                 ppu_on_all();
-                //unrom_set_prg_bank(BANK_PLAYER);
                 init_map();
 
                 // Aim the player down to start
@@ -170,7 +187,6 @@ void main() {
             case GAME_STATE_RUNNING:
                 unrom_set_prg_bank(BANK_PLAYER);
                 update_hud();
-                // unrom_set_prg_bank(BANK_PLAYER);
                 handle_player_movement();
                 update_player_sprite();
                 break;
@@ -200,6 +216,18 @@ void main() {
                 fade_in();
 
                 break;
+            case GAME_STATE_PASSWORD_INPUT:
+                fade_out();
+                draw_password_screen();
+                fade_in();
+                do_password_input();
+                gameState = GAME_STATE_LOAD_LEVEL;
+                unrom_set_prg_bank(BANK_SOUND);
+                for (j = 0; j < currentLevelId; ++j) {
+                    playSongForEvent(MUSIC_TIME_ON_LEVEL + j);
+                }
+
+                break;
             case GAME_STATE_CREDITS:
             
                 unrom_set_prg_bank(BANK_SOUND);
@@ -222,6 +250,7 @@ void main() {
                 break;
                 
         }
+        endcycle:
         ppu_wait_nmi();
         
     }
