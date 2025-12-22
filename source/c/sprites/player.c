@@ -953,37 +953,37 @@ void handle_player_movement() {
     // Track whether we should actually try to move, then animate the sprite to its new position.
     playerDidMove = 0;
     if (playerGridPositionX > nextPlayerGridPositionX) {
+        sfx_play(SFX_STEP, SFX_CHANNEL_4);
         for (i = 0; i < 8; ++i) {
             animationPositionX = 0 - (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
     } else if (playerGridPositionX < nextPlayerGridPositionX) {
+        sfx_play(SFX_STEP, SFX_CHANNEL_4);
         for (i = 0; i < 8; ++i) {
             animationPositionX = (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
     }
 
     if (playerGridPositionY > nextPlayerGridPositionY) {
+        sfx_play(SFX_STEP, SFX_CHANNEL_4);
         for (i = 0; i < 8; ++i) {
             animationPositionY = 0 - (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
 
     } else if (playerGridPositionY < nextPlayerGridPositionY) {
+        sfx_play(SFX_STEP, SFX_CHANNEL_4);
         for (i = 0; i < 8; ++i) {
             animationPositionY = (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
