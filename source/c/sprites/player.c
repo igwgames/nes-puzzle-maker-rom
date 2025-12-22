@@ -896,7 +896,7 @@ void handle_player_movement() {
             update_single_tile(nextPlayerGridPositionX, nextPlayerGridPositionY, currentMap[rawTileId], tilePalettes[currentMap[rawTileId]]);
             run_dynamic_tile_update(UPDATE_TILE_TRIGGER_END);
             update_hud();
-            sfx_play(SFX_HEART, SFX_CHANNEL_1);
+            sfx_play(SFX_HEART, SFX_CHANNEL_2);
             break;
         case TILE_COLLISION_COLLAPSIBLE:
             // Figure out where a hole is
