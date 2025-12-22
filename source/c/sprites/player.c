@@ -956,7 +956,7 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionX = 0 - (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_3);
+            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
@@ -964,7 +964,7 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionX = (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_3);
+            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
@@ -974,7 +974,7 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionY = 0 - (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_3);
+            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
@@ -983,7 +983,7 @@ void handle_player_movement() {
         for (i = 0; i < 8; ++i) {
             animationPositionY = (i<<1);
             update_player_sprite();
-            sfx_play(SFX_STEP, SFX_CHANNEL_3);
+            sfx_play(SFX_STEP, SFX_CHANNEL_4);
             delay(movementSpeed);
         }
         playerDidMove = 1;
