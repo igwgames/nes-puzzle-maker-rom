@@ -28,6 +28,9 @@
 #define SFX_CRATE_SMASH 6
 #define SFX_CRATE_MOVE 7
 #define SFX_SWITCH_HIT 8
+#define SFX_UNLOCK_DOOR 9
+#define SFX_COLLAPSE_TILE 10
+#define SFX_STEP 11
 
 // Constants for sfx channels. Completely unnecessary but it's easier to read
 #define SFX_CHANNEL_1 0

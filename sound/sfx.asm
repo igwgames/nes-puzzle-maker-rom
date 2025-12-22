@@ -13,6 +13,9 @@ sounds:
 	.word @sfx_ntsc_6
 	.word @sfx_ntsc_7
 	.word @sfx_ntsc_8
+	.word @sfx_ntsc_9
+	.word @sfx_ntsc_10
+	.word @sfx_ntsc_11
 @pal:
 	.word @sfx_pal_0
 	.word @sfx_pal_1
@@ -23,6 +26,9 @@ sounds:
 	.word @sfx_pal_6
 	.word @sfx_pal_7
 	.word @sfx_pal_8
+	.word @sfx_pal_9
+	.word @sfx_pal_10
+	.word @sfx_pal_11
 
 @sfx_ntsc_0:
 	.byte $83,$3b,$84,$d2,$85,$00,$01,$83,$39,$84,$f8,$01,$83,$35,$84,$08
@@ -85,4 +91,20 @@ sounds:
 	.byte $00
 @sfx_pal_8:
 	.byte $89,$3e,$8a,$0c,$01,$89,$3d,$01,$89,$3b,$8a,$08,$01,$8a,$09,$01
+	.byte $00
+@sfx_ntsc_9:
+	.byte $89,$3d,$8a,$8f,$01,$89,$3c,$8a,$0f,$01,$89,$3a,$01,$89,$36,$01
+	.byte $89,$33,$01,$89,$32,$01,$00
+@sfx_pal_9:
+	.byte $89,$3d,$8a,$8f,$01,$89,$3c,$8a,$0f,$01,$89,$3a,$01,$89,$36,$01
+	.byte $89,$33,$01,$89,$32,$01,$00
+@sfx_ntsc_10:
+	.byte $89,$3d,$8a,$8f,$01,$89,$3c,$8a,$0f,$01,$89,$3a,$01,$89,$36,$01
+	.byte $89,$33,$01,$89,$32,$01,$00
+@sfx_pal_10:
+	.byte $89,$3d,$8a,$8f,$01,$89,$3c,$8a,$0f,$01,$89,$3a,$01,$89,$36,$01
+	.byte $89,$33,$01,$89,$32,$01,$00
+@sfx_ntsc_11:
+	.byte $00
+@sfx_pal_11:
 	.byte $00
