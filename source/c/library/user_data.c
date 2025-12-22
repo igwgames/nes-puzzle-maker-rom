@@ -20,6 +20,7 @@ unsigned char showGoal;
 unsigned char disableStatsScreen;
 unsigned char animateBlockMovement;
 unsigned char customSongShowTimes[16];
+unsigned char customSongIds[16];
 
 unsigned char userDataBuffer[28];
 unsigned char enablePassword;
@@ -54,6 +55,7 @@ extern const unsigned char user_animateBlockMovement;
 extern const unsigned char user_hudData[];
 extern const unsigned char user_hudDataAttrs[];
 extern const unsigned char user_customSongShowTimes[];
+extern const unsigned char user_customSongIds[];
 extern const unsigned char user_enablePassword;
 
 
@@ -79,6 +81,8 @@ void load_user_data(void) {
     memcpy(&gamePaletteData[0], &user_gamePaletteData[0], 16);
     memcpy(&spritePalette[0], &user_spritePalette[0], 4);
     memcpy(&customSongShowTimes[0], &user_customSongShowTimes[0], 16);
+    memcpy(&customSongIds[0], &user_customSongIds[0], 16);
+    
 }
 
 #pragma code-name ("CODE")

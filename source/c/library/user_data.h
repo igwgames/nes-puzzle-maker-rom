@@ -18,6 +18,7 @@ extern unsigned char animateBlockMovement;
 extern unsigned char showGameTitle;
 extern unsigned char disableStatsScreen;
 extern unsigned char customSongShowTimes[16];
+extern unsigned char customSongIds[16];
 
 extern unsigned char userDataBuffer[28];
 extern unsigned char enablePassword;

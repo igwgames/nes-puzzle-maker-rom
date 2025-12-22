@@ -416,6 +416,10 @@ _user_customSongShowTimes:
     .byte 101, 0, 102, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff
 .export _user_customSongShowTimes
 
+_user_customSongIds:
+    .byte $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0a, $0b, $0c, $0d, $0e, $0f
+.export _user_customSongIds
+
 .segment "STATIC_SC"
 
 _user_staticScreenTypes:

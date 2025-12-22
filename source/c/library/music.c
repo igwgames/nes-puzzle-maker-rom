@@ -6,7 +6,7 @@
 void playSongForEvent(unsigned char event) {
     for (i = 0; i < 16; ++i) {
         if (customSongShowTimes[i] == event) {
-            music_play(i);
+            music_play(customSongIds[i]);
         }
     }
 }
